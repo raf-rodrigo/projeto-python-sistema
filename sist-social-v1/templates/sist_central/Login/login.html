@@ -1,0 +1,186 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLIÈGE - Login</title>
+
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/font-awesome/css/font-awesome.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/animate.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet"/>
+    <link href="{% static 'assets/img/favicon.ico' %}" rel="icon" type="image/x-icon">
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/login.css' %}" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .swal-footer {
+            display: flex;
+            justify-content: center;
+        }
+
+        .swal-button--confirm {
+            margin-right: 10px;
+        }
+
+        {% if img_background_url %}
+        .corpo {
+            background-image: url('{{ img_background_url }}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+        {% endif %}
+    </style>
+</head>
+
+<body>
+<div class="outer-wrapper corpo">
+    <div class="inner-wrapper">
+        <form method="post" id="formLogin" action="{% url 'login' %}">
+            {% csrf_token %}    
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-4 col-sm-offset-4 bg-form">
+                        <div class="text-center margin-img">
+                            <img src="{% if img_login_url %}{{ img_login_url }}{% else %}{% static 'assets/img/inicio/imagem-login.png' %}{% endif %}"
+                                alt="Imagem da Tela de Login"
+                                class="img-responsive center-block">
+                        </div>
+
+                        <div id="blocoLogin">
+
+                            {% if msgAviso %}
+                                <div class="alert alert-warning">
+                                    {{ msgAviso|safe }}
+                                </div>
+                            {% endif %}
+
+                            {% if msgErros %}
+                                <div class="alert alert-danger">
+                                    {{ msgErros|safe }}
+                                </div>
+                            {% endif %}
+
+                            <div class="form-group">
+                                <input type="text"
+                                    class="form-control"
+                                    placeholder="Usuário"
+                                    id="usuario"
+                                    name="usuario"
+                                    value="{{ usuario_digitado|default:'' }}"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="password"
+                                    class="form-control"
+                                    id="senha"
+                                    name="senha"
+                                    placeholder="Senha"
+                                    value="{{ senha_digitada|default:'' }}"
+                                    required>
+                            </div>
+
+                            {% if mostrar_unidades %}
+                                <div style="text-align: center; margin-bottom: 15px;" class="form-group" id="divUnidades">
+                                    <h3 style="color: red; font-size: 16px; margin-bottom: 10px;">Selecione a unidade de atendimento</h3>
+                                    <select style="width: 100%; border: 2px solid red;"
+                                            id="selUnidade"
+                                            class="form-control"
+                                            name="selUnidade"
+                                            required>
+                                        <option value="">-- Selecione a Unidade --</option>
+                                        {% for unidade in unidades %}
+                                            <option value="{{ unidade.id }}">{{ unidade.nome_conhecido|default:unidade.razao_social }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <input type="hidden" id="unidade" name="unidade">
+                            {% endif %}
+
+                            {% if renderiza_login_sistsocial == 1 %}
+                                <button type="submit"
+                                        class="col-sm-12 col-xs-12 btn conecta text-white"
+                                        id="conecta">
+                                    Conectar
+                                </button>
+                            {% endif %}
+
+                            {% if renderiza_sso == 1 %}
+                                <div class="btn-group-vertical" style="width: 100%; margin-top:2px">
+                                    <button class="btn btn-primary btn-block vision"
+                                            type="button"
+                                            id="aouth"
+                                            title="Logar com Vision">
+                                        Logar com Vision
+                                    </button>
+                                </div>
+                            {% endif %}
+
+                            {% if renderiza_sso_betha == 1 %}
+                                <div class="btn-group-vertical" style="width: 100%; margin-top:2px">
+                                    <button class="btn btn-primary btn-block vision"
+                                            type="button"
+                                            id="aouthBetha"
+                                            title="Logar com Betha Sistemas">
+                                        <span style="font-weight: 600; font-size:14px; padding-right:3px;">
+                                            <i>B</i>
+                                        </span>
+                                        <span style="font-size:10px;">ACESSAR COM BETHA SISTEMAS</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+
+                            {% if renderiza_recupera_senha == 1 %}
+                                <div class="links mt-2 row text-center">
+                                    <a href="#"
+                                    class="col-sm-12 offset-sm-3 text-dark btn">
+                                        Recuperar senha?
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid footer col-sm-12">
+                    <div class="rodape">
+                        <small>
+                            Copyright & Copyleft &copy; All material in this platform is the property of the contributing authors and partners.
+                        </small>
+
+                        <div class="container-fluid">
+                            <div class="row footer-lliege">
+                                <small>
+                                    <i style="margin-right:10px;"> powered by</i><br>
+                                    &copy;2014 - {% now "Y" %}
+                                </small>
+
+                                <img src="{% if img_rodape_url %}{{ img_rodape_url }}{% else %}{% static 'assets/img/inicio/rodape-lliege.png' %}{% endif %}"
+                                    alt="Logo Lliege"
+                                    height="28"
+                                    style="margin-top:-25px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>  
+    </div>
+
+    <div class="loader hide" id="carregando">
+        <img src="{% static 'assets/img/pin_lliege.png' %}" width="70" class="pulse">
+    </div>
+</div>
+
+</body>
+</html>

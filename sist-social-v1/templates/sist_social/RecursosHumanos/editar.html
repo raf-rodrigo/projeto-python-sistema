@@ -1,0 +1,162 @@
+{% extends 'telaInicio.html' %}                                                                                                                                                        
+    {% load static %}                                                                                                                                                                      
+                                                                                                                                                                                           
+    {% block titulo %}Editar Funcionário - Plataforma SistSocial{% endblock %}                                                                                                             
+                                                                                                                                                                                           
+    {% block css %}                                                                                                                                                                        
+    <style>                                                                                                                                                                                
+        .card-form {                                                                                                                                                                       
+            border: none;                                                                                                                                                                  
+            border-radius: 16px;                                                                                                                                                           
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);                                                                                            
+        }                                                                                                                                                                                  
+        .unit-card {                                                                                                                                                                       
+            border: 1px solid #e5e7eb;                                                                                                                                                     
+            border-radius: 10px;                                                                                                                                                           
+            padding: 10px 15px;                                                                                                                                                            
+            cursor: pointer;                                                                                                                                                               
+            transition: all 0.2s ease;                                                                                                                                                     
+            background-color: #f9fafb;                                                                                                                                                     
+        }                                                                                                                                                                                  
+        .unit-card:hover {                                                                                                                                                                 
+            background-color: #f3f4f6;                                                                                                                                                     
+            border-color: #cbd5e1;                                                                                                                                                         
+        }                                                                                                                                                                                  
+        .unit-checkbox:checked + .unit-card {                                                                                                                                              
+            background-color: #eff6ff;                                                                                                                                                     
+            border-color: #3b82f6;                                                                                                                                                         
+            color: #1d4ed8;                                                                                                                                                                
+            box-shadow: 0 0 0 1px #3b82f6;                                                                                                                                                 
+        }                                                                                                                                                                                  
+    </style>                                                                                                                                                                               
+    {% endblock %}                                                                                                                                                                         
+                                                                                                                                                                                           
+    {% block titulo_pagina %}                                                                                                                                                              
+    <div class="d-flex justify-content-between align-items-center w-100">                                                                                                                  
+        <div>                                                                                                                                                                              
+            <h2 class="h3 mb-0 text-gray-800">Editar Cadastro do Recursos Humanos</h2>                                                                                                     
+        </div>                                                                                                                                                                             
+        <div>                                                                                                                                                                              
+            <a href="{% url 'list_recursos_humanos' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-3">                                                                           
+                <i class="fa fa-arrow-left me-2"></i>Voltar                                                                                                                                
+            </a>                                                                                                                                                                           
+        </div>                                                                                                                                                                             
+    </div>                                                                                                                                                                                 
+    {% endblock %}                                                                                                                                                                         
+                                                                                                                                                                                           
+    {% block htmlConteudo %}                                                                                                                                                               
+    <div class="container-fluid px-0" style="max-width: 900px; margin: 0 auto;">                                                                                                           
+                                                                                                                                                                                           
+        <!-- Mensagens de Erro de Validação -->                                                                                                                                            
+        {% if errors %}                                                                                                                                                                    
+            <div class="alert alert-danger rounded-3 shadow-sm mb-4" role="alert">                                                                                                         
+                <h5 class="alert-heading fw-bold"><i class="fa fa-exclamation-triangle me-2"></i>Erros no Formulário:</h5>                                                                 
+                <ul class="mb-0">                                                                                                                                                          
+                    {% for err in errors %}                                                                                                                                                
+                        <li>{{ err }}</li>                                                                                                                                                 
+                    {% endfor %}                                                                                                                                                           
+                </ul>                                                                                                                                                                      
+            </div>                                                                                                                                                                         
+        {% endif %}                                                                                                                                                                        
+                                                                                                                                                                                           
+        <!-- Card de Formulário -->                                                                                                                                                        
+        <div class="card card-form mb-4">                                                                                                                                                  
+            <div class="card-body p-4">                                                                                                                                                    
+                <form method="POST" action="{% url 'edit_recurso_humano' rh.id %}">                                                                                                        
+                    {% csrf_token %}                                                                                                                                                       
+                                                                                                                                                                                           
+                    <!-- Seção 1: Dados Pessoais -->                                                                                                                                       
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa fa-user me-2 text-primary"></i>Dados Pessoais</h5>                                                                     
+                    <div class="row g-3 mb-4">                                                                                                                                             
+                        <div class="col-md-8">                                                                                                                                             
+                            <label for="nome" class="form-label fw-semibold text-dark">Nome Completo *</label>                                                                             
+                            <input type="text" name="nome" id="nome" class="form-control rounded-3" value="{{ rh.nome|default:'' }}" required>                                             
+                        </div>                                                                                                                                                             
+                        <div class="col-md-4">                                                                                                                                             
+                            <label for="sexo" class="form-label fw-semibold text-dark">Sexo *</label>                                                                                      
+                            <select name="sexo" id="sexo" class="form-select rounded-3" required>                                                                                          
+                                <option value="Masc" {% if rh.sexo == "Masc" %}selected{% endif %}>Masculino</option>                                                                      
+                                <option value="Fem" {% if rh.sexo == "Fem" %}selected{% endif %}>Feminino</option>                                                                         
+                            </select>                                                                                                                                                      
+                        </div>                                                                                                                                                             
+                        <div class="col-md-4">                                                                                                                                             
+                            <label for="apelido" class="form-label fw-semibold text-dark">Nome Social / Apelido</label>                                                                    
+                            <input type="text" name="apelido" id="apelido" class="form-control rounded-3" value="{{ rh.apelido|default:'' }}">                                             
+                        </div>                                                                                                                                                             
+                        <div class="col-md-4">                                                                                                                                             
+                            <label for="cpf_num" class="form-label fw-semibold text-dark">CPF</label>                                                                                      
+                            <input type="text" name="cpf_num" id="cpf_num" class="form-control rounded-3" value="{{ rh.cpf_num|default:'' }}">                                             
+                        </div>                                                                                                                                                             
+                        <div class="col-md-4">                                                                                                                                             
+                            <label for="celular" class="form-label fw-semibold text-dark">Celular / Telefone</label>                                                                       
+                            <input type="text" name="celular" id="celular" class="form-control rounded-3" value="{{ rh.celular|default:'' }}">                                             
+                        </div>                                                                                                                                                             
+                        <div class="col-md-8">                                                                                                                                             
+                            <label for="email" class="form-label fw-semibold text-dark">E-mail Corporativo</label>                                                                         
+                            <input type="email" name="email" id="email" class="form-control rounded-3" value="{{ rh.email|default:'' }}">                                                  
+                        </div>                                                                                                                                                             
+                        <div class="col-md-4">                                                                                                                                             
+                            <label for="ativo" class="form-label fw-semibold text-dark">Status Cadastral</label>                                                                           
+                            <select name="ativo" id="ativo" class="form-select rounded-3">                                                                                                 
+                                <option value="1" {% if rh.ativo == 1 %}selected{% endif %}>Ativo</option>                                                                                 
+                                <option value="0" {% if rh.ativo == 0 %}selected{% endif %}>Inativo</option>                                                                               
+                            </select>                                                                                                                                                      
+                        </div>                                                                                                                                                             
+                    </div>                                                                                                                                                                 
+                                                                                                                                                                                           
+                    <!-- Se o funcionário possuir usuário de login vinculado, mostra um aviso -->                                                                                          
+                    {% if rh.memberID %}                                                                                                                                                   
+                        <div class="alert alert-info rounded-3 shadow-sm mb-4 small text-muted py-2.5">                                                                                    
+                            <i class="fa fa-info-circle me-1 text-primary"></i><strong>Usuário Vinculado:</strong>                                                                         
+                            Este funcionário possui a conta de login <span class="badge bg-light text-dark border font-monospace">{{ rh.memberID }}</span> associada. Alterações de Nome e 
+  E-mail serão atualizadas automaticamente na conta de usuário dele.                                                                                                                       
+                        </div>                                                                                                                                                             
+                    {% endif %}                                                                                                                                                            
+                                                                                                                                                                                           
+                    <hr class="text-secondary opacity-25 my-4">                                                                                                                            
+                                                                                                                                                                                           
+                    <!-- Seção 2: Local de Trabalho e Vínculos -->                                                                                                                         
+                    <h5 class="fw-bold text-dark mb-3"><i class="fa fa-building me-2 text-success"></i>Local de Trabalho e Vínculos</h5>                                                   
+                                                                                                                                                                                           
+                    <div class="mb-4 col-md-6">                                                                                                                                            
+                        <label for="onde_trab_social" class="form-label fw-semibold text-dark">Unidade de Trabalho Principal</label>                                                       
+                        <select name="onde_trab_social" id="onde_trab_social" class="form-select rounded-3">                                                                               
+                            <option value="">Selecione a unidade principal...</option>                                                                                                     
+                            {% for u in unidades %}                                                                                                                                        
+                                <option value="{{ u.id }}" {% if rh.onde_trab_social == u.id %}selected{% endif %}>                                                                        
+                                    {{ u.nome_conhecido }}                                                                                                                                 
+                                </option>                                                                                                                                                  
+                            {% endfor %}                                                                                                                                                   
+                        </select>                                                                                                                                                          
+                        <div class="form-text">Indica a unidade primária física onde o funcionário atua.</div>                                                                             
+                    </div>                                                                                                                                                                 
+                                                                                                                                                                                           
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark mb-2">Unidades Vinculadas (Acesso ao Sistema)</label>
+                        <div class="form-text mb-3">Marque todas as unidades que o funcionário poderá visualizar e operar no sistema.</div>
+
+                        <div class="row g-2">
+                            {% for u in unidades %}
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <input type="checkbox" name="unidades" value="{{ u.id }}" id="unit-{{ u.id }}" class="unit-checkbox d-none"
+                                           {% if u.id in selected_unidades %}checked{% endif %}>
+                                    <label for="unit-{{ u.id }}" class="unit-card d-flex align-items-center w-100">
+                                        <i class="fa fa-building me-2 opacity-50"></i>
+                                        <span class="small fw-medium">{{ u.nome_conhecido }}</span>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="mt-5 d-flex justify-content-end gap-2">
+                        <a href="{% url 'list_recursos_humanos' %}" class="btn btn-outline-secondary rounded-3 px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-3 px-4">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    {% endblock %}

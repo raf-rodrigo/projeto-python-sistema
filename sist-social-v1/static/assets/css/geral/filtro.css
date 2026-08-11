@@ -1,0 +1,40 @@
+.filtros-usados {
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding-top: 5px;
+    padding-left: 5px;
+    margin-bottom: 7px;
+}
+
+.filtros-usados span,
+.filtros-usados button {
+    margin-left: 5px;
+}
+
+.filtros-usados span {
+    padding: 6px;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.filtros-usados button {
+    margin-top: 5px;
+}
+
+.filtros-usados .row {
+    padding-left:15px;
+    padding-bottom:5px
+}
+
+.botoes-filtro {
+    padding-left:15px;
+}
+
+.btn-group {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}

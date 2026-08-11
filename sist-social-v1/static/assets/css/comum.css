@@ -1,0 +1,159 @@
+#modalCorpoSobre {
+    height: 300px;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+.tabs-container .nav-tabs>li.active>a,
+.tabs-container .nav-tabs>li.active>a:hover,
+.tabs-container .nav-tabs>li.active>a:focus {
+
+    background: #1ab394;
+    color: #fff;
+}
+
+.nav-tabs>li>a {
+
+    color: #808080;
+    background-color: #edecec;
+}
+
+.nav-tabs>li:not(.active)>a:hover {
+
+    color: rgba(0, 0, 0, 0.69);
+    background-color: #e0dfdf;
+}
+
+.radio-inline {
+    padding-left: 0px;
+}
+
+.inputObg {
+    color: red;
+}
+
+.atalhoAcoes:hover {
+    background-color: #1ab394;
+    color: white;
+}
+
+#btnDeletarLocal:hover {
+    background-color: #ed5565;
+    color: white;
+}
+
+.clockpicker-popover {
+    z-index: 999999 ! important;
+}
+
+/* Aumentando ainda mais o modal */
+.modal-xl {
+    max-width: 90%;
+    /* Defina o tamanho máximo que você deseja */
+    width: auto;
+    /* Permitir que o modal cresça até o tamanho máximo */
+}
+
+/* Para aumentar também a altura do modal */
+.modal-xl .modal-content {
+    height: 90%;
+    /* Defina a altura máxima desejada */
+    overflow-y: auto;
+    /* Adicionar rolagem vertical se necessário */
+}
+
+.btnDisabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Estilo para SweetAlert2 */
+.swal2-popup {
+    font-size: 1.4rem !important;
+    min-width: 43rem !important;
+}
+
+/*
+Adiciona um espaço entre os botoes que apararecem na barra de açõe so sweetalert
+Para aplica rm mais classes de botoes, adicina as mesmas abaixo.
+*/
+.swal2-actions-custom .swal2-confirm,
+.swal2-actions-custom .swal2-cancel {
+    margin: 0 2px;
+}
+
+.modal-footer .btn+.btn {
+    margin-left: 0 !important;
+    margin-bottom: 5px !important;
+}
+
+.swal2-container {
+    z-index: 20000 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search__field {
+    width: 100% !important;
+    /* Ajusta a largura do campo de pesquisa para 100% */
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 26px;
+    position: absolute;
+    top: 4px;
+    right: 15px;
+    width: 0px;
+}
+
+.select2 {
+    width: 100% !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 34px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 30px;
+}
+
+.select2-container--default .select2-selection--single {
+    border: 1px solid #e5e6e7;
+    border-radius: 2px;
+}
+
+/*  Para aumentar o tamanhao do modal*/
+.modal-dialog.modal-custom {
+    width: 80%;
+    /* Ajuste a largura conforme necessário */
+    max-width: 1200px;
+    /* Defina um valor máximo de largura se desejar */
+}
+
+.badge_cv {
+    border-radius: 0.25rem;
+    font-family: sans-serif;
+    font-size: small;
+}
+
+#fotoMunicipe {
+    display: none;
+    /* Esconde o input de arquivo */
+}
+
+.custom-file-upload {
+    cursor: pointer;
+    max-width: 200px;
+    max-height: 200px;
+    display: block;
+}
+
+.destaque-nome-social {
+    background-color: #f0f8ff;
+    border-left: 4px solid #ff00a2;
+    padding: 10px 5px;
+    border-radius: 4px;
+}
+
+.destaque-nome-social label {
+    margin-left: -7px;
+}

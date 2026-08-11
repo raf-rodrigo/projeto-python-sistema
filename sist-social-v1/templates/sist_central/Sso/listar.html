@@ -1,0 +1,183 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}SSO Integrations - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-sso {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .table-sso th {
+        background-color: #f9fafb;
+        color: #4b5563;
+        font-weight: 600;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .table-sso td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Integrações SSO (Single Sign-On)</h2>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    <!-- Mensagens do Servidor -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Card Principal -->
+    <div class="card card-sso mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-sso mb-0">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3" style="width: 80px;">ID</th>
+                            <th class="py-3" style="width: 150px;">Plataforma</th>
+                            <th class="py-3">Client ID</th>
+                            <th class="py-3">Callback URL</th>
+                            <th class="py-3">API URL</th>
+                            <th class="py-3 text-center" style="width: 120px;">Status</th>
+                            <th class="px-4 py-3 text-end" style="width: 150px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in sso_list %}
+                        <tr id="sso-row-{{ s.id }}">
+                            <td class="px-4 fw-semibold text-muted">{{ s.id }}</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 fs-6 rounded-3">
+                                    <i class="fa fa-key me-1"></i>{{ s.plataforma }}
+                                </span>
+                            </td>
+                            <td><span class="font-monospace text-secondary">{{ s.client_id }}</span></td>
+                            <td><span class="font-monospace text-secondary small">{{ s.callback }}</span></td>
+                            <td><span class="font-monospace text-secondary small">{{ s.api_url }}</span></td>
+                            <td class="text-center">
+                                {% if s.ativo == 1 %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill" id="status-badge-{{ s.id }}">Ativo</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 rounded-pill" id="status-badge-{{ s.id }}">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 text-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Editar -->
+                                    <a href="{% url 'edit_sso' s.id %}" class="btn btn-outline-secondary" title="Editar Credenciais">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <!-- Toggle Status -->
+                                    <button type="button" class="btn btn-outline-danger btn-toggle-status" data-id="{{ s.id }}" data-plataforma="{{ s.plataforma }}" data-status="{{ s.ativo }}" title="Ativar/Inativar">
+                                        <i class="fa fa-power-off"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fa fa-key fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Nenhuma plataforma SSO integrada.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        // Alternar Status SSO via AJAX e SweetAlert
+        document.querySelectorAll(".btn-toggle-status").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const ssoId = this.getAttribute("data-id");
+                const plataforma = this.getAttribute("data-plataforma");
+                const currentStatus = this.getAttribute("data-status");
+                
+                const actionText = currentStatus == '1' ? 'inativar' : 'ativar';
+                const confirmButtonColor = currentStatus == '1' ? '#dc3545' : '#198754';
+                
+                Swal.fire({
+                    title: `Deseja ${actionText} o SSO?`,
+                    text: `Tem certeza que deseja alterar o status de acesso SSO da plataforma '${plataforma}'?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, alterar!',
+                    cancelButtonText: 'Não, cancelar',
+                    confirmButtonColor: confirmButtonColor,
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/sso/status/${ssoId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Sucesso!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                
+                                // Atualizar Badge e Atributos na Tela
+                                const badge = document.getElementById(`status-badge-${ssoId}`);
+                                if (data.ativo == 1) {
+                                    badge.className = "badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill";
+                                    badge.innerText = "Ativo";
+                                    this.setAttribute("data-status", "1");
+                                } else {
+                                    badge.className = "badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 rounded-pill";
+                                    badge.innerText = "Inativo";
+                                    this.setAttribute("data-status", "0");
+                                }
+                            } else {
+                                Swal.fire('Erro!', data.message || 'Falha ao tentar mudar o status.', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire('Erro!', 'Falha de rede ou servidor.', 'error');
+                        });
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+{% endblock %}

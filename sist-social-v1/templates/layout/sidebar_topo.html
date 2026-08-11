@@ -1,0 +1,47 @@
+<nav class="navbar navbar-expand navbar-light bg-white border-bottom px-3 py-2 shadow-sm align-items-center" style="height: 60px;">
+    <!-- Botão de Toggle Menu (verde/azul-turquesa idêntico à imagem) -->
+    <button id="btnToggleMenu" class="btn text-white rounded-3 d-flex align-items-center justify-content-center" style="background-color: #1abc9c; border: none; width: 38px; height: 38px;">
+        <i class="fa fa-bars fs-5"></i>
+    </button>
+    
+    <!-- Lado Direito: Unidade, Notificações, Perfil, etc. -->
+    <div class="ms-auto d-flex align-items-center gap-3">
+        {% if request.session.unidadeLogada and request.session.unidadeLogada != 'Nenhuma' %}
+            <span class="badge bg-light text-secondary border px-3 py-2 d-none d-md-inline-block" style="font-size: 13px;">
+                🏢 {{ request.session.unidadeLogada }}
+            </span>
+        {% endif %}
+
+        <!-- Ícones: Logout, User, Bell, Cog -->
+        <a href="{% url 'logout' %}" class="text-secondary fs-5 px-1 hover-opacity" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
+        <a href="#" class="text-secondary fs-5 px-1 hover-opacity" title="Perfil"><i class="fa-solid fa-user"></i></a>
+        
+        <!-- Bell com badge de notificações -->
+        <div class="position-relative px-1">
+            <a href="#" class="text-secondary fs-5 hover-opacity" title="Notificações"><i class="fa-solid fa-bell"></i></a>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style="font-size: 9px; padding: 2px 4px; margin-top: -2px; margin-left: -4px;">36</span>
+        </div>
+        
+        <a href="#" class="text-secondary fs-5 px-1 hover-opacity" title="Configurações"><i class="fa-solid fa-cog"></i></a>
+        
+        <!-- Separador Visual -->
+        <div class="vr mx-1 text-secondary opacity-25" style="height: 24px;"></div>
+
+        <!-- Avatar com Iniciais do Usuário (RD) -->
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold me-2 shadow-sm" 
+                 style="width: 38px; height: 38px; background-color: #1a5276; font-size: 13px; letter-spacing: 0.5px;">
+                {{ request.session.nomeUsuarioIniciais|default:"U" }}
+            </div>
+            <span class="fw-semibold text-primary d-none d-sm-inline" style="font-size: 14px; color: #2980b9 !important;">
+                {{ request.session.nomeUsuario|default:"Usuário" }}
+            </span>
+        </div>
+    </div>
+</nav>
+
+<style>
+    .hover-opacity:hover {
+        opacity: 0.8;
+    }
+</style>

@@ -1,0 +1,387 @@
+{% extends 'telaInicio.html' %}
+
+{% block titulo %}Envio de Imagens - Administração{% endblock %}
+
+{% block css %}
+<!-- SweetAlert2 CSS for Premium Alerts -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+    .image-admin-container {
+        font-family: 'Outfit', 'Inter', sans-serif;
+    }
+
+    .image-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+
+    .image-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    }
+
+    .image-card .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .image-card .card-title {
+        font-weight: 600;
+        font-size: 1.05rem;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .image-card .card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 280px;
+    }
+
+    .preview-box {
+        width: 100%;
+        height: 120px;
+        border: 2px dashed #e5e7eb;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        background-color: #f9fafb;
+        margin-bottom: 1.25rem;
+        position: relative;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+
+    .preview-box:hover {
+        border-color: #3b82f6;
+    }
+
+    .preview-box img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .preview-placeholder {
+        text-align: center;
+        color: #9ca3af;
+        font-size: 0.85rem;
+    }
+
+    .preview-placeholder i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Hide standard file input */
+    .file-input {
+        display: none;
+    }
+
+    .progress-height {
+        height: 6px !important;
+    }
+
+    .loading-spinner {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        top: 0;
+        left: 0;
+        justify-content: center;
+        align-items: center;
+        z-index: 5;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Parametrização de Imagens</h2>
+        <p class="text-muted mb-0 small">Envie logotipos, fundos e ícones personalizados para a plataforma</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="image-admin-container container-fluid px-0">
+
+    <div class="row g-3">
+        {% for card in cards %}
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div class="card image-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title text-truncate" title="{{ card.title }}">{{ card.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3" style="min-height: 40px;">{{ card.desc }}</p>
+                    
+                    <form class="upload-form" data-tipo="{{ card.tipo }}" data-input="{{ card.id_input }}">
+                        {% csrf_token %}
+                        <input type="file" 
+                               id="{{ card.id_input }}" 
+                               name="{{ card.id_input }}" 
+                               class="file-input" 
+                               accept="image/png, image/jpeg, image/jpg" 
+                               data-tipo="{{ card.tipo }}">
+                        
+                        <!-- Preview Box clickable to trigger input -->
+                        <div class="preview-box" onclick="document.getElementById('{{ card.id_input }}').click()">
+                            <div class="loading-spinner" id="spinner_{{ card.tipo }}">
+                                <div class="spinner-border text-primary" role="status"></div>
+                            </div>
+                            
+                            <img id="preview_img_{{ card.tipo }}" 
+                                 src="{% if card.thumb_url %}{{ card.thumb_url }}{% else %}/static/assets/img/pin_lliege.png{% endif %}" 
+                                 alt="Preview"
+                                 class="{% if not card.thumb_url %}opacity-25{% endif %}">
+                        </div>
+
+                        <!-- Progress Bar Container -->
+                        <div class="progress progress-height mb-3 d-none" id="progress_container_{{ card.tipo }}">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 id="progress_bar_{{ card.tipo }}"
+                                 role="progressbar" 
+                                 aria-valuenow="0" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100" 
+                                 style="width: 0%"></div>
+                        </div>
+
+                        <!-- Buttons actions -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" 
+                                    id="btn_send_{{ card.tipo }}" 
+                                    disabled 
+                                    class="btn btn-sm btn-outline-primary py-2 btn-send">
+                                Aguardando arquivo...
+                            </button>
+                            <button type="button" 
+                                    id="btn_cancel_{{ card.tipo }}" 
+                                    style="display: none;" 
+                                    class="btn btn-sm btn-outline-danger py-1 btn-cancel" 
+                                    data-tipo="{{ card.tipo }}">
+                                Descartar Alteração
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const originalSources = {};
+
+        // 1. Handle file selection
+        document.querySelectorAll(".file-input").forEach(input => {
+            input.addEventListener("change", function () {
+                const tipo = this.getAttribute("data-tipo");
+                const file = this.files[0];
+                const previewImg = document.getElementById(`preview_img_${tipo}`);
+                const btnSend = document.getElementById(`btn_send_${tipo}`);
+                const btnCancel = document.getElementById(`btn_cancel_${tipo}`);
+
+                if (file) {
+                    // Validate file type
+                    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+                    if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                            title: "Formato Inválido",
+                            text: "Por favor, selecione apenas imagens no formato PNG, JPG ou JPEG.",
+                            icon: "warning"
+                        });
+                        this.value = "";
+                        return;
+                    }
+
+                    // Store original source for cancellation
+                    if (!originalSources[tipo]) {
+                        originalSources[tipo] = previewImg.src;
+                    }
+
+                    // Apply local preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        previewImg.classList.remove("opacity-25");
+                        
+                        btnSend.disabled = false;
+                        btnSend.innerText = "Enviar Imagem";
+                        btnSend.classList.replace("btn-outline-primary", "btn-success");
+                        btnSend.classList.add("text-white");
+                        
+                        btnCancel.style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        // 2. Handle Cancel/Discard button
+        document.querySelectorAll(".btn-cancel").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const tipo = this.getAttribute("data-tipo");
+                const inputId = this.closest(".card-body").querySelector(".file-input").id;
+                const fileInput = document.getElementById(inputId);
+                const previewImg = document.getElementById(`preview_img_${tipo}`);
+                const btnSend = document.getElementById(`btn_send_${tipo}`);
+
+                // Restore original source
+                if (originalSources[tipo]) {
+                    previewImg.src = originalSources[tipo];
+                    if (originalSources[tipo].includes("pin_lliege.png")) {
+                        previewImg.classList.add("opacity-25");
+                    }
+                }
+
+                // Reset inputs and buttons
+                fileInput.value = "";
+                btnSend.disabled = true;
+                btnSend.innerText = "Aguardando arquivo...";
+                btnSend.classList.replace("btn-success", "btn-outline-primary");
+                btnSend.classList.remove("text-white");
+                
+                this.style.display = "none";
+            });
+        });
+
+        // 3. Handle Form Submissions via AJAX
+        document.querySelectorAll(".upload-form").forEach(form => {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const tipo = this.getAttribute("data-tipo");
+                const inputId = this.getAttribute("data-input");
+                const fileInput = document.getElementById(inputId);
+                const file = fileInput.files[0];
+
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('tipo', tipo);
+                formData.append(inputId, file);
+                formData.append('csrfmiddlewaretoken', this.querySelector("[name=csrfmiddlewaretoken]").value);
+
+                const btnSend = document.getElementById(`btn_send_${tipo}`);
+                const btnCancel = document.getElementById(`btn_cancel_${tipo}`);
+                const spinner = document.getElementById(`spinner_${tipo}`);
+                const progressContainer = document.getElementById(`progress_container_${tipo}`);
+                const progressBar = document.getElementById(`progress_bar_${tipo}`);
+
+                // UI adjustments during upload
+                btnSend.disabled = true;
+                btnSend.innerText = "Enviando...";
+                btnCancel.style.display = "none";
+                spinner.style.display = "flex";
+                progressContainer.classList.remove("d-none");
+
+                // Execute custom AJAX request with progress tracking
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/imagens/upload/", true);
+
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        const percent = Math.round((evt.loaded / evt.total) * 100);
+                        progressBar.style.width = percent + "%";
+                        progressBar.setAttribute("aria-valuenow", percent);
+                    }
+                });
+
+                xhr.onload = function () {
+                    spinner.style.display = "none";
+                    progressContainer.classList.add("d-none");
+                    progressBar.style.width = "0%";
+
+                    if (xhr.status === 200) {
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.success) {
+                                Swal.fire({
+                                    title: "Sucesso!",
+                                    text: "A imagem foi configurada com sucesso.",
+                                    icon: "success"
+                                });
+
+                                // Update saved source to the new thumbnail path
+                                const previewImg = document.getElementById(`preview_img_${tipo}`);
+                                previewImg.src = res.thumb_url || res.url;
+                                originalSources[tipo] = res.thumb_url || res.url;
+
+                                // Reset button states
+                                fileInput.value = "";
+                                btnSend.innerText = "Aguardando arquivo...";
+                                btnSend.classList.replace("btn-success", "btn-outline-primary");
+                                btnSend.classList.remove("text-white");
+                            } else {
+                                Swal.fire({
+                                    title: "Aviso",
+                                    text: res.message || "Erro desconhecido ao enviar imagem.",
+                                    icon: "warning"
+                                });
+                                btnSend.disabled = false;
+                                btnSend.innerText = "Enviar Imagem";
+                                btnCancel.style.display = "block";
+                            }
+                        } catch (err) {
+                            Swal.fire({
+                                title: "Erro",
+                                text: "Resposta inválida do servidor.",
+                                icon: "error"
+                            });
+                            btnSend.disabled = false;
+                            btnSend.innerText = "Enviar Imagem";
+                            btnCancel.style.display = "block";
+                        }
+                    } else {
+                        Swal.fire({
+                            title: "Erro",
+                            text: "Ocorreu um erro no servidor durante o upload.",
+                            icon: "error"
+                        });
+                        btnSend.disabled = false;
+                        btnSend.innerText = "Enviar Imagem";
+                        btnCancel.style.display = "block";
+                    }
+                };
+
+                xhr.onerror = function () {
+                    spinner.style.display = "none";
+                    progressContainer.classList.add("d-none");
+                    Swal.fire({
+                        title: "Erro de Conexão",
+                        text: "Não foi possível conectar ao servidor.",
+                        icon: "error"
+                    });
+                    btnSend.disabled = false;
+                    btnSend.innerText = "Enviar Imagem";
+                    btnCancel.style.display = "block";
+                };
+
+                xhr.send(formData);
+            });
+        });
+    });
+</script>
+{% endblock %}

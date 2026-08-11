@@ -1,0 +1,70 @@
+<aside id="menuLateral" class="menu-lateral bg-dark text-white min-vh-100">
+    <div class="p-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/dashboard/">
+                    <span class="menu-icone"><i class="fa fa-chart-line"></i></span>
+                    <span class="menu-texto">Dashboard Principal</span>
+                </a>
+            </li>
+            <hr class="text-secondary opacity-25 my-2 menu-texto">
+            {% for item in menu_lateral %}
+                <li class="nav-item">
+
+                    {% if item.children %}
+                        <a class="nav-link text-white d-flex justify-content-between align-items-center menu-collapse-toggle"
+                        data-bs-toggle="collapse"
+                        href="#menu-{{ item.id }}"
+                        role="button"
+                        aria-expanded="false">
+
+                            <span>
+                                {% if item.icone %}
+                                    <span class="menu-icone">
+                                        {% if 'fa-' in item.icone or 'fa ' in item.icone %}
+                                            <i class="fa {{ item.icone }}"></i>
+                                        {% else %}
+                                            {{ item.icone }}
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                                <span class="menu-texto">{{ item.nome }}</span>
+                            </span>
+
+                            <span class="menu-texto">▾</span>
+                        </a>
+
+                        <div class="collapse" id="menu-{{ item.id }}">
+                            <ul class="nav flex-column ms-3">
+                                {% for filho in item.children %}
+                                    <li class="nav-item">
+                                        <a class="nav-link text-white-50" href="{{ filho.url }}">
+                                            <span class="menu-texto">{{ filho.nome }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                    {% else %}
+                        <a class="nav-link text-white" href="{{ item.url }}">
+                            {% if item.icone %}
+                                <span class="menu-icone">
+                                    {% if 'fa-' in item.icone or 'fa ' in item.icone %}
+                                        <i class="fa {{ item.icone }}"></i>
+                                    {% else %}
+                                        {{ item.icone }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                            <span class="menu-texto">{{ item.nome }}</span>
+                        </a>
+                    {% endif %}
+
+                </li>
+            {% empty %}
+                <li class="text-secondary menu-texto">Nenhum menu disponível</li>
+            {% endfor %}
+        </ul>
+    </div>
+</aside>

@@ -1,0 +1,254 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}{{ config.title }} - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-list {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .table-container {
+        font-size: 13px; /* As requested by the user */
+    }
+    .table-container th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        background-color: #f8fafc;
+        color: #64748b;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .table-container td {
+        vertical-align: middle;
+        color: #334155;
+    }
+    .search-input {
+        border-radius: 20px;
+        padding-left: 40px;
+    }
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    .badge-active {
+        background-color: #dcfce7;
+        color: #15803d;
+        font-weight: 600;
+    }
+    .badge-inactive {
+        background-color: #fee2e2;
+        color: #b91c1c;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">{{ config.title }}</h2>
+        <p class="text-muted small mb-0">Gerenciamento da tabela básica de {{ config.title }}</p>
+    </div>
+    <div>
+        <a href="{% url 'tbasica_create_legacy' config.model_name %}" class="btn btn-primary btn-sm px-3 py-2 rounded-3 shadow-sm">
+            <i class="fa fa-plus me-2"></i>Adicionar Novo
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    <div class="card card-list">
+        <div class="card-body p-4">
+            <!-- Barra de Filtros -->
+            <form method="GET" action="{% url 'tbasica_list_legacy' config.model_name %}" id="search-form" class="row g-3 mb-4 align-items-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="position-relative">
+                        <i class="fa fa-search search-icon"></i>
+                        <input type="text" name="search" class="form-control form-control-sm search-input" placeholder="Buscar..." value="{{ search }}">
+                    </div>
+                </div>
+                
+                <div class="col-12 col-md-auto ms-auto d-flex align-items-center gap-2">
+                    <label for="per_page" class="small text-secondary text-nowrap mb-0">Exibir:</label>
+                    <select name="per_page" id="per_page" class="form-select form-select-sm rounded-3" style="width: 80px;" onchange="document.getElementById('search-form').submit();">
+                        <option value="10" {% if per_page == '10' %}selected{% endif %}>10</option>
+                        <option value="25" {% if per_page == '25' %}selected{% endif %}>25</option>
+                        <option value="50" {% if per_page == '50' %}selected{% endif %}>50</option>
+                        <option value="100" {% if per_page == '100' %}selected{% endif %}>100</option>
+                    </select>
+                </div>
+            </form>
+
+            <!-- Tabela -->
+            <div class="table-responsive table-container">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th width="80">ID</th>
+                            {% for field in config.fields %}
+                                {% if field.list_display %}
+                                    <th>{{ field.label }}</th>
+                                {% endif %}
+                            {% endfor %}
+                            <th width="150" class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in page_obj %}
+                            <tr>
+                                <td class="fw-bold text-secondary">#{{ item.id }}</td>
+                                {% for val in item.display_values %}
+                                    <td>
+                                        {% if val == 'Ativo' %}
+                                            <span class="badge rounded-pill badge-active">Ativo</span>
+                                        {% elif val == 'Inativo' %}
+                                            <span class="badge rounded-pill badge-inactive">Inativo</span>
+                                        {% else %}
+                                            {{ val|default:'' }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{% url 'tbasica_edit_legacy' config.model_name item.id %}" class="btn btn-outline-secondary btn-xs rounded-2" title="Editar">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger btn-xs rounded-2 btn-delete" data-id="{{ item.id }}" title="Excluir">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-4 text-muted">Nenhum registro encontrado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if page_obj.has_other_pages %}
+                <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+                    <span class="small text-secondary">
+                        Mostrando de {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+                    </span>
+                    <nav aria-label="Navegação da tabela">
+                        <ul class="pagination pagination-sm mb-0 rounded-3">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&per_page={{ per_page }}" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">&laquo;</span>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}&search={{ search }}&per_page={{ per_page }}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}&per_page={{ per_page }}" aria-label="Próximo">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">&raquo;</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- Script global/nomeTela para compatibilidade com crud.js se necessário -->
+<script>
+    var nomeTela = '{{ config.title }}';
+    var nomeForm = 'formGeneric';
+</script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // CSRF Token
+        const csrfToken = '{{ csrf_token }}';
+
+        // Delete handling
+        document.querySelectorAll('.btn-delete').forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                
+                Swal.fire({
+                    title: `Deseja realmente excluir este registro de ${nomeTela}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sim, excluir!',
+                    cancelButtonText: 'Não'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`{% url 'tbasica_delete_legacy' config.model_name %}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': csrfToken
+                            },
+                            body: new URLSearchParams({ id: id })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire(
+                                    'Excluído!',
+                                    'Registro excluído com sucesso.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Erro!',
+                                    data.messages || 'Não foi possível excluir o registro.',
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Erro!', 'Erro de rede ou permissão.', 'error');
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

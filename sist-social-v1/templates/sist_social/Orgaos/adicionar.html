@@ -1,0 +1,197 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Novo Órgão/Recurso - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-form {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Cadastrar Novo Órgão/Recurso</h2>
+    </div>
+    <div>
+        <a href="{% url 'list_orgaos' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0" style="max-width: 900px; margin: 0 auto;">
+
+    <!-- Listagem de Erros -->
+    {% if errors %}
+        <div class="alert alert-danger rounded-3 shadow-sm mb-4" role="alert">
+            <h5 class="alert-heading fw-bold"><i class="fa fa-exclamation-triangle me-2"></i>Erros de Validação:</h5>
+            <ul class="mb-0">
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Card do Formulário -->
+    <div class="card card-form">
+        <div class="card-body p-4">
+            <form method="POST" action="{% url 'create_orgao' %}" id="formNovoOrgao">
+                {% csrf_token %}
+
+                <!-- Seção 1: Dados Gerais -->
+                <h5 class="text-primary fw-bold mb-3 border-bottom pb-2"><i class="fa fa-info-circle me-2"></i>Informações Gerais</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="nome" class="form-label fw-semibold text-dark">Nome do Órgão/Recurso *</label>
+                        <input type="text" name="nome" id="nome" class="form-control rounded-3" value="{{ form_data.nome|default:'' }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="sigla" class="form-label fw-semibold text-dark">Sigla</label>
+                        <input type="text" name="sigla" id="sigla" class="form-control rounded-3" value="{{ form_data.sigla|default:'' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="esfera" class="form-label fw-semibold text-dark">Esfera *</label>
+                        <select name="esfera" id="esfera" class="form-select rounded-3" required>
+                            <option value="Municipal" {% if form_data.esfera == "Municipal" or not form_data.esfera %}selected{% endif %}>Municipal</option>
+                            <option value="Estadual" {% if form_data.esfera == "Estadual" %}selected{% endif %}>Estadual</option>
+                            <option value="Federal" {% if form_data.esfera == "Federal" %}selected{% endif %}>Federal</option>
+                            <option value="Privada" {% if form_data.esfera == "Privada" %}selected{% endif %}>Privada</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="tipo_orgao_id" class="form-label fw-semibold text-dark">Tipo de Órgão/Recurso *</label>
+                        <select name="tipo_orgao_id" id="tipo_orgao_id" class="form-select rounded-3" required>
+                            <option value="" selected disabled>Selecione...</option>
+                            {% for t in tipos %}
+                                <option value="{{ t.id }}" {% if form_data.tipo_orgao_id == t.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ t.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="cnpj" class="form-label fw-semibold text-dark">CNPJ</label>
+                        <input type="text" name="cnpj" id="cnpj" class="form-control rounded-3" placeholder="00.000.000/0000-00" value="{{ form_data.cnpj|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Seção 2: Endereço -->
+                <h5 class="text-primary fw-bold mb-3 border-bottom pb-2"><i class="fa fa-map-marker-alt me-2"></i>Endereço</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="cep" class="form-label fw-semibold text-dark">CEP</label>
+                        <input type="text" name="cep" id="cep" class="form-control rounded-3" placeholder="00000-000" value="{{ form_data.cep|default:'' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="tipo_lograd" class="form-label fw-semibold text-dark">Tipo Logradouro</label>
+                        <input type="text" name="tipo_lograd" id="tipo_lograd" class="form-control rounded-3" placeholder="Rua, Av, etc." value="{{ form_data.tipo_lograd|default:'' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="logradouro" class="form-label fw-semibold text-dark">Logradouro</label>
+                        <input type="text" name="logradouro" id="logradouro" class="form-control rounded-3" value="{{ form_data.logradouro|default:'' }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="lograd_num" class="form-label fw-semibold text-dark">Número</label>
+                        <input type="text" name="lograd_num" id="lograd_num" class="form-control rounded-3" value="{{ form_data.lograd_num|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="lograd_compl" class="form-label fw-semibold text-dark">Complemento</label>
+                        <input type="text" name="lograd_compl" id="lograd_compl" class="form-control rounded-3" value="{{ form_data.lograd_compl|default:'' }}">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="bairro" class="form-label fw-semibold text-dark">Bairro</label>
+                        <input type="text" name="bairro" id="bairro" class="form-control rounded-3" value="{{ form_data.bairro|default:'' }}">
+                    </div>
+
+                    <div class="col-md-8">
+                        <label for="municipio" class="form-label fw-semibold text-dark">Município</label>
+                        <input type="text" name="municipio" id="municipio" class="form-control rounded-3" value="{{ form_data.municipio|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="uf" class="form-label fw-semibold text-dark">UF</label>
+                        <input type="text" name="uf" id="uf" class="form-control rounded-3" maxlength="2" placeholder="EX: SP" value="{{ form_data.uf|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Seção 3: Contatos e Funcionamento -->
+                <h5 class="text-primary fw-bold mb-3 border-bottom pb-2"><i class="fa fa-phone me-2"></i>Contato e Funcionamento</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="email" class="form-label fw-semibold text-dark">E-mail</label>
+                        <input type="email" name="email" id="email" class="form-control rounded-3" placeholder="contato@orgao.gov.br" value="{{ form_data.email|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="telefone" class="form-label fw-semibold text-dark">Telefone principal</label>
+                        <input type="text" name="telefone" id="telefone" class="form-control rounded-3" placeholder="(00) 0000-0000" value="{{ form_data.telefone|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="telefone2" class="form-label fw-semibold text-dark">Telefone secundário</label>
+                        <input type="text" name="telefone2" id="telefone2" class="form-control rounded-3" placeholder="(00) 0000-0000" value="{{ form_data.telefone2|default:'' }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="horario_func" class="form-label fw-semibold text-dark">Horário de Funcionamento (Descritivo)</label>
+                        <input type="text" name="horario_func" id="horario_func" class="form-control rounded-3" placeholder="ex: Segunda a Sexta, das 8h às 17h" value="{{ form_data.horario_func|default:'' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="hora_ini" class="form-label fw-semibold text-dark">Hora Inicial</label>
+                        <input type="text" name="hora_ini" id="hora_ini" class="form-control rounded-3" placeholder="08:00" value="{{ form_data.hora_ini|default:'' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="hora_fim" class="form-label fw-semibold text-dark">Hora Final</label>
+                        <input type="text" name="hora_fim" id="hora_fim" class="form-control rounded-3" placeholder="17:00" value="{{ form_data.hora_fim|default:'' }}">
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="recursos_disponiveis" class="form-label fw-semibold text-dark">Recursos Disponíveis / Observações</label>
+                        <textarea name="recursos_disponiveis" id="recursos_disponiveis" class="form-control rounded-3" rows="3" placeholder="Descreva os recursos humanos, materiais ou financeiros deste órgão...">{{ form_data.recursos_disponiveis|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Seção 4: Dados Legislativos e Legais -->
+                <h5 class="text-primary fw-bold mb-3 border-bottom pb-2"><i class="fa fa-gavel me-2"></i>Informações Legislativas</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="num_lei_criacao" class="form-label fw-semibold text-dark">Número da Lei de Criação</label>
+                        <input type="text" name="num_lei_criacao" id="num_lei_criacao" class="form-control rounded-3" value="{{ form_data.num_lei_criacao|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="dt_lei_criacao" class="form-label fw-semibold text-dark">Data da Lei de Criação</label>
+                        <input type="date" name="dt_lei_criacao" id="dt_lei_criacao" class="form-control rounded-3" value="{{ form_data.dt_lei_criacao|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="num_lei_atualiz" class="form-label fw-semibold text-dark">Número da Lei de Atualização</label>
+                        <input type="text" name="num_lei_atualiz" id="num_lei_atualiz" class="form-control rounded-3" value="{{ form_data.num_lei_atualiz|default:'' }}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="ativo" class="form-label fw-semibold text-dark">Status</label>
+                        <select name="ativo" id="ativo" class="form-select rounded-3">
+                            <option value="1" {% if form_data.ativo == "1" or not form_data.ativo %}selected{% endif %}>Ativo</option>
+                            <option value="0" {% if form_data.ativo == "0" %}selected{% endif %}>Inativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-5 d-flex justify-content-end gap-2 border-top pt-4">
+                    <a href="{% url 'list_orgaos' %}" class="btn btn-outline-secondary rounded-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4">Salvar Órgão/Recurso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

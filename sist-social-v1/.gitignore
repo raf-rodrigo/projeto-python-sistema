@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.venv/
+venv/
+staticfiles/
+media/
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+dump-sist_central_postgresql.sql
+dump-sist_central_mysql.sql
+dump-sist_social_postgresql.sql
+dump-sist_social_mysql.sql
+*.sql

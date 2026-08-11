@@ -1,0 +1,165 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Nova Pessoa - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-form {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .form-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #4f46e5;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e0e7ff;
+        padding-bottom: 6px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Nova Pessoa</h2>
+    </div>
+    <div>
+        <a href="{% url 'list_pessoas' %}" class="btn btn-outline-secondary btn-sm px-3 py-2 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    {% if errors %}
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+            <h5 class="alert-heading fw-bold mb-2">Por favor, corrija os seguintes erros:</h5>
+            <ul class="mb-0">
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    <div class="card card-form mb-4">
+        <div class="card-body p-4">
+            <form method="POST" action="{% url 'create_pessoa' %}" id="form-pessoa">
+                {% csrf_token %}
+
+                <!-- Seção 1: Dados Pessoais -->
+                <h4 class="form-section-title"><i class="fa fa-user me-2"></i>Dados Pessoais</h4>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-6">
+                        <label for="nom_pessoa" class="form-label small fw-bold text-secondary">Nome Completo <span class="text-danger">*</span></label>
+                        <input type="text" name="nom_pessoa" id="nom_pessoa" class="form-control rounded-3" value="{{ form_data.nom_pessoa|default:'' }}" required placeholder="Ex: João Silva">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="nom_apelido_pes" class="form-label small fw-bold text-secondary">Apelido / Nome Conhecido</label>
+                        <input type="text" name="nom_apelido_pes" id="nom_apelido_pes" class="form-control rounded-3" value="{{ form_data.nom_apelido_pes|default:'' }}" placeholder="Ex: Juninho">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="cod_sexo_pes" class="form-label small fw-bold text-secondary">Sexo <span class="text-danger">*</span></label>
+                        <select name="cod_sexo_pes" id="cod_sexo_pes" class="form-select rounded-3" required>
+                            <option value="Masc" {% if form_data.cod_sexo_pes == "Masc" %}selected{% endif %}>Masculino</option>
+                            <option value="Fem" {% if form_data.cod_sexo_pes == "Fem" %}selected{% endif %}>Feminino</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="dta_nasc_pes" class="form-label small fw-bold text-secondary">Data de Nascimento <span class="text-danger">*</span></label>
+                        <input type="date" name="dta_nasc_pes" id="dta_nasc_pes" class="form-control rounded-3" value="{{ form_data.dta_nasc_pes|default:'' }}" required>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="orientacao_sexual_id" class="form-label small fw-bold text-secondary">Orientação Sexual</label>
+                        <select name="orientacao_sexual_id" id="orientacao_sexual_id" class="form-select rounded-3">
+                            <option value="">Selecione...</option>
+                            {% for o in orientacoes %}
+                                <option value="{{ o.id }}" {% if form_data.orientacao_sexual_id == o.id|stringformat:"i" %}selected{% endif %}>{{ o.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="estado_civil_id" class="form-label small fw-bold text-secondary">Estado Civil</label>
+                        <select name="estado_civil_id" id="estado_civil_id" class="form-select rounded-3">
+                            <option value="">Selecione...</option>
+                            {% for ec in estados_civis %}
+                                <option value="{{ ec.id }}" {% if form_data.estado_civil_id == ec.id|stringformat:"i" %}selected{% endif %}>{{ ec.estado_civil }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Seção 2: Documentos e Contato -->
+                <h4 class="form-section-title"><i class="fa fa-id-card me-2"></i>Documentos & Contato</h4>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-4">
+                        <label for="num_cpf_pes" class="form-label small fw-bold text-secondary">CPF</label>
+                        <input type="text" name="num_cpf_pes" id="num_cpf_pes" class="form-control rounded-3" value="{{ form_data.num_cpf_pes|default:'' }}" placeholder="000.000.000-00">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="num_nis_pes" class="form-label small fw-bold text-secondary">NIS</label>
+                        <input type="text" name="num_nis_pes" id="num_nis_pes" class="form-control rounded-3" value="{{ form_data.num_nis_pes|default:'' }}" placeholder="00000000000">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="celular_pessoa" class="form-label small fw-bold text-secondary">Celular</label>
+                        <input type="text" name="celular_pessoa" id="celular_pessoa" class="form-control rounded-3" value="{{ form_data.celular_pessoa|default:'' }}" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="fone_pessoa" class="form-label small fw-bold text-secondary">Telefone Fixo</label>
+                        <input type="text" name="fone_pessoa" id="fone_pessoa" class="form-control rounded-3" value="{{ form_data.fone_pessoa|default:'' }}" placeholder="(00) 0000-0000">
+                    </div>
+                    <div class="col-12 col-md-8">
+                        <label for="email" class="form-label small fw-bold text-secondary">Email</label>
+                        <input type="email" name="email" id="email" class="form-control rounded-3" value="{{ form_data.email|default:'' }}" placeholder="exemplo@email.com">
+                    </div>
+                </div>
+
+                <!-- Seção 3: Relação Familiar -->
+                <h4 class="form-section-title"><i class="fa fa-users me-2"></i>Relação Familiar</h4>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-6">
+                        <label for="cod_familia_id" class="form-label small fw-bold text-secondary">Família Vincular <span class="text-danger">*</span></label>
+                        <select name="cod_familia_id" id="cod_familia_id" class="form-select rounded-3" required>
+                            <option value="">Selecione a família...</option>
+                            {% for f in familias %}
+                                <option value="{{ f.id }}" {% if form_data.cod_familia_id == f.id|stringformat:"i" %}selected{% endif %}>{{ f.cod_familia }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="cod_parent_rf_pes_id" class="form-label small fw-bold text-secondary">Grau de Parentesco com RF</label>
+                        <select name="cod_parent_rf_pes_id" id="cod_parent_rf_pes_id" class="form-select rounded-3">
+                            <option value="">Selecione...</option>
+                            {% for p in parentescos %}
+                                <option value="{{ p.id }}" {% if form_data.cod_parent_rf_pes_id == p.id|stringformat:"i" %}selected{% endif %}>{{ p.tipo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="ativo" class="form-label small fw-bold text-secondary">Status</label>
+                        <select name="ativo" id="ativo" class="form-select rounded-3">
+                            <option value="1" {% if form_data.ativo == "1" or not form_data.ativo %}selected{% endif %}>Ativo</option>
+                            <option value="0" {% if form_data.ativo == "0" %}selected{% endif %}>Inativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'list_pessoas' %}" class="btn btn-light rounded-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm">Salvar Pessoa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

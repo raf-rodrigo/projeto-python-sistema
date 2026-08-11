@@ -1,0 +1,260 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Unidades de Atendimento - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-unidades {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .table-unidades th {
+        background-color: #f9fafb;
+        color: #4b5563;
+        font-weight: 600;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .table-unidades td {
+        vertical-align: middle;
+    }
+    .table-unidades {
+        font-size: 13px !important;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Unidades de Atendimento Social</h2>
+    </div>
+    <div>
+        <a href="{% url 'create_unidade' %}" class="btn btn-primary btn-sm px-3 py-2 rounded-3 shadow-sm">
+            <i class="fa fa-plus me-2"></i>Nova Unidade
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    <!-- Mensagens de Sucesso/Erro -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Card Principal -->
+    <div class="card card-unidades mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <form method="GET" action="{% url 'list_unidades' %}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Buscar por nome, sigla ou município..." value="{{ search }}">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-primary px-3">Filtrar</button>
+                    {% if search %}
+                        <a href="{% url 'list_unidades' %}" class="btn btn-sm btn-outline-secondary px-3">Limpar</a>
+                    {% endif %}
+                </div>
+                <div class="col-auto ms-auto d-flex align-items-center gap-2">
+                    <label for="per_page" class="small text-muted mb-0 text-nowrap">Exibir:</label>
+                    <select name="per_page" id="per_page" class="form-select form-select-sm rounded-3" style="width: 80px;" onchange="this.form.submit()">
+                        <option value="10" {% if per_page == "10" %}selected{% endif %}>10</option>
+                        <option value="25" {% if per_page == "25" %}selected{% endif %}>25</option>
+                        <option value="50" {% if per_page == "50" %}selected{% endif %}>50</option>
+                        <option value="100" {% if per_page == "100" %}selected{% endif %}>100</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-unidades mb-0">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3" style="width: 80px;">ID</th>
+                            <th class="py-3">Nome Conhecido</th>
+                            <th class="py-3">CNPJ</th>
+                            <th class="py-3">Tipo de Unidade</th>
+                            <th class="py-3">Localização</th>
+                            <th class="py-3 text-center" style="width: 120px;">Status</th>
+                            <th class="px-4 py-3 text-end" style="width: 150px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in page_obj %}
+                        <tr id="unidade-row-{{ u.id }}">
+                            <td class="px-4 fw-semibold text-muted">{{ u.id }}</td>
+                            <td>
+                                <div><strong class="text-dark">{{ u.nome_conhecido }}</strong></div>
+                                {% if u.razao_social %}
+                                    <div class="small text-muted">{{ u.razao_social }}</div>
+                                {% endif %}
+                            </td>
+                            <td><span class="text-secondary small">{{ u.cnpj|default:"-" }}</span></td>
+                            <td><span class="badge bg-light text-dark border">{{ u.tipo_unidade.tipo|default:"Não Informado" }}</span></td>
+                            <td class="text-secondary">
+                                {% if u.municipio %}
+                                    {{ u.municipio }}/{{ u.uf }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if u.ativo == 1 %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill" id="status-badge-{{ u.id }}">Ativa</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 rounded-pill" id="status-badge-{{ u.id }}">Inativa</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 text-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Editar -->
+                                    <a href="{% url 'edit_unidade' u.id %}" class="btn btn-outline-secondary" title="Editar Unidade">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <!-- Toggle Status -->
+                                    <button type="button" class="btn btn-outline-danger btn-toggle-status" data-id="{{ u.id }}" data-nome="{{ u.nome_conhecido }}" data-status="{{ u.ativo }}" title="Ativar/Inativar">
+                                        <i class="fa fa-power-off"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fa fa-building fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Nenhuma unidade de atendimento encontrada.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginação -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+            <span class="text-muted small">
+                Exibindo página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+            <nav aria-label="Navegação de unidades">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}&per_page={{ per_page }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}&per_page={{ per_page }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}&per_page={{ per_page }}" aria-label="Próximo">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        // Toggle Status (Ativar/Inativar)
+        document.querySelectorAll(".btn-toggle-status").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const unidId = this.getAttribute("data-id");
+                const unidNome = this.getAttribute("data-nome");
+                const currentStatus = this.getAttribute("data-status");
+                
+                const actionText = currentStatus == '1' ? 'inativar' : 'ativar';
+                const confirmButtonColor = currentStatus == '1' ? '#dc3545' : '#198754';
+                
+                Swal.fire({
+                    title: `Deseja ${actionText} a unidade?`,
+                    text: `Tem certeza que deseja alterar o status da unidade '${unidNome}'?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, alterar!',
+                    cancelButtonText: 'Não, cancelar',
+                    confirmButtonColor: confirmButtonColor,
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/unidades-atendimento/status/${unidId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Sucesso!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                
+                                // Atualiza os elementos na tela
+                                const badge = document.getElementById(`status-badge-${unidId}`);
+                                if (data.ativo == 1) {
+                                    badge.className = "badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5 rounded-pill";
+                                    badge.innerText = "Ativa";
+                                    this.setAttribute("data-status", "1");
+                                } else {
+                                    badge.className = "badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 rounded-pill";
+                                    badge.innerText = "Inativa";
+                                    this.setAttribute("data-status", "0");
+                                }
+                            } else {
+                                Swal.fire('Erro!', data.message || 'Ocorreu um erro ao tentar alterar o status.', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire('Erro!', 'Falha de comunicação com o servidor.', 'error');
+                        });
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+{% endblock %}

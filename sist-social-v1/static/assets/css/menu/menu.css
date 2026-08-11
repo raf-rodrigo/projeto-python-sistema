@@ -1,0 +1,15 @@
+.scrollVerPagina{
+    max-height:450px;
+    overflow-x:auto;
+}
+
+.selectPagina{
+    width:300px;
+}
+
+.selectPaginaModal{
+    width:250px;
+}
+.select2-dropdown {
+  z-index: 2100 !important;
+}

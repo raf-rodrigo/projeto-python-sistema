@@ -1,0 +1,128 @@
+.sweet-alert {
+    box-sizing : border-box;
+    max-height : 100% !important;
+    overflow-y : auto !important;
+    padding : 0 17px 17px !important;
+    width : 512px;
+}
+.sweet-alert:before {
+    content : "";
+    display : block;
+    height : 17px;
+    width : 0;
+}
+
+.dd3-content{
+    display: block;
+    height: 30px;
+    margin: 5px 0;
+    padding: 5px 10px 5px 40px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    background: -webkit-linear-gradient(top, #fafafa 0%, #eee 100%);
+    background: -moz-linear-gradient(top, #fafafa 0%, #eee 100%);
+    background: linear-gradient(top, #fafafa 0%, #eee 100%);
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.dd-expand{
+    padding-left: -1000px;
+}
+
+.dd3-content:hover { color: #2ea8e5; background: #fff; }
+
+.dd-dragel > .dd3-item > .dd3-content { margin: 0; }
+
+.dd3-item > button{ margin-left: 30px; }
+
+.dd3-handle{
+    position: absolute;
+    margin: 0;
+    left: 0;
+    top: 0;
+    cursor: pointer;
+    width: 30px;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    border: 1px solid #aaa;
+    background: #2f4050;
+    background: -webkit-linear-gradient(top, #2f4050 0%, #2f4050 100%);
+    background: -moz-linear-gradient(top, #2f4050 0%, #2f4050 100%);
+    background: linear-gradient(top, #2f4050 0%, #2f4050 100%);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.dd3-handle:before{
+    content: '≡';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 100%;
+    text-align: center;
+    text-indent: 0;
+    color: #fff;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.divbotaoAdd{
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.botaoAddPagina{
+    margin-right:-3px
+}
+
+.btnAddCategoria{
+    text-align: right;
+}
+
+#menuLateralIbox{
+    overflow-y: scroll;
+    height: 400px;
+}
+
+.btnRemovePagina{
+    position: absolute;
+    right:0;
+    margin-right: 5px;
+    color:red;
+}
+
+.select2-container{
+  z-index: 2500;
+}
+
+.select2{
+    width:400px;
+}
+
+.scrollmodal{
+    max-height:450px;
+    overflow-x:auto;
+}
+
+#tableListagemPagina_paginate{
+    margin-left: -100px!important;
+}
+
+.divItemMenu{
+    padding:10px
+}
+
+.divTextItemMenu{
+    background-color:#FFF;
+    color:#000;
+    padding:10px;
+}

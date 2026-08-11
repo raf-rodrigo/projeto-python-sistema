@@ -1,0 +1,66 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Editar Configuração - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-form {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Editar Parâmetro Geral</h2>
+    </div>
+    <div>
+        <a href="{% url 'list_configuracoes' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0" style="max-width: 750px; margin: 0 auto;">
+
+    <!-- Card de Formulário -->
+    <div class="card card-form mb-4">
+        <div class="card-body p-4">
+            <form method="POST" action="{% url 'edit_configuracao' config.id %}">
+                {% csrf_token %}
+
+                <!-- Identificação do Parâmetro -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-secondary">Parâmetro de Configuração</label>
+                    <div class="p-3 bg-light border rounded-3">
+                        <span class="badge bg-secondary-subtle text-secondary border font-monospace mb-2">{{ config.chave }}</span>
+                        <h4 class="h5 mb-0 text-dark fw-bold">{{ config.descricao }}</h4>
+                    </div>
+                </div>
+
+                <!-- Campo de Valor -->
+                <div class="mb-4">
+                    <label for="valor" class="form-label fw-semibold text-dark">Valor do Parâmetro *</label>
+                    <input type="text" name="valor" id="valor" class="form-control rounded-3 font-monospace px-3 py-2.5" value="{{ config.valor|default:'' }}" placeholder="Digite o valor correspondente..." required>
+                    <div class="form-text mt-2 text-muted">
+                        <i class="fa fa-info-circle me-1"></i>Atenção: A alteração incorreta deste valor pode impactar as regras de validação ou comportamentos do sistema.
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-5 d-flex justify-content-end gap-2">
+                    <a href="{% url 'list_configuracoes' %}" class="btn btn-outline-secondary rounded-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4">Salvar Alteração</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

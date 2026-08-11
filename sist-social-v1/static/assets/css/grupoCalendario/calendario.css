@@ -1,0 +1,125 @@
+#modalJust, #modalExcluir{
+    display: none;
+    animation: modalAgenda 0.6s;
+    background-color: #ffffff;
+}
+
+.modalJust{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0px;
+    padding: 15px;
+}
+
+#icone{
+    width: 100px;
+    height: 100px;
+    border: 4px solid #F8BB86;
+    border-radius: 50%;
+}
+
+#icone .tracoIcone{
+    text-align: center;
+    color: #F8BB86;
+    font-size: 6.8rem;
+    font-weight: 100;
+}
+
+#frasesModal{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 55px 0;
+}
+
+#frasesModal h2{
+    color: #575757;
+    font-size: 30px;
+    text-align: center;
+    font-weight: 600;
+    text-transform: none;
+    position: relative;
+    line-height: 40px;
+    padding: 5px;
+}
+
+#frasesModal p{
+    color: #575757;
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    text-transform: none;
+    position: relative;
+    line-height: 40px;
+    padding: 5px;
+}
+
+
+#botoes{
+    margin-top: 20px;
+}
+
+.cancelCalend{
+    background-color: #d9534f;
+    color: #ffffff;
+    margin: 0px 15px;
+    padding: 10px 30px;
+    border-radius: 5px;
+}
+
+.cancelCalend:hover{
+    background-color: #d83a35;
+    color: #ffffff;
+}
+
+.encerCalend{
+    background-color: rgb(237, 85, 101);
+    box-shadow: none;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.encerCalend:hover{
+    background-color: rgb(221, 117, 128);
+    box-shadow: none;
+    color: #000000;
+}
+
+@keyframes modalAgenda {
+    from{
+        transform: translate3d(12px, 50%, 3em)
+    }   
+
+    to{
+        transform: translate3d(0, 0, 0)
+    }
+}
+
+/*
+estilos aplicados na nova versão de Agenda/Calendário sem comprometer as atuais definições e que serão mantidas até a substituição completa
+contemplando qualquer tipo de agendamento (Atendimento, Grupos, Eventos, Pessoal)
+Novo Agendamento (DEV-829) 
+*/
+
+.badge-aberto {
+    background-color: #1c84c6 !important; /* Azul para "Em Andamento" */
+    color: white;
+}
+.badge-em-andamento {
+    background-color: #23c6c8 !important; /* Verde para "Aberto" */
+    color: white;
+}
+.badge-encerrado {
+    background-color: #ed5565 !important; /* Vermelho para "Encerrado" */
+    color: white;
+}
+.badge-cancelado {
+    background-color: #f8ac59 !important; /* Laranja para "Cancelado" */
+    color: white;
+}
+

@@ -1,0 +1,195 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Permissões do Perfil - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-permissoes {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .tree-list {
+        list-style-type: none;
+        padding-left: 20px;
+    }
+    .tree-root {
+        padding-left: 0;
+    }
+    .tree-item {
+        margin-bottom: 8px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background-color 0.2s ease;
+    }
+    .tree-item:hover {
+        background-color: #f3f4f6;
+    }
+    .category-node {
+        font-weight: 600;
+        color: #1f2937;
+    }
+    .page-node {
+        font-weight: 400;
+        color: #4b5563;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Gerenciar Permissões</h2>
+        <p class="text-muted mb-0">Defina quais menus e páginas o perfil <strong>{{ perfil.nome }}</strong> poderá acessar.</p>
+    </div>
+    <div>
+        <a href="{% url 'list_perfis' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0" style="max-width: 900px; margin: 0 auto;">
+
+    <!-- Card Principal -->
+    <div class="card card-permissoes mb-4">
+        <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-dark fw-bold"><i class="fa fa-sitemap text-primary me-2"></i>Árvore de Menus</h5>
+            <div>
+                <button type="button" class="btn btn-xs btn-outline-primary me-2" id="btnMarcarTodos">Marcar Todos</button>
+                <button type="button" class="btn btn-xs btn-outline-secondary" id="btnDesmarcarTodos">Desmarcar Todos</button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <form method="POST" action="{% url 'manage_perfil_permissions' perfil.id %}" id="formPermissoes">
+                {% csrf_token %}
+
+                <!-- Macro de Renderização Recursiva para a Árvore de Menus -->
+                <ul class="tree-list tree-root">
+                    {% for item in menu_tree %}
+                        <li class="mb-3">
+                            <div class="tree-item category-node">
+                                <div class="form-check">
+                                    <input class="form-check-input menu-checkbox parent-checkbox" type="checkbox" name="menus" value="{{ item.id }}" id="menu-{{ item.id }}" {% if item.marcado %}checked{% endif %}>
+                                    <label class="form-check-label" for="menu-{{ item.id }}">
+                                        {{ item.nome }}
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            {% if item.children %}
+                                <ul class="tree-list">
+                                    {% for child in item.children %}
+                                        <li class="mb-2">
+                                            <div class="tree-item {% if child.children %}category-node{% else %}page-node{% endif %}">
+                                                <div class="form-check">
+                                                    <input class="form-check-input menu-checkbox child-checkbox" type="checkbox" name="menus" value="{{ child.id }}" id="menu-{{ child.id }}" data-parent="menu-{{ item.id }}" {% if child.marcado %}checked{% endif %}>
+                                                    <label class="form-check-label" for="menu-{{ child.id }}">
+                                                        {{ child.nome }}
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            {% if child.children %}
+                                                <ul class="tree-list">
+                                                    {% for grand_child in child.children %}
+                                                        <li>
+                                                            <div class="tree-item page-node">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input menu-checkbox grandchild-checkbox" type="checkbox" name="menus" value="{{ grand_child.id }}" id="menu-{{ grand_child.id }}" data-parent="menu-{{ child.id }}" {% if grand_child.marcado %}checked{% endif %}>
+                                                                    <label class="form-check-label" for="menu-{{ grand_child.id }}">
+                                                                        {{ grand_child.nome }}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li class="text-center py-4 text-muted">
+                            <i class="fa fa-info-circle fa-2x mb-2"></i>
+                            <p class="mb-0">Nenhum item de menu cadastrado.</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Botões de Ação -->
+                <div class="mt-5 d-flex justify-content-end gap-2 border-top pt-4">
+                    <a href="{% url 'list_perfis' %}" class="btn btn-outline-secondary rounded-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4">Salvar Permissões</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".menu-checkbox");
+        
+        // 1. Ação de Marcar Todos
+        document.getElementById("btnMarcarTodos").addEventListener("click", function () {
+            checkboxes.forEach(cb => cb.checked = true);
+        });
+
+        // 2. Ação de Desmarcar Todos
+        document.getElementById("btnDesmarcarTodos").addEventListener("click", function () {
+            checkboxes.forEach(cb => cb.checked = false);
+        });
+
+        // 3. Comportamento cascata (marcar pai marca filhos, desmarcar pai desmarca filhos)
+        checkboxes.forEach(cb => {
+            cb.addEventListener("change", function () {
+                const id = this.id;
+                const isChecked = this.checked;
+                
+                // Encontra e atualiza todos os elementos que possuem este id como data-parent
+                const children = document.querySelectorAll(`[data-parent="${id}"]`);
+                children.forEach(child => {
+                    child.checked = isChecked;
+                    // Dispara evento para propagar para netos
+                    child.dispatchEvent(new Event('change'));
+                });
+
+                // Se marcar um filho, garante que os pais também sejam marcados
+                if (isChecked) {
+                    const parentId = this.getAttribute("data-parent");
+                    if (parentId) {
+                        const parentCb = document.getElementById(parentId);
+                        if (parentCb && !parentCb.checked) {
+                            parentCb.checked = true;
+                            // Dispara evento para propagar para cima
+                            parentCb.dispatchEvent(new Event('change_parent_only'));
+                        }
+                    }
+                }
+            });
+
+            // Evento customizado para marcar pais sem cascade descendente indesejado
+            cb.addEventListener("change_parent_only", function() {
+                const parentId = this.getAttribute("data-parent");
+                if (parentId) {
+                    const parentCb = document.getElementById(parentId);
+                    if (parentCb && !parentCb.checked) {
+                        parentCb.checked = true;
+                        parentCb.dispatchEvent(new Event('change_parent_only'));
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

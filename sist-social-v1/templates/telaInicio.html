@@ -1,0 +1,148 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block titulo %}Sist Social{% endblock %}</title>
+
+    <script>
+        window.GOOGLE_API_KEY = "{{ GOOGLE_API_KEY }}";
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+    <style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 14px;
+    }
+
+    /* Estilo global para todas as tabelas */
+    table, .table {
+        font-size: 13px !important;
+    }
+
+    .menu-lateral {
+        width: 260px;
+        background-color: #2c3e50 !important; /* Cor idêntica ao menu lateral da imagem */
+        transition: width 0.3s ease;
+        overflow: visible;
+        position: relative;
+        z-index: 100;
+    }
+
+    .menu-lateral .nav-link {
+        font-size: 14px;
+        padding: 12px 16px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .menu-lateral .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #1abc9c !important; /* Efeito hover verde-turquesa */
+    }
+
+    .menu-lateral.recolhido {
+        width: 70px;
+    }
+
+    .menu-lateral.recolhido .menu-texto,
+    .menu-lateral.recolhido .menu-titulo,
+    .menu-lateral.recolhido .menu-texto + span {
+        display: none !important;
+    }
+
+    /* Submenus recolhidos */
+    .menu-lateral .collapse .nav-link {
+        padding-left: 32px;
+        font-size: 13px;
+    }
+</style>
+
+    {% block css %}{% endblock %}
+</head>
+<body>
+
+<div class="d-flex min-vh-100">
+    <!-- Menu Lateral (Sidebar) -->
+    {% include 'layout/menu_lateral.html' %}
+
+    <!-- Painel de Conteúdo e Cabeçalho à direita -->
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+        <!-- Cabeçalho Superior -->
+        {% include 'layout/sidebar_topo.html' %}
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-grow-1 p-4 bg-light overflow-auto">
+            <div class="container-fluid px-0">
+                <div class="mb-4">
+                    {% block titulo_pagina %}{% endblock %}
+                </div>
+                {% block htmlConteudo %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $('#btnToggleMenu').on('click', function () {
+        $('#menuLateral').toggleClass('recolhido');
+    });
+
+    $('.menu-lateral .nav-link').on('click', function (event) {
+        const $menuLateral = $('#menuLateral');
+
+        if ($menuLateral.hasClass('recolhido')) {
+            $menuLateral.removeClass('recolhido');
+            event.preventDefault();
+            event.stopPropagation();
+
+            if ($(this).hasClass('menu-collapse-toggle')) {
+                const targetSelector = $(this).attr('href');
+                const target = document.querySelector(targetSelector);
+
+                if (target) {
+                    bootstrap.Collapse.getOrCreateInstance(target, { toggle: false }).show();
+                    this.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            return;
+        }
+    });
+
+    $('.menu-collapse-toggle').on('click', function (event) {
+        const targetSelector = $(this).attr('href');
+        const $target = $(targetSelector);
+
+        if ($target.hasClass('show')) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+
+    $('.menu-lateral .collapse .nav-link').each(function () {
+        const linkPath = new URL(this.href, window.location.origin).pathname;
+
+        if (linkPath === window.location.pathname) {
+            const $collapse = $(this).closest('.collapse');
+            const toggle = document.querySelector(`[href="#${$collapse.attr('id')}"]`);
+
+            $collapse.addClass('show');
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'true');
+            }
+        }
+    });
+</script>
+
+{% block js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,898 @@
+{% extends 'telaInicio.html' %}
+
+{% block titulo %}Dashboard - Sistema Social{% endblock %}
+
+{% block css %}
+<!-- Flatpickr CSS for Date Range Selection -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    /* Custom Styling for Premium Feel */
+    .dashboard-container {
+        font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    @media (min-width: 1200px) {
+        .col-xl-2-4 {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+    }
+
+    /* Stats Cards styling */
+    .stat-card {
+        border: none;
+        border-radius: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        color: white;
+        position: relative;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card .card-body {
+        padding: 1.5rem;
+        z-index: 2;
+        position: relative;
+    }
+    
+    .stat-card .card-icon {
+        font-size: 3rem;
+        opacity: 0.25;
+        position: absolute;
+        right: 1.5rem;
+        bottom: 1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover .card-icon {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    
+    /* Card Gradients */
+    .bg-gradient-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    }
+    
+    .bg-gradient-teal {
+        background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    }
+    
+    .bg-gradient-orange {
+        background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+    }
+    
+    .bg-gradient-purple {
+        background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    }
+    
+    .bg-gradient-rose {
+        background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+    }
+    
+    /* Chart Panels */
+    .chart-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        background: #ffffff;
+        transition: box-shadow 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    }
+    
+    .chart-card .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .chart-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #1f2937;
+        margin: 0;
+    }
+    
+    .chart-wrapper {
+        position: relative;
+        padding: 1.5rem;
+        min-height: 320px;
+    }
+    
+    /* Loading Overlay */
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        border-radius: 16px;
+        transition: opacity 0.3s ease;
+    }
+    
+    /* Table styling */
+    .dashboard-table {
+        font-size: 0.9rem;
+    }
+    .dashboard-table th {
+        background-color: #f9fafb;
+        color: #4b5563;
+        font-weight: 600;
+    }
+    
+    /* Date Selector */
+    .date-picker-container {
+        max-width: 320px;
+    }
+
+    .chart-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .chart-type-select {
+        width: auto;
+        min-width: 120px;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Painel de Indicadores Sociais</h2>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="dashboard-container container-fluid px-0">
+    
+    <!-- Loading overlay global -->
+    <div id="globalLoader" class="loading-overlay" style="position: fixed; z-index: 9999; display: flex;">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2 text-primary fw-semibold">Carregando dados estatísticos...</p>
+        </div>
+    </div>
+
+    <!-- 5 Top Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Famílias -->
+        <div class="col-12 col-sm-6 col-xl-2-4 col-lg-4">
+            <div class="card stat-card bg-gradient-blue h-100">
+                <div class="card-body">
+                    <span class="text-uppercase opacity-75 small fw-semibold">Famílias</span>
+                    <h2 id="valFamilias" class="display-6 fw-bold my-2">-</h2>
+                    <span class="small">Cadastradas no Sistema</span>
+                    <div class="card-icon"><i class="fa-solid fa-house-chimney"></i></div>
+                </div>
+            </div>
+        </div>
+        <!-- Pessoas -->
+        <div class="col-12 col-sm-6 col-xl-2-4 col-lg-4">
+            <div class="card stat-card bg-gradient-teal h-100">
+                <div class="card-body">
+                    <span class="text-uppercase opacity-75 small fw-semibold">Pessoas</span>
+                    <h2 id="valPessoas" class="display-6 fw-bold my-2">-</h2>
+                    <span class="small">Total de Indivíduos</span>
+                    <div class="card-icon"><i class="fa-solid fa-users"></i></div>
+                </div>
+            </div>
+        </div>
+        <!-- Mulheres Responsáveis Familiares -->
+        <div class="col-12 col-sm-6 col-xl-2-4 col-lg-4">
+            <div class="card stat-card bg-gradient-orange h-100">
+                <div class="card-body">
+                    <span class="text-uppercase opacity-75 small fw-semibold">Mulher RF</span>
+                    <h2 id="valMulherRF" class="display-6 fw-bold my-2">-</h2>
+                    <span class="small">Responsável Familiar</span>
+                    <div class="card-icon"><i class="fa-solid fa-person-dress"></i></div>
+                </div>
+            </div>
+        </div>
+        <!-- Idosos -->
+        <div class="col-12 col-sm-6 col-xl-2-4 col-lg-4">
+            <div class="card stat-card bg-gradient-purple h-100">
+                <div class="card-body">
+                    <span class="text-uppercase opacity-75 small fw-semibold">Idosos (65+)</span>
+                    <h2 id="valIdosos" class="display-6 fw-bold my-2">-</h2>
+                    <span class="small">Pessoas de Terceira Idade</span>
+                    <div class="card-icon"><i class="fa-solid fa-blind"></i></div>
+                </div>
+            </div>
+        </div>
+        <!-- PcD -->
+        <div class="col-12 col-sm-6 col-xl-2-4 col-lg-4">
+            <div class="card stat-card bg-gradient-rose h-100">
+                <div class="card-body">
+                    <span class="text-uppercase opacity-75 small fw-semibold">PcD</span>
+                    <h2 id="valPcd" class="display-6 fw-bold my-2">-</h2>
+                    <span class="small">Pessoas com Deficiência</span>
+                    <div class="card-icon"><i class="fa-solid fa-wheelchair"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2x2 Grid for Charts -->
+    <div class="row">
+        <!-- Faixa Etária -->
+        <div class="col-lg-6">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5 class="chart-title"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Faixa Etária</h5>
+                    <div class="chart-controls">
+                        <select class="form-select form-select-sm chart-type-select" data-chart-type="etaria">
+                            <option value="doughnut" selected>Rosca</option>
+                            <option value="pie">Pizza</option>
+                            <option value="bar">Barras</option>
+                        </select>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active btn-chart-toggle" data-target="etaria" data-view="chart"><i class="fa-solid fa-chart-simple"></i></button>
+                            <button type="button" class="btn btn-outline-secondary btn-chart-toggle" data-target="etaria" data-view="table"><i class="fa-solid fa-table"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div id="loaderEtaria" class="loading-overlay d-none"><div class="spinner-border text-primary" role="status"></div></div>
+                    <div id="viewEtariaChart">
+                        <canvas id="chartEtaria" style="max-height: 280px;"></canvas>
+                    </div>
+                    <div id="viewEtariaTable" class="d-none overflow-auto" style="max-height: 280px;">
+                        <table class="table table-sm table-striped dashboard-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Faixa Etária</th>
+                                    <th class="text-center">Masculino</th>
+                                    <th class="text-center">Feminino</th>
+                                    <th class="text-center">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableEtariaBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Educação -->
+        <div class="col-lg-6">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5 class="chart-title"><i class="fa-solid fa-graduation-cap me-2 text-success"></i>Vulnerabilidade Educacional</h5>
+                    <div class="chart-controls">
+                        <select class="form-select form-select-sm chart-type-select" data-chart-type="educacao">
+                            <option value="bar" selected>Barras</option>
+                            <option value="line">Linha</option>
+                            <option value="doughnut">Rosca</option>
+                        </select>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active btn-chart-toggle" data-target="educacao" data-view="chart"><i class="fa-solid fa-chart-simple"></i></button>
+                            <button type="button" class="btn btn-outline-secondary btn-chart-toggle" data-target="educacao" data-view="table"><i class="fa-solid fa-table"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div id="loaderEducacao" class="loading-overlay d-none"><div class="spinner-border text-primary" role="status"></div></div>
+                    <div id="viewEducacaoChart">
+                        <canvas id="chartEducacao" style="max-height: 280px;"></canvas>
+                    </div>
+                    <div id="viewEducacaoTable" class="d-none overflow-auto" style="max-height: 280px;">
+                        <table class="table table-sm table-striped dashboard-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Indicador Educacional</th>
+                                    <th class="text-center">Quantidade</th>
+                                    <th class="text-center">% sobre Total Pessoas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableEducacaoBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Situação Imóvel -->
+        <div class="col-lg-6">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5 class="chart-title"><i class="fa-solid fa-building me-2 text-warning"></i>Situação Imóvel (Moradia)</h5>
+                    <div class="chart-controls">
+                        <select class="form-select form-select-sm chart-type-select" data-chart-type="imovel">
+                            <option value="bar" selected>Barras</option>
+                            <option value="pie">Pizza</option>
+                            <option value="doughnut">Rosca</option>
+                        </select>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active btn-chart-toggle" data-target="imovel" data-view="chart"><i class="fa-solid fa-chart-simple"></i></button>
+                            <button type="button" class="btn btn-outline-secondary btn-chart-toggle" data-target="imovel" data-view="table"><i class="fa-solid fa-table"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div id="loaderImovel" class="loading-overlay d-none"><div class="spinner-border text-primary" role="status"></div></div>
+                    <div id="viewImovelChart">
+                        <canvas id="chartImovel" style="max-height: 280px;"></canvas>
+                    </div>
+                    <div id="viewImovelTable" class="d-none overflow-auto" style="max-height: 280px;">
+                        <table class="table table-sm table-striped dashboard-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Residência</th>
+                                    <th class="text-center">Famílias</th>
+                                    <th class="text-center">%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableImovelBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Renda Percapita -->
+        <div class="col-lg-6">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h5 class="chart-title"><i class="fa-solid fa-wallet me-2 text-info"></i>Renda Percapita</h5>
+                    <div class="chart-controls">
+                        <select class="form-select form-select-sm chart-type-select" data-chart-type="renda">
+                            <option value="pie" selected>Pizza</option>
+                            <option value="doughnut">Rosca</option>
+                            <option value="bar">Barras</option>
+                        </select>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary active btn-chart-toggle" data-target="renda" data-view="chart"><i class="fa-solid fa-chart-simple"></i></button>
+                            <button type="button" class="btn btn-outline-secondary btn-chart-toggle" data-target="renda" data-view="table"><i class="fa-solid fa-table"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <div id="loaderRenda" class="loading-overlay d-none"><div class="spinner-border text-primary" role="status"></div></div>
+                    <div id="viewRendaChart">
+                        <canvas id="chartRenda" style="max-height: 280px;"></canvas>
+                    </div>
+                    <div id="viewRendaTable" class="d-none overflow-auto" style="max-height: 280px;">
+                        <table class="table table-sm table-striped dashboard-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Faixa de Renda</th>
+                                    <th class="text-center">Famílias</th>
+                                    <th class="text-center">%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableRendaBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atendimentos Realizados - Período (Full Width) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card chart-card">
+                <div class="card-header flex-column flex-sm-row gap-2">
+                    <div class="d-flex align-items-center">
+                        <h5 class="chart-title"><i class="fa-solid fa-file-invoice me-2 text-danger"></i>Atendimentos Realizados no Período</h5>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <select class="form-select form-select-sm chart-type-select" data-chart-type="atendimentos">
+                            <option value="line" selected>Linha</option>
+                            <option value="bar">Barras</option>
+                        </select>
+                        <div class="date-picker-container input-group input-group-sm">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-calendar text-muted"></i></span>
+                            <input type="text" id="dateRangeInput" class="form-control bg-white" placeholder="Selecione o período">
+                        </div>
+                        <button id="btnFilterAtend" class="btn btn-sm btn-primary">Filtrar</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper" style="min-height: 380px;">
+                    <div id="loaderAtendimentos" class="loading-overlay d-none"><div class="spinner-border text-primary" role="status"></div></div>
+                    <div>
+                        <canvas id="chartAtendimentos" style="max-height: 340px; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- Chart.js and Flatpickr JS libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script>
+    // State management for raw data and chart objects
+    let cadunicoData = null;
+    let atendimentosData = null;
+    let chartObjects = {};
+    const chartPalette = [
+        '#2563eb', '#16a34a', '#f97316', '#dc2626', '#7c3aed',
+        '#0891b2', '#ca8a04', '#db2777', '#4f46e5', '#059669'
+    ];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Initialize date picker
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - 6); // default to last 7 days
+
+        const picker = flatpickr("#dateRangeInput", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            defaultDate: [start, end],
+            locale: "pt",
+            maxDate: new Date()
+        });
+
+        // Initialize loader
+        const globalLoader = document.getElementById("globalLoader");
+
+        // Load all data
+        loadCadunicoStats();
+        loadAtendimentosStats(start, end);
+
+        // Filter button action
+        document.getElementById("btnFilterAtend").addEventListener("click", function() {
+            const selectedDates = picker.selectedDates;
+            if (selectedDates.length === 2) {
+                loadAtendimentosStats(selectedDates[0], selectedDates[1]);
+            } else {
+                alert("Por favor selecione um intervalo de datas (Início e Fim)");
+            }
+        });
+
+        // Toggle Chart/Table logic
+        document.querySelectorAll(".btn-chart-toggle").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const target = this.getAttribute("data-target");
+                const view = this.getAttribute("data-view");
+                
+                // Update active button state
+                document.querySelectorAll(`.btn-chart-toggle[data-target="${target}"]`).forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+
+                // Toggle views
+                const chartView = document.getElementById(`view${capitalize(target)}Chart`);
+                const tableView = document.getElementById(`view${capitalize(target)}Table`);
+
+                if (view === "chart") {
+                    chartView.classList.remove("d-none");
+                    tableView.classList.add("d-none");
+                } else {
+                    chartView.classList.add("d-none");
+                    tableView.classList.remove("d-none");
+                }
+            });
+        });
+
+        document.querySelectorAll(".chart-type-select").forEach(select => {
+            select.addEventListener("change", function() {
+                const target = this.getAttribute("data-chart-type");
+
+                if (target === "atendimentos" && atendimentosData) {
+                    buildAtendimentosChart(atendimentosData);
+                    return;
+                }
+
+                if (!cadunicoData) return;
+
+                const builders = {
+                    etaria: buildEtariaChart,
+                    educacao: buildEducacaoChart,
+                    imovel: buildImovelChart,
+                    renda: buildRendaChart
+                };
+
+                if (builders[target]) {
+                    builders[target](cadunicoData);
+                }
+            });
+        });
+
+        // Helper capitalize
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // 1. Fetch CadUnico stats
+        function loadCadunicoStats() {
+            fetch("/dashboard/api/cadunico/")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("Erro ao buscar dados do Cadastro Único: " + data.error);
+                        return;
+                    }
+                    cadunicoData = data;
+                    
+                    // Populate top card stats
+                    document.getElementById("valFamilias").innerText = Number(data.Total).toLocaleString('pt-BR');
+                    document.getElementById("valPessoas").innerText = Number(data.totpes).toLocaleString('pt-BR');
+                    document.getElementById("valMulherRF").innerText = Number(data.mMulher_Arrimo).toLocaleString('pt-BR');
+                    document.getElementById("valIdosos").innerText = Number(data.m65).toLocaleString('pt-BR');
+                    document.getElementById("valPcd").innerText = Number(data.mDef).toLocaleString('pt-BR');
+
+                    // Generate charts & tables
+                    buildEtariaChart(data);
+                    buildEducacaoChart(data);
+                    buildImovelChart(data);
+                    buildRendaChart(data);
+
+                    // Hide global loader
+                    globalLoader.style.opacity = '0';
+                    setTimeout(() => globalLoader.style.display = 'none', 300);
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Erro ao carregar os dados.");
+                });
+        }
+
+        // 2. Fetch Atendimentos stats
+        function loadAtendimentosStats(startDate, endDate) {
+            const loader = document.getElementById("loaderAtendimentos");
+            loader.classList.remove("d-none");
+
+            const startStr = formatDateISO(startDate);
+            const endStr = formatDateISO(endDate);
+
+            fetch(`/dashboard/api/atendimentos/?start=${startStr}&end=${endStr}`)
+                .then(res => res.json())
+                .then(data => {
+                    loader.classList.add("d-none");
+                    if (data.error) {
+                        alert("Erro ao buscar dados de atendimentos: " + data.error);
+                        return;
+                    }
+                    atendimentosData = data;
+                    buildAtendimentosChart(data);
+                })
+                .catch(err => {
+                    loader.classList.add("d-none");
+                    console.error(err);
+                });
+        }
+
+        // Helper to format Date to YYYY-MM-DD
+        function formatDateISO(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getSelectedChartType(target, fallback) {
+            const select = document.querySelector(`[data-chart-type="${target}"]`);
+            return select ? select.value : fallback;
+        }
+
+        function isCircularChart(type) {
+            return type === 'pie' || type === 'doughnut';
+        }
+
+        function buildChartOptions(type, options = {}) {
+            const baseOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: options.plugins || {}
+            };
+
+            if (isCircularChart(type)) {
+                const legendOptions = options.plugins?.legend || {};
+                return {
+                    ...baseOptions,
+                    plugins: {
+                        ...(options.plugins || {}),
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 12, font: { size: 11 } },
+                            ...legendOptions,
+                            display: false
+                        }
+                    }
+                };
+            }
+
+            return {
+                ...baseOptions,
+                indexAxis: options.indexAxis || 'x',
+                scales: options.scales || {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            };
+        }
+
+        // Chart Building Helpers
+        function buildEtariaChart(d) {
+            const labels = ['0-6 Anos', '7-15 Anos', '16-19 Anos', '20-29 Anos', '30-39 Anos', '40-49 Anos', '50-59 Anos', '60-64 Anos', '65+ Anos'];
+            const mascData = [d.masculino_m6, d.masculino_m7_15, d.masculino_m16_19, d.masculino_m20_29, d.masculino_m30_39, d.masculino_m40_49, d.masculino_m50_59, d.masculino_m60_64, d.masculino_m65];
+            const femData = [d.feminino_m6, d.feminino_m7_15, d.feminino_m16_19, d.feminino_m20_29, d.feminino_m30_39, d.feminino_m40_49, d.feminino_m50_59, d.feminino_m60_64, d.feminino_m65];
+            const totalData = [d.m6, d.m7_15, d.m16_19, d.m20_29, d.m30_39, d.m40_49, d.m50_59, d.m60_64, d.m65];
+
+            // Render table
+            const tbody = document.getElementById("tableEtariaBody");
+            tbody.innerHTML = "";
+            labels.forEach((label, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${label}</strong></td>
+                        <td class="text-center">${mascData[idx].toLocaleString('pt-BR')}</td>
+                        <td class="text-center">${femData[idx].toLocaleString('pt-BR')}</td>
+                        <td class="text-center fw-semibold text-primary">${totalData[idx].toLocaleString('pt-BR')}</td>
+                    </tr>
+                `;
+            });
+
+            // Render chart
+            const ctx = document.getElementById('chartEtaria').getContext('2d');
+            const chartType = getSelectedChartType('etaria', 'doughnut');
+            if (chartObjects['etaria']) chartObjects['etaria'].destroy();
+            chartObjects['etaria'] = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pessoas',
+                        data: totalData,
+                        backgroundColor: chartType === 'bar' ? chartPalette : chartPalette.slice(0, totalData.length),
+                        borderColor: '#3b82f6',
+                        borderWidth: 2
+                    }]
+                },
+                options: buildChartOptions(chartType, {
+                    plugins: { legend: { display: false } }
+                })
+            });
+        }
+
+        function buildEducacaoChart(d) {
+            const labels = [
+                'Menor 5 anos - Sem Creche',
+                'De 6 a 14 - Sem Escola',
+                'De 15 a 17 - Sem Escola',
+                'De 10 a 17 - Analfabeto',
+                'De 18 a 59 - Analfabeto',
+                'Mais de 60 - Analfabeto'
+            ];
+            const values = [
+                d.m0_5_naofreq,
+                d.m6_14_naofreq,
+                d.m15_17_naofreq,
+                d.m10_17_naole,
+                d.m18_59_naole,
+                d.m60_naole
+            ];
+            const totpes = d.totpes || 1;
+
+            // Render table
+            const tbody = document.getElementById("tableEducacaoBody");
+            tbody.innerHTML = "";
+            labels.forEach((label, idx) => {
+                const pct = ((values[idx] * 100) / totpes).toFixed(2);
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${label}</strong></td>
+                        <td class="text-center">${values[idx].toLocaleString('pt-BR')}</td>
+                        <td class="text-center"><span class="badge bg-light text-dark border">${pct}%</span></td>
+                    </tr>
+                `;
+            });
+
+            // Render chart
+            const ctx = document.getElementById('chartEducacao').getContext('2d');
+            const chartType = getSelectedChartType('educacao', 'bar');
+            if (chartObjects['educacao']) chartObjects['educacao'].destroy();
+            chartObjects['educacao'] = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Indivíduos',
+                        data: values,
+                        backgroundColor: chartType === 'line' ? 'rgba(37, 99, 235, 0.12)' : chartPalette.slice(0, values.length),
+                        borderColor: chartType === 'line' ? '#2563eb' : chartPalette.slice(0, values.length),
+                        borderRadius: chartType === 'bar' ? 6 : 0,
+                        fill: chartType === 'line' ? false : undefined,
+                        pointBackgroundColor: chartPalette.slice(0, values.length),
+                        tension: chartType === 'line' ? 0.3 : 0
+                    }]
+                },
+                options: buildChartOptions(chartType, {
+                    indexAxis: chartType === 'bar' ? 'y' : 'x',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { display: false } },
+                        y: { beginAtZero: true, grid: { display: false } }
+                    }
+                })
+            });
+        }
+
+        function buildImovelChart(d) {
+            const labels = ['Alugado', 'Cedido/Coab. Fam.', 'Cedido/Única Fam.', 'Ocupado', 'Com Parentes', 'Outros'];
+            const values = [d.mAlugada, d.mCedida_Coabit, d.mCedida_Unica, d.mOcupada, d.mCParentes, d.mOutros];
+            const total = values.reduce((a, b) => a + b, 0) || 1;
+
+            // Render table
+            const tbody = document.getElementById("tableImovelBody");
+            tbody.innerHTML = "";
+            labels.forEach((label, idx) => {
+                const pct = ((values[idx] * 100) / total).toFixed(2);
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${label}</strong></td>
+                        <td class="text-center">${values[idx].toLocaleString('pt-BR')}</td>
+                        <td class="text-center"><span class="badge bg-light text-dark border">${pct}%</span></td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML += `
+                <tr class="table-group-divider">
+                    <td><strong>Total Geral</strong></td>
+                    <td class="text-center fw-bold">${total.toLocaleString('pt-BR')}</td>
+                    <td class="text-center fw-bold">100%</td>
+                </tr>
+            `;
+
+            // Render chart
+            const ctx = document.getElementById('chartImovel').getContext('2d');
+            const chartType = getSelectedChartType('imovel', 'bar');
+            if (chartObjects['imovel']) chartObjects['imovel'].destroy();
+            chartObjects['imovel'] = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Famílias',
+                        data: values,
+                        backgroundColor: chartPalette.slice(0, values.length),
+                        borderColor: chartPalette.slice(0, values.length),
+                        borderRadius: chartType === 'bar' ? 6 : 0
+                    }]
+                },
+                options: buildChartOptions(chartType, {
+                    plugins: { legend: { display: false } }
+                })
+            });
+        }
+
+        function buildRendaChart(d) {
+            const labels = [];
+            const values = [];
+
+            for (let i = 1; i <= 5; i++) {
+                const desc = d[`desc_faixa_${i}`];
+                const count = d[`renda_media_faixa_${i}`];
+                if (desc && count > 0) {
+                    labels.push(desc);
+                    values.push(count);
+                }
+            }
+
+            const total = values.reduce((a, b) => a + b, 0) || 1;
+
+            // Render table
+            const tbody = document.getElementById("tableRendaBody");
+            tbody.innerHTML = "";
+            labels.forEach((label, idx) => {
+                const pct = ((values[idx] * 100) / total).toFixed(2);
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${label}</strong></td>
+                        <td class="text-center">${values[idx].toLocaleString('pt-BR')}</td>
+                        <td class="text-center"><span class="badge bg-light text-dark border">${pct}%</span></td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML += `
+                <tr class="table-group-divider">
+                    <td><strong>Total</strong></td>
+                    <td class="text-center fw-bold">${total.toLocaleString('pt-BR')}</td>
+                    <td class="text-center fw-bold">100%</td>
+                </tr>
+            `;
+
+            // Render chart
+            const ctx = document.getElementById('chartRenda').getContext('2d');
+            const chartType = getSelectedChartType('renda', 'pie');
+            if (chartObjects['renda']) chartObjects['renda'].destroy();
+            chartObjects['renda'] = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Famílias',
+                        data: values,
+                        backgroundColor: chartPalette.slice(0, values.length),
+                        borderColor: chartPalette.slice(0, values.length),
+                        borderWidth: 2
+                    }]
+                },
+                options: buildChartOptions(chartType, {
+                    plugins: { legend: { display: false } }
+                })
+            });
+        }
+
+        function buildAtendimentosChart(data) {
+            const labels = data.map(d => {
+                // format date string YYYY-MM-DD to DD/MM/YYYY
+                const parts = d.dia.split('-');
+                if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                return d.dia;
+            });
+            const values = data.map(d => d.atendimento);
+
+            const ctx = document.getElementById('chartAtendimentos').getContext('2d');
+            const chartType = getSelectedChartType('atendimentos', 'line');
+            if (chartObjects['atendimentos']) chartObjects['atendimentos'].destroy();
+            chartObjects['atendimentos'] = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Atendimentos Realizados',
+                        data: values,
+                        borderColor: '#ef4444',
+                        backgroundColor: chartType === 'bar' ? values.map((_, idx) => chartPalette[idx % chartPalette.length]) : 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: chartType === 'line',
+                        tension: chartType === 'line' ? 0.3 : 0,
+                        pointBackgroundColor: values.map((_, idx) => chartPalette[idx % chartPalette.length]),
+                        borderRadius: chartType === 'bar' ? 6 : 0,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Editar {{ config.title }} - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-form {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Editar {{ config.title }}</h2>
+        <p class="text-muted small mb-0">Atualizar informações do registro #{{ pk }}</p>
+    </div>
+    <div>
+        <a href="{% url 'tbasica_list_legacy' config.model_name %}" class="btn btn-outline-secondary btn-sm px-3 py-2 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    <div class="card card-form col-12 col-md-8 col-lg-6 mx-auto mb-4">
+        <div class="card-body p-4">
+            <form method="POST" action="{% url 'tbasica_update_legacy' config.model_name %}" id="formGeneric">
+                {% csrf_token %}
+                <input type="hidden" name="id" id="id" value="{{ id }}">
+
+                <div class="row g-3">
+                    {% for field in fields %}
+                        <div class="col-12">
+                            {% if field.type == 'checkbox' %}
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="{{ field.name }}" id="{{ field.name }}" value="1"
+                                           {% if field.value == 1 or field.value == True or field.value == '1' %}checked{% endif %}>
+                                    <label class="form-check-label small fw-bold text-secondary" for="{{ field.name }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <label for="{{ field.name }}" class="form-label small fw-bold text-secondary">
+                                    {{ field.label }} {% if field.required %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                
+                                {% if field.type == 'textarea' %}
+                                    <textarea class="form-control rounded-3" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %} rows="3">{{ field.value }}</textarea>
+                                {% elif field.type == 'select' %}
+                                    <select class="form-select rounded-3" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %}>
+                                        <option value="">Selecione...</option>
+                                        {% for opt_val, opt_label in field.options %}
+                                            <option value="{{ opt_val }}" {% if field.value == opt_val %}selected{% endif %}>{{ opt_label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif field.type == 'date' %}
+                                    <input type="date" class="form-control rounded-3" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %} value="{{ field.value }}">
+                                {% elif field.type == 'number' %}
+                                    <input type="number" class="form-control rounded-3" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %} value="{{ field.value }}">
+                                {% else %}
+                                    <input type="text" class="form-control rounded-3" name="{{ field.name }}" id="{{ field.name }}" {% if field.required %}required{% endif %} value="{{ field.value }}">
+                                {% endif %}
+                            {% endif %}
+                            <div class="text-danger small mt-1" id="error-{{ field.name }}"></div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{% url 'tbasica_list_legacy' config.model_name %}" class="btn btn-light rounded-3 px-4">Cancelar</a>
+                    <button type="button" class="btn btn-primary rounded-3 px-4 shadow-sm" id="salvar">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- Script variables for legacy crud.js compatibility -->
+<script>
+    var nomeTela = '{{ config.title }}';
+    var nomeForm = 'formGeneric';
+</script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Include custom crud.js if present, otherwise handle AJAX directly -->
+<script src="{% static 'assets/js/crud/crud.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Configurações Gerais - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-config {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .table-config th {
+        background-color: #f9fafb;
+        color: #4b5563;
+        font-weight: 600;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    .table-config td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Parâmetros Globais do Sistema</h2>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    <!-- Mensagens do Servidor -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Card de Tabela -->
+    <div class="card card-config mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <form method="GET" action="{% url 'list_configuracoes' %}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Buscar por chave ou descrição..." value="{{ search }}">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-primary px-3">Filtrar</button>
+                    {% if search %}
+                        <a href="{% url 'list_configuracoes' %}" class="btn btn-sm btn-outline-secondary px-3">Limpar</a>
+                    {% endif %}
+                </div>
+                <div class="col-auto ms-auto d-flex align-items-center gap-2">
+                    <label for="per_page" class="small text-muted mb-0 text-nowrap">Exibir:</label>
+                    <select name="per_page" id="per_page" class="form-select form-select-sm rounded-3" style="width: 80px;" onchange="this.form.submit()">
+                        <option value="10" {% if per_page == "10" %}selected{% endif %}>10</option>
+                        <option value="25" {% if per_page == "25" %}selected{% endif %}>25</option>
+                        <option value="50" {% if per_page == "50" %}selected{% endif %}>50</option>
+                        <option value="100" {% if per_page == "100" %}selected{% endif %}>100</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-config mb-0">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3" style="width: 80px;">ID</th>
+                            <th class="py-3" style="width: 250px;">Parâmetro (Chave)</th>
+                            <th class="py-3">Descrição da Configuração</th>
+                            <th class="py-3">Valor Configurado</th>
+                            <th class="px-4 py-3 text-end" style="width: 100px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for config in page_obj %}
+                        <tr>
+                            <td class="px-4 fw-semibold text-muted">{{ config.id }}</td>
+                            <td><span class="badge bg-light text-secondary border font-monospace">{{ config.chave }}</span></td>
+                            <td><strong class="text-dark">{{ config.descricao }}</strong></td>
+                            <td>
+                                {% if config.valor %}
+                                    <span class="font-monospace text-primary bg-primary-subtle px-2 py-1 rounded small border border-primary-subtle">{{ config.valor }}</span>
+                                {% else %}
+                                    <span class="text-muted small italic">Não definido (Vazio)</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 text-end">
+                                <!-- Editar -->
+                                <a href="{% url 'edit_configuracao' config.id %}" class="btn btn-sm btn-outline-secondary" title="Editar Parâmetro">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fa fa-gears fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Nenhum parâmetro de configuração encontrado.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Paginação -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+            <span class="text-muted small">
+                Exibindo página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+            <nav aria-label="Navegação de configurações">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}&per_page={{ per_page }}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}&per_page={{ per_page }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}&per_page={{ per_page }}" aria-label="Próximo">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

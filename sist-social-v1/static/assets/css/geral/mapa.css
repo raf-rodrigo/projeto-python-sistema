@@ -1,0 +1,90 @@
+.map {
+	height: 100%;
+}
+
+.controls {
+	margin-top: 10px;
+	border: 1px solid transparent;
+	border-radius: 2px 0 0 2px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	height: 32px;
+	outline: none;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#pac-input {
+	background-color: #fff;
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+	margin-left: 12px;
+	padding: 0 11px 0 13px;
+	text-overflow: ellipsis;
+	width: 300px;
+}
+
+#pac-input:focus {
+	border-color: #4d90fe;
+}
+
+.pac-container {
+	font-family: Roboto;
+}
+
+#legend {
+	font-family: Arial, sans-serif;
+	background: #fff;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid transparent;
+	border-radius: 2px 0 0 2px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#btnLegendaText {
+	color: rgb(25,25,25);
+	font-family: Roboto,Arial,sans-serif;
+	font-size: 15px;
+	float: left;
+}
+
+#btnExibir {
+	border-radius: 2px;
+	font-size: 16px;
+	line-height: 8px;
+	font-weight: bold;
+	text-align: center;
+	background-color: #5e5e5e;
+	color: #FFF;
+	width: 15px;
+	padding: 5px 3px 3px 2px;
+	height: 16px;
+	float: right;
+	margin-left: 10px;
+}
+
+#caixaLegenda {
+	padding-top: 5px;
+}
+
+.invisivel {
+	display: none;
+}
+
+.quebra {
+	clear: both;
+}
+
+.mapaLoading {
+    z-index: 999999999;
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    text-align: center;
+    padding: 170px !important;
+    opacity: 0.5;
+    filter: alpha(opacity=50); /* For IE8 and earlier */
+}

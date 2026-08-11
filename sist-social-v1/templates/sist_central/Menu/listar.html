@@ -1,0 +1,297 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Estrutura do Menu - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-menu {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .tree-list {
+        list-style-type: none;
+        padding-left: 20px;
+    }
+    .tree-root {
+        padding-left: 0;
+    }
+    .tree-item {
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+    .tree-item:hover {
+        background-color: #f3f4f6;
+        border-color: #d1d5db;
+    }
+    .category-node {
+        border-left: 4px solid #3b82f6;
+    }
+    .page-node {
+        border-left: 4px solid #10b981;
+    }
+    .nav-tabs-custom .nav-link {
+        border: none;
+        color: #4b5563;
+        font-weight: 500;
+        padding: 12px 20px;
+        border-bottom: 2px solid transparent;
+    }
+    .nav-tabs-custom .nav-link.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+        background: transparent;
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100 flex-wrap">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Administração de Menus e Categorias</h2>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'create_categoria' %}" class="btn btn-outline-primary btn-sm px-3 py-2 rounded-3 shadow-sm">
+            <i class="fa fa-folder-plus me-2"></i>Nova Categoria
+        </a>
+        <a href="{% url 'create_menu_item' %}" class="btn btn-primary btn-sm px-3 py-2 rounded-3 shadow-sm">
+            <i class="fa fa-plus me-2"></i>Novo Item de Menu
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0">
+
+    <!-- Mensagens de Sucesso/Erro -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Tabs de Navegação -->
+    <ul class="nav nav-tabs nav-tabs-custom mb-4 border-bottom" id="menuTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tree-tab" data-bs-toggle="tab" data-bs-target="#tree-pane" type="button" role="tab" aria-controls="tree-pane" aria-selected="true">
+                <i class="fa fa-sitemap me-2"></i>Estrutura do Menu
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories-pane" type="button" role="tab" aria-controls="categories-pane" aria-selected="false">
+                <i class="fa fa-folder me-2"></i>Categorias
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="menuTabsContent">
+        <!-- Tab 1: Estrutura do Menu -->
+        <div class="tab-pane fade show active" id="tree-pane" role="tabpanel" aria-labelledby="tree-tab">
+            <div class="card card-menu">
+                <div class="card-body p-4">
+                    <ul class="tree-list tree-root">
+                        {% for item in menu_tree %}
+                            <li class="mb-3">
+                                <div class="tree-item category-node d-flex justify-content-between align-items-center">
+                                    <div>
+                                        {% if item.icone %}
+                                            <i class="{{ item.icone }} me-2 text-primary"></i>
+                                        {% endif %}
+                                        <strong>{{ item.nome }}</strong>
+                                        <span class="badge bg-secondary-subtle text-secondary border font-monospace ms-2">Ordem: {{ item.ordem }}</span>
+                                    </div>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'edit_menu_item' item.id %}" class="btn btn-outline-secondary" title="Editar Posição/Ordem"><i class="fa fa-edit"></i></a>
+                                        <button type="button" class="btn btn-outline-danger btn-delete-menu-item" data-id="{{ item.id }}" data-nome="{{ item.nome }}" title="Excluir do Menu"><i class="fa fa-trash-alt"></i></button>
+                                    </div>
+                                </div>
+                                
+                                {% if item.children %}
+                                    <ul class="tree-list">
+                                        {% for child in item.children %}
+                                            <li class="mb-2">
+                                                <div class="tree-item {% if child.children %}category-node{% else %}page-node{% endif %} d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        {% if child.icone %}
+                                                            <i class="{{ child.icone }} me-2 {% if child.tipo == 'C' %}text-primary{% else %}text-success{% endif %}"></i>
+                                                        {% endif %}
+                                                        <span>{{ child.nome }}</span>
+                                                        {% if child.caminho %}
+                                                            <code class="text-muted small font-monospace ms-2">{{ child.caminho }}</code>
+                                                        {% endif %}
+                                                        <span class="badge bg-secondary-subtle text-secondary border font-monospace ms-2">Ordem: {{ child.ordem }}</span>
+                                                    </div>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a href="{% url 'edit_menu_item' child.id %}" class="btn btn-outline-secondary" title="Editar Posição/Ordem"><i class="fa fa-edit"></i></a>
+                                                        <button type="button" class="btn btn-outline-danger btn-delete-menu-item" data-id="{{ child.id }}" data-nome="{{ child.nome }}" title="Excluir do Menu"><i class="fa fa-trash-alt"></i></button>
+                                                    </div>
+                                                </div>
+
+                                                {% if child.children %}
+                                                    <ul class="tree-list">
+                                                        {% for grand_child in child.children %}
+                                                            <li>
+                                                                <div class="tree-item page-node d-flex justify-content-between align-items-center">
+                                                                    <div>
+                                                                        {% if grand_child.icone %}
+                                                                            <i class="{{ grand_child.icone }} me-2 text-success"></i>
+                                                                        {% endif %}
+                                                                        <span>{{ grand_child.nome }}</span>
+                                                                        <code class="text-muted small font-monospace ms-2">{{ grand_child.caminho }}</code>
+                                                                        <span class="badge bg-secondary-subtle text-secondary border font-monospace ms-2">Ordem: {{ grand_child.ordem }}</span>
+                                                                    </div>
+                                                                    <div class="btn-group btn-group-sm">
+                                                                        <a href="{% url 'edit_menu_item' grand_child.id %}" class="btn btn-outline-secondary" title="Editar Posição/Ordem"><i class="fa fa-edit"></i></a>
+                                                                        <button type="button" class="btn btn-outline-danger btn-delete-menu-item" data-id="{{ grand_child.id }}" data-nome="{{ grand_child.nome }}" title="Excluir do Menu"><i class="fa fa-trash-alt"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="text-center py-5 text-muted">
+                                <i class="fa fa-sitemap fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Estrutura do menu vazia. Adicione itens para construir seu layout de sidebar.</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Categorias -->
+        <div class="tab-pane fade" id="categories-pane" role="tabpanel" aria-labelledby="categories-tab">
+            <div class="card card-menu">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-menu mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="px-4 py-3" style="width: 80px;">ID</th>
+                                    <th class="py-3">Nome da Categoria</th>
+                                    <th class="py-3">Módulo Vinculado</th>
+                                    <th class="py-3">Ícone (CSS)</th>
+                                    <th class="py-3 text-center" style="width: 120px;">Status</th>
+                                    <th class="px-4 py-3 text-end" style="width: 120px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cat in categorias %}
+                                <tr>
+                                    <td class="px-4 fw-semibold text-muted">{{ cat.id }}</td>
+                                    <td>
+                                        <strong>
+                                            {% if cat.icone %}
+                                                <i class="{{ cat.icone }} me-2 text-primary"></i>
+                                            {% endif %}
+                                            {{ cat.nome }}
+                                        </strong>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border font-monospace">{{ cat.modulo.nome }}</span></td>
+                                    <td><code class="text-secondary">{{ cat.icone|default:"-" }}</code></td>
+                                    <td class="text-center">
+                                        {% if cat.ativo == 1 %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">Ativa</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">Inativa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 text-end">
+                                        <a href="{% url 'edit_categoria' cat.id %}" class="btn btn-sm btn-outline-secondary" title="Editar Categoria">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="fa fa-folder-open fa-3x mb-3 opacity-50"></i>
+                                        <p class="mb-0">Nenhuma categoria de menu cadastrada.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- SweetAlert2 Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        // Excluir Item do Menu (AJAX)
+        document.querySelectorAll(".btn-delete-menu-item").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const itemId = this.getAttribute("data-id");
+                const itemNome = this.getAttribute("data-nome");
+                
+                Swal.fire({
+                    title: 'Deseja remover o item?',
+                    text: `Tem certeza que deseja remover '${itemNome}' da estrutura do menu? Os itens filhos (se houver) serão movidos para o nível raiz.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, remover!',
+                    cancelButtonText: 'Não, cancelar',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/menu/deletar/${itemId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Sucesso!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Erro!', data.message || 'Ocorreu um erro ao tentar remover o item.', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire('Erro!', 'Falha de comunicação com o servidor.', 'error');
+                        });
+                    }
+                });
+            });
+        });
+
+    });
+</script>
+{% endblock %}

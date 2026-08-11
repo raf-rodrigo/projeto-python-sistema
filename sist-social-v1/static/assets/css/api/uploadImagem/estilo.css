@@ -1,0 +1,13 @@
+#imagem{
+    width: 200px;
+    height: auto;
+}
+
+.fechaImg{
+    font-size: 16px;
+    position: absolute;
+    margin-left: 183px;
+    text-shadow: 0px 1px 1px #fffefe;
+    color: #676A6C;
+    cursor: pointer;
+}

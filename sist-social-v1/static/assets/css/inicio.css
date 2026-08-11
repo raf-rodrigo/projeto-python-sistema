@@ -1,0 +1,17 @@
+.fundo{
+    background-image: url(../../../arquivos/sist_social/sistema/imagens/bem-vindo-bg.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    padding: 15px 20px;
+    text-align: center;
+    margin: -25px;
+}
+
+#logo_ci{
+    width: 200px;
+}
+
+#logo{
+    width: 300px;
+}

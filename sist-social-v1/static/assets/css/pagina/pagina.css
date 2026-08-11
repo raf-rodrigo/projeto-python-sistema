@@ -1,0 +1,10 @@
+.scrollModalIcones{
+   max-height:450px;
+   overflow-x:auto;
+}
+.modal-wide .modal-dialog{
+    width: 80%;
+}
+.modal-wide .modal-body{
+    overflow-y: auto;
+}

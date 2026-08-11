@@ -1,0 +1,193 @@
+#carregando {
+    margin-top: -50px;
+}
+
+body {
+    background-color: #fff !important;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.outer-wrapper {
+    padding-top: 30px;
+    height: 100vh;
+}
+
+.inner-wrapper {
+    padding: 15px;
+}
+
+.bg-form {
+    background-color: #F5F5F5;
+    /* min-height: 50vh; */
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.corpo {
+    background-image: url('../../../arquivos/sist_social/sistema/imagens/login-bg.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.conecta {
+    padding: 8px;
+    background-color: #141E37 !important;
+    border-bottom: 4px solid #505a82 !important;
+}
+
+.vision {
+    border-bottom: 4px solid #0d9f6e !important;
+}
+
+.conecta:hover {
+    background-color: #030d26 !important;
+    color: white;
+}
+
+.margin-img {
+    margin-bottom: 15px;
+}
+
+.footer {
+    height: 10vh;
+    width: 100%;
+    background: none !important;
+    border-top: none !important;
+}
+
+.footer-lliege {
+    float: right;
+    margin-top: -25px;
+}
+
+.links a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.links a:hover {
+    color: #f5911e !important;
+}
+
+@media screen and (max-width: 858px) {
+    .footer-lliege {
+        float: none;
+        margin-top: 5px;
+        margin-right: 0 !important;
+    }
+}
+
+
+/*Css loader*/
+
+.loader {
+    left: 50%;
+    margin-left: -4em;
+}
+
+.loader,
+.loader:after {
+    border-radius: 50%;
+    width: 8em;
+    height: 8em;
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -4.05em;
+}
+
+.pulse {
+    animation: pulse 0.7s infinite;
+    margin: 0 auto;
+    display: table;
+    animation-direction: alternate;
+    -webkit-animation-name: pulse;
+    animation-name: pulse;
+}
+
+@-webkit-keyframes pulse {
+    0% {
+        -webkit-transform: scale(1);
+        -webkit-filter: brightness(100%);
+    }
+    100% {
+        -webkit-transform: scale(1.1);
+        -webkit-filter: brightness(200%);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        filter: brightness(100%);
+    }
+    100% {
+        transform: scale(1.1);
+        filter: brightness(200%);
+    }
+}
+
+.modalInicioHidden {
+    display: none;
+}
+
+.modalInicioShow {
+    display: block;
+    position: relative;
+    left: 272px;
+    top: -350px;
+}
+
+.modalInicioHidden div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #ffffffec;
+    width: 40vw;
+    height: 65vh;
+    border: 1px solid rgba(182, 182, 182, 0.904);
+    animation: modalInicio .8s;
+    box-shadow: 1px 2px 3px #000000c2;
+    border-radius: 10px;
+    margin: 50px;
+}
+
+.modalInicioHidden div h2,
+select,
+.acessar {
+    margin: 35px;
+}
+
+#selUnidade {
+    width: 215px;
+    height: 35px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+#selUnidade,
+option {
+    cursor: pointer;
+}
+
+.acessar {
+    background-color: #008000;
+    color: #ffffff;
+}
+
+.acessar:hover {
+    background-color: #1c7c1c;
+    color: #ffffff;
+}
+
+@keyframes modalInicio {
+    from {
+        transform: scale(0.2);
+        transition: .1s all;
+    }
+    to {
+        transform: scale(1);
+        transition: .2s all;
+    }
+}

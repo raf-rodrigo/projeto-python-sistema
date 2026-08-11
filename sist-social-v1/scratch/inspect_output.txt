@@ -1,0 +1,268 @@
+
+TABLE: tipo_trabalho
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  funcao: varchar(60) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_serie_curso
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  serie: varchar(30) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_frequencia_escola
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  tipo: varchar(40) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_curso_fez
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  curso: varchar(100) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_curso_atual
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  curso: varchar(70) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: cid
+  id: int (Null: NO, Key: PRI, Default: None)
+  codigo: varchar(255) (Null: NO, Key: , Default: None)
+  descricao: text (Null: NO, Key: , Default: None)
+  codigo_cid_dez: varchar(255) (Null: NO, Key: , Default: None)
+  ativo: varchar(100) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_animal
+  id: int (Null: NO, Key: PRI, Default: None)
+  tipo: varchar(255) (Null: NO, Key: , Default: None)
+  ativo: varchar(100) (Null: NO, Key: , Default: None)
+  status: int (Null: YES, Key: , Default: 1)
+
+TABLE: tipo_prioridade_scfv
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(255) (Null: NO, Key: , Default: None)
+  ativo: tinyint(1) (Null: NO, Key: , Default: 1)
+
+TABLE: motivo_desligamento
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(255) (Null: NO, Key: , Default: None)
+  ativo: tinyint(1) (Null: NO, Key: , Default: 1)
+  grupo: tinyint (Null: NO, Key: , Default: 1)
+
+TABLE: tipo_recurso
+  id: int (Null: NO, Key: PRI, Default: None)
+  nome: varchar(255) (Null: YES, Key: , Default: None)
+  ativo: int (Null: YES, Key: , Default: None)
+
+TABLE: feriados
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(255) (Null: NO, Key: , Default: None)
+  ano: varchar(4) (Null: NO, Key: , Default: None)
+  data_ocorrencia: date (Null: NO, Key: , Default: None)
+  tipo: enum('fixo','móvel') (Null: NO, Key: , Default: None)
+  ativo: tinyint(1) (Null: YES, Key: , Default: 1)
+  status: enum('ativo','inativo') (Null: YES, Key: , Default: ativo)
+  data_criacao: timestamp (Null: YES, Key: , Default: CURRENT_TIMESTAMP)
+
+TABLE: vulnerabilidades_sociais
+  id: int (Null: NO, Key: PRI, Default: None)
+  nome: varchar(255) (Null: NO, Key: , Default: None)
+  descricao: text (Null: YES, Key: , Default: None)
+  categoria: varchar(10) (Null: YES, Key: , Default: None)
+  nivel_severidade: enum('baixo','médio','alto') (Null: YES, Key: , Default: None)
+  prioridade_atendimento: enum('alta','média','baixa') (Null: YES, Key: , Default: None)
+  data_criacao: timestamp (Null: YES, Key: , Default: CURRENT_TIMESTAMP)
+  ativo: tinyint(1) (Null: YES, Key: , Default: 1)
+  status: enum('ativo','inativo') (Null: YES, Key: , Default: ativo)
+
+TABLE: religioes
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(255) (Null: NO, Key: , Default: None)
+  ativo: tinyint(1) (Null: YES, Key: , Default: 1)
+  status: enum('ativo','inativo') (Null: YES, Key: , Default: ativo)
+
+TABLE: bairros
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  nome_oficial: varchar(60) (Null: YES, Key: , Default: None)
+  nome_correios: varchar(60) (Null: YES, Key: , Default: None)
+  area_geo: varchar(40) (Null: YES, Key: , Default: None)
+  ativo: tinyint(1) (Null: NO, Key: , Default: 1)
+  cep: varchar(8) (Null: YES, Key: , Default: None)
+
+TABLE: areas
+  id: int (Null: NO, Key: PRI, Default: None)
+  name: varchar(255) (Null: NO, Key: , Default: None)
+  description: text (Null: YES, Key: , Default: None)
+  created_at: timestamp (Null: YES, Key: , Default: CURRENT_TIMESTAMP)
+  ativo: int (Null: NO, Key: , Default: 1)
+
+TABLE: microareas
+  id: int (Null: NO, Key: PRI, Default: None)
+  area_id: int (Null: NO, Key: MUL, Default: None)
+  name: varchar(255) (Null: NO, Key: , Default: None)
+  description: text (Null: YES, Key: , Default: None)
+  created_at: timestamp (Null: YES, Key: , Default: CURRENT_TIMESTAMP)
+  ativo: int (Null: NO, Key: , Default: 1)
+
+TABLE: potencialidades
+  id: int (Null: NO, Key: PRI, Default: None)
+  nome: varchar(255) (Null: NO, Key: , Default: None)
+  descricao: text (Null: YES, Key: , Default: None)
+  categoria: varchar(100) (Null: YES, Key: , Default: None)
+  nivel_desenvolvimento: enum('inicial','intermediário','avançado') (Null: YES, Key: , Default: None)
+  prioridade_investimento: enum('alta','média','baixa') (Null: YES, Key: , Default: None)
+  data_criacao: timestamp (Null: YES, Key: , Default: CURRENT_TIMESTAMP)
+  ativo: tinyint(1) (Null: YES, Key: , Default: 1)
+
+TABLE: atos_infracionais
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(255) (Null: NO, Key: , Default: None)
+  artigo_infringido: varchar(255) (Null: NO, Key: , Default: None)
+  status: enum('ativo','inativo') (Null: YES, Key: , Default: ativo)
+  ativo: int (Null: NO, Key: , Default: 1)
+
+TABLE: motivo_atendimento
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(255) (Null: NO, Key: , Default: None)
+  status: enum('ativo','inativo') (Null: YES, Key: , Default: ativo)
+  ativo: int (Null: NO, Key: , Default: 1)
+
+TABLE: tipo_medida_socioeduc
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  medida: varchar(60) (Null: YES, Key: , Default: None)
+  ativo: tinyint(1) (Null: YES, Key: , Default: 1)
+
+TABLE: tipo_deficiencia
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  tipo: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_cbo
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  codigo: varchar(6) (Null: YES, Key: , Default: None)
+  ocupacao: varchar(100) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_contato_parente
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  contato: varchar(40) (Null: NO, Key: , Default: None)
+  field1: varchar(40) (Null: YES, Key: , Default: None)
+  field2: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_escolaridade_pront
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  codigo: varchar(2) (Null: YES, Key: , Default: None)
+  escolaridade: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_tempo_rua
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  tempo_vive_rua: varchar(40) (Null: YES, Key: , Default: None)
+  field1: varchar(40) (Null: YES, Key: , Default: None)
+  field2: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_origem_cad
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  origem: varchar(50) (Null: YES, Key: , Default: None)
+
+TABLE: publico_alvo
+  id: int (Null: NO, Key: PRI, Default: None)
+  nome: varchar(200) (Null: YES, Key: , Default: None)
+  ativo: int (Null: YES, Key: , Default: None)
+
+TABLE: tipo_sit_violencia
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  situacao: varchar(80) (Null: YES, Key: , Default: None)
+  ativo: tinyint(1) (Null: YES, Key: , Default: 1)
+
+TABLE: origem_tipo_encaminhamento
+  id: int (Null: NO, Key: PRI, Default: None)
+  idchave: varchar(55) (Null: YES, Key: UNI, Default: None)
+  descricao: varchar(55) (Null: YES, Key: , Default: None)
+  ativo: int (Null: YES, Key: , Default: None)
+
+TABLE: sit_privado_liberdade
+  id: int (Null: NO, Key: PRI, Default: None)
+  idchave: varchar(55) (Null: YES, Key: , Default: None)
+  situacao: varchar(55) (Null: YES, Key: , Default: None)
+  ativo: int (Null: YES, Key: , Default: None)
+
+TABLE: servico_social
+  id: int (Null: NO, Key: PRI, Default: None)
+  idchave: varchar(55) (Null: YES, Key: , Default: None)
+  nome: varchar(85) (Null: YES, Key: , Default: None)
+  descricao: text (Null: YES, Key: , Default: None)
+  tipo_servico_protecao_id: int (Null: YES, Key: MUL, Default: None)
+  ativo: smallint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_servico_protecao
+  id: int (Null: NO, Key: PRI, Default: None)
+  idchave: varchar(55) (Null: YES, Key: UNI, Default: None)
+  nome: varchar(55) (Null: YES, Key: , Default: None)
+  ativo: int (Null: YES, Key: , Default: None)
+
+TABLE: tipo_periodo
+  id: int (Null: NO, Key: PRI, Default: None)
+  periodo: varchar(255) (Null: YES, Key: , Default: None)
+  ativo: int (Null: YES, Key: , Default: None)
+
+TABLE: caps
+  id: int (Null: NO, Key: PRI, Default: None)
+  descricao: varchar(80) (Null: NO, Key: , Default: None)
+  ativo: tinyint(1) (Null: NO, Key: , Default: None)
+
+TABLE: raca_cor
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  raca_cor: varchar(15) (Null: YES, Key: UNI, Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_ocupacao
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  ocupacao: varchar(50) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_etnia
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  tipo: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: tipo_abastec_agua
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  abastecimento: varchar(40) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_efeito_descumpr
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  efeito: varchar(40) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_grupos_fam_mds
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  codigo: varchar(3) (Null: YES, Key: , Default: None)
+  tipo: varchar(60) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_mat_piso
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  material: varchar(40) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+
+TABLE: tipo_beneficios
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  beneficio: varchar(40) (Null: YES, Key: , Default: None)
+  ativo: tinyint (Null: YES, Key: , Default: None)
+  tipo_unidade_id: int (Null: YES, Key: , Default: None)
+  rma_linha: varchar(100) (Null: YES, Key: , Default: None)
+  categoria: enum('','Eventuais','Contínuos','Programas','Outras Políticas') (Null: NO, Key: , Default: None)
+
+TABLE: estados
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  cod_ibge: varchar(4) (Null: YES, Key: , Default: None)
+  sigla: varchar(2) (Null: YES, Key: , Default: None)
+  nome: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: municipios
+  id: int unsigned (Null: NO, Key: PRI, Default: None)
+  id_uf: int unsigned (Null: YES, Key: MUL, Default: None)
+  cod_ibge: varchar(7) (Null: YES, Key: , Default: None)
+  nome: varchar(40) (Null: YES, Key: , Default: None)
+
+TABLE: pais
+  id: tinyint unsigned (Null: NO, Key: PRI, Default: None)
+  nome: varchar(50) (Null: NO, Key: , Default: None)
+  name: varchar(50) (Null: NO, Key: , Default: None)

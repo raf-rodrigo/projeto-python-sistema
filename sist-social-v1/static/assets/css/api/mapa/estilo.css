@@ -1,0 +1,29 @@
+.buscaCheck {
+    display: inline-block;
+    margin: 0px 50px 0px 6px;
+    font-weight: 700;
+    height: 21px;
+}
+.check{
+    margin-bottom: 3px;
+    margin-left: 15px;
+}
+
+.mapaLoading {
+    z-index: 999;
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    text-align: center;
+    padding: 170px !important;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+.legendaLoading {
+    z-index: 9999;
+    position: absolute;
+    left: 50%;
+    top: 65%;
+    width: 221px;
+}

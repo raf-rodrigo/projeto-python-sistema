@@ -1,0 +1,110 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Editar SSO - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-form {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Editar Integração SSO</h2>
+    </div>
+    <div>
+        <a href="{% url 'list_sso' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0" style="max-width: 800px; margin: 0 auto;">
+
+    <!-- Listagem de Erros da View -->
+    {% if errors %}
+        <div class="alert alert-danger rounded-3 shadow-sm mb-4" role="alert">
+            <h5 class="alert-heading fw-bold"><i class="fa fa-exclamation-triangle me-2"></i>Erros no Formulário:</h5>
+            <ul class="mb-0">
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Card de Formulário -->
+    <div class="card card-form">
+        <div class="card-body p-4">
+            <form method="POST" action="{% url 'edit_sso' sso.id %}">
+                {% csrf_token %}
+
+                <!-- Identificação do SSO -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-secondary">Plataforma SSO</label>
+                    <div class="p-3 bg-light border rounded-3">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6 rounded-3">
+                            <i class="fa fa-key me-1"></i>{{ sso.plataforma }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Credenciais -->
+                <h5 class="fw-bold text-dark mb-3"><i class="fa fa-shield me-2 text-primary"></i>Credenciais da Integração</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="client_id" class="form-label fw-semibold text-dark">Client ID *</label>
+                        <input type="text" name="client_id" id="client_id" class="form-control rounded-3 font-monospace" value="{{ sso.client_id|default:'' }}" placeholder="Digite o Client ID" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="client_secret" class="form-label fw-semibold text-dark">Client Secret</label>
+                        <input type="text" name="client_secret" id="client_secret" class="form-control rounded-3 font-monospace" value="{{ sso.client_secret|default:'' }}" placeholder="Digite o Client Secret">
+                    </div>
+                </div>
+
+                <hr class="text-secondary opacity-25 my-4">
+
+                <!-- URLs de Conexão -->
+                <h5 class="fw-bold text-dark mb-3"><i class="fa fa-link me-2 text-success"></i>URLs de Comunicação</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label for="callback" class="form-label fw-semibold text-dark">Callback URL *</label>
+                        <input type="url" name="callback" id="callback" class="form-control rounded-3 font-monospace" value="{{ sso.callback|default:'' }}" placeholder="https://..." required>
+                        <div class="form-text">Endereço de retorno após a autorização do OAuth externo.</div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label for="api_url" class="form-label fw-semibold text-dark">API URL *</label>
+                        <input type="url" name="api_url" id="api_url" class="form-control rounded-3 font-monospace" value="{{ sso.api_url|default:'' }}" placeholder="https://..." required>
+                        <div class="form-text">URL base do servidor externo de SSO.</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="ativo" class="form-label fw-semibold text-dark">Status da Integração</label>
+                        <select name="ativo" id="ativo" class="form-select rounded-3">
+                            <option value="1" {% if sso.ativo == 1 %}selected{% endif %}>Ativo (Permite login via SSO)</option>
+                            <option value="0" {% if sso.ativo == 0 %}selected{% endif %}>Inativo (Bloqueado)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-5 d-flex justify-content-end gap-2">
+                    <a href="{% url 'list_sso' %}" class="btn btn-outline-secondary rounded-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

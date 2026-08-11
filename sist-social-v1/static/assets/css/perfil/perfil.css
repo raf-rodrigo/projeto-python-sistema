@@ -1,0 +1,16 @@
+.socialInativo{
+    display: none;
+}
+
+.modal-wide .modal-dialog{
+    width: 80%;
+}
+
+.modal-wide .modal-body{
+    overflow-y: auto;
+}
+
+.liSubItens{
+    background-color:#F0F0F0;
+    display: none;
+}

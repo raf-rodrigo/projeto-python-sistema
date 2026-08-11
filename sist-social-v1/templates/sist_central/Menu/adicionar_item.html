@@ -1,0 +1,165 @@
+{% extends 'telaInicio.html' %}
+{% load static %}
+
+{% block titulo %}Novo Item de Menu - Plataforma SistSocial{% endblock %}
+
+{% block css %}
+<style>
+    .card-form {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+</style>
+{% endblock %}
+
+{% block titulo_pagina %}
+<div class="d-flex justify-content-between align-items-center w-100">
+    <div>
+        <h2 class="h3 mb-0 text-gray-800">Adicionar Item à Estrutura do Menu</h2>
+    </div>
+    <div>
+        <a href="{% url 'list_menu' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-3">
+            <i class="fa fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block htmlConteudo %}
+<div class="container-fluid px-0" style="max-width: 800px; margin: 0 auto;">
+
+    <!-- Listagem de Erros da View -->
+    {% if errors %}
+        <div class="alert alert-danger rounded-3 shadow-sm mb-4" role="alert">
+            <h5 class="alert-heading fw-bold"><i class="fa fa-exclamation-triangle me-2"></i>Erros de Validação:</h5>
+            <ul class="mb-0">
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Card do Formulário -->
+    <div class="card card-form">
+        <div class="card-body p-4">
+            <form method="POST" action="{% url 'create_menu_item' %}" id="formNovoMenuItem">
+                {% csrf_token %}
+
+                <!-- Tipo de Item (Categoria ou Página) -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark">Tipo de Item *</label>
+                    <div class="d-flex gap-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipo" id="tipo_categoria" value="C" checked>
+                            <label class="form-check-label" for="tipo_categoria">
+                                <i class="fa fa-folder text-primary me-1"></i> Categoria de Menu
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="tipo" id="tipo_pagina" value="P">
+                            <label class="form-check-label" for="tipo_pagina">
+                                <i class="fa fa-file-alt text-success me-1"></i> Página / Rota
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seleção do Item Relacionado -->
+                <div class="mb-4">
+                    <label for="item_id" class="form-label fw-semibold text-dark" id="label_item_id">Selecione a Categoria *</label>
+                    <select name="item_id" id="item_id" class="form-select rounded-3" required>
+                        <option value="" selected disabled>Selecione...</option>
+                        <!-- Populado via JS com base no tipo -->
+                    </select>
+                </div>
+
+                <!-- Item de Menu Pai (Hierarquia) -->
+                <div class="mb-4">
+                    <label for="menu_id_acima" class="form-label fw-semibold text-dark">Item Superior (Pai)</label>
+                    <select name="menu_id_acima" id="menu_id_acima" class="form-select rounded-3">
+                        <option value="0">Nenhum (Nível Raiz)</option>
+                        {% for p in parent_choices %}
+                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Apenas categorias de menu podem conter subitens.</div>
+                </div>
+
+                <!-- Ordem de Exibição -->
+                <div class="mb-4">
+                    <label for="ordem" class="form-label fw-semibold text-dark">Ordem de Exibição</label>
+                    <input type="number" name="ordem" id="ordem" class="form-control rounded-3" value="0" min="0" required>
+                    <div class="form-text">Itens com ordem menor são exibidos primeiro.</div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-5 d-flex justify-content-end gap-2">
+                    <a href="{% url 'list_menu' %}" class="btn btn-outline-secondary rounded-3 px-4">Cancelar</a>
+                    <button type="submit" class="btn btn-primary rounded-3 px-4">Salvar no Menu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- Data Stores para JS -->
+<div id="data_categorias" class="d-none">
+    {% for cat in categorias %}
+        <span data-id="{{ cat.id }}" data-nome="📁 {{ cat.nome }} (Modulo: {{ cat.modulo.nome }})"></span>
+    {% endfor %}
+</div>
+<div id="data_paginas" class="d-none">
+    {% for pag in paginas %}
+        <span data-id="{{ pag.id }}" data-nome="📄 {{ pag.nome }} (Modulo: {{ pag.modulo.nome }})"></span>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itemSelect = document.getElementById("item_id");
+        const labelItem = document.getElementById("label_item_id");
+        
+        // Elementos de rádio
+        const radCat = document.getElementById("tipo_categoria");
+        const radPag = document.getElementById("tipo_pagina");
+
+        // Elementos que guardam a informação vinda do Django
+        const dataCats = document.getElementById("data_categorias").children;
+        const dataPags = document.getElementById("data_paginas").children;
+
+        function refreshOptions() {
+            // Limpa o select
+            itemSelect.innerHTML = '<option value="" selected disabled>Selecione...</option>';
+            
+            if (radCat.checked) {
+                labelItem.innerText = "Selecione a Categoria *";
+                Array.from(dataCats).forEach(span => {
+                    const opt = document.createElement("option");
+                    opt.value = span.getAttribute("data-id");
+                    opt.innerText = span.getAttribute("data-nome");
+                    itemSelect.appendChild(opt);
+                });
+            } else {
+                labelItem.innerText = "Selecione a Página *";
+                Array.from(dataPags).forEach(span => {
+                    const opt = document.createElement("option");
+                    opt.value = span.getAttribute("data-id");
+                    opt.innerText = span.getAttribute("data-nome");
+                    itemSelect.appendChild(opt);
+                });
+            }
+        }
+
+        radCat.addEventListener("change", refreshOptions);
+        radPag.addEventListener("change", refreshOptions);
+
+        // Executa carga inicial
+        refreshOptions();
+    });
+</script>
+{% endblock %}
