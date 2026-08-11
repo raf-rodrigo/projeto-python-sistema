@@ -22,6 +22,8 @@ services:
       - .:/app
     ports:
       - "8001:8000"
+    environment:
+      - RUN_MIGRATIONS=1
     depends_on:
       db:
         condition: service_healthy

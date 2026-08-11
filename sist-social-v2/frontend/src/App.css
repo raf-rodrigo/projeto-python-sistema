@@ -1,8 +1,184 @@
-/* Estilos gerais do componente principal */
-.app-container {
+/* Estilização da Tela de Login - Inspirado na V1 */
+
+body {
+  background-color: #fff !important;
+  line-height: 1.2;
+  overflow: hidden;
+  margin: 0;
+}
+
+.outer-wrapper {
+  padding-top: 30px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Fundo padrão do login (substituir depois pela imagem dinâmica) */
+.corpo {
+  background-color: #e2e8f0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.inner-wrapper {
+  padding: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f5f5f5;
+  flex-grow: 1;
+}
+
+.container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bg-form {
+  background-color: #F5F5F5;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.margin-img {
+  margin-bottom: 20px;
+}
+
+/* Espaço reservado para as imagens dinâmicas futuras */
+.image-placeholder {
+  width: 100%;
+  height: 100px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #64748b;
+  font-size: 14px;
+  background-color: #f8fafc;
+}
+
+.logo-placeholder {
+  display: inline-block;
+  padding: 4px 8px;
+  border: 1px dashed #94a3b8;
+  color: #475569;
+  font-size: 11px;
+  margin-left: 5px;
+  background-color: #f1f5f9;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  background-color: #fff;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #141E37;
+}
+
+.conecta {
+  width: 100%;
+  padding: 12px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  background-color: #141E37 !important;
+  border-bottom: 4px solid #505a82 !important;
+  transition: background-color 0.2s;
+  font-size: 15px;
+}
+
+.conecta:hover:not(:disabled) {
+  background-color: #030d26 !important;
+}
+
+.conecta:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.links {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.links a {
+  text-decoration: none;
+  font-size: 13px;
+  color: #374151;
+  transition: color 0.2s;
+}
+
+.links a:hover {
+  color: #f5911e !important;
+}
+
+.footer {
+  text-align: center;
+  padding: 10px 0;
+  color: #4b5563;
+}
+
+.rodape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-lliege {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* CSS Loader */
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.pulse {
+  animation: pulse 0.7s infinite alternate;
+  font-weight: bold;
+  color: #141E37;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
 }
