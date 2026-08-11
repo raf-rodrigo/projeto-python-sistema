@@ -629,3 +629,103 @@ class Pessoas(models.Model):
 
     def __str__(self):
         return self.nom_pessoa or f"Pessoa {self.id}"
+
+
+class ProntuarioSocial(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_familia = models.PositiveIntegerField(blank=True, null=True)
+    num_prontuario = models.CharField(max_length=10, blank=True, null=True)
+    id_forma_acesso = models.PositiveIntegerField(blank=True, null=True)
+    encam_por_unid = models.CharField(max_length=50, blank=True, null=True)
+    encam_por_pes_unid = models.CharField(max_length=50, blank=True, null=True)
+    raz_demand_necess = models.TextField(blank=True, null=True)
+    nome_pessoa = models.CharField(max_length=40, blank=True, null=True)
+    data_abertura_pront = models.DateField(blank=True, null=True)
+    nome_pessoa_rf = models.PositiveIntegerField(blank=True, null=True)
+    nome_mae_rf = models.PositiveIntegerField(blank=True, null=True)
+    nis_pessoa_rf = models.PositiveIntegerField(blank=True, null=True)
+    bolsa_familia = models.CharField(max_length=1, blank=True, null=True)
+    bpc = models.CharField(max_length=1, blank=True, null=True)
+    peti = models.CharField(max_length=1, blank=True, null=True)
+    viva_leite = models.CharField(max_length=1, blank=True, null=True)
+    acao_jovem = models.CharField(max_length=1, blank=True, null=True)
+    outros_pgms_priorit = models.TextField(blank=True, null=True)
+    ind_outros_pgms = models.CharField(max_length=1, blank=True, null=True)
+    unidade_atend = models.PositiveIntegerField()
+    tipo_unidade = models.PositiveIntegerField(blank=True, null=True)
+    busca_por = models.CharField(max_length=6, blank=True, null=True)
+    busca_nis = models.PositiveIntegerField(blank=True, null=True)
+    busca_rf = models.PositiveIntegerField(blank=True, null=True)
+    busca_nome = models.PositiveIntegerField(blank=True, null=True)
+    status = models.CharField(max_length=10)
+    dt_encerramento = models.DateField(blank=True, null=True)
+    motivo_encerramento = models.TextField(blank=True, null=True)
+    ultima_atualiz = models.DateField(blank=True, null=True)
+    id_tecnico = models.PositiveIntegerField(blank=True, null=True)
+    nivel_atencao = models.CharField(max_length=5, blank=True, null=True)
+    ind_trab_infantil = models.CharField(max_length=1, blank=True, null=True)
+    ind_extr_pobr = models.CharField(max_length=1, blank=True, null=True)
+    ativo = models.IntegerField(blank=True, null=True)
+    unid_abert = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'prontuario_social'
+
+    def __str__(self):
+        return self.num_prontuario or f"Prontuário {self.id}"
+
+
+class AtendimentoSocial(models.Model):
+    id = models.AutoField(primary_key=True)
+    origem = models.IntegerField(blank=True, null=True)
+    id_pessoa = models.ForeignKey(Pessoas, models.DO_NOTHING, db_column='id_pessoa', blank=True, null=True)
+    data_atend = models.DateTimeField()
+    cod_atend = models.ForeignKey(TipoAtendimento, models.DO_NOTHING, db_column='cod_atend')
+    descr_sum_atend = models.TextField(blank=True, null=True)
+    tecnico_resp_atend = models.ForeignKey(RecursosHumanos, models.DO_NOTHING, db_column='tecnico_resp_atend', related_name='atendimentos_tecnicos')
+    raz_demand_necess = models.TextField(blank=True, null=True)
+    id_prontuario = models.ForeignKey(ProntuarioSocial, models.DO_NOTHING, db_column='id_prontuario', blank=True, null=True)
+    familia = models.ForeignKey(FamiliaDomicilio, models.DO_NOTHING, db_column='familia', blank=True, null=True)
+    funcao_profis = models.ForeignKey(TipoOcupacao, models.DO_NOTHING, db_column='funcao_profis', blank=True, null=True)
+    unidade = models.ForeignKey(UnidadeAtendimentoSocial, models.DO_NOTHING, db_column='unidade', blank=True, null=True)
+    modalidade = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=50, blank=True, null=True)
+    observacoes = models.CharField(max_length=500, blank=True, null=True)
+    informacoes = models.CharField(max_length=500, blank=True, null=True)
+    ativo = models.IntegerField(default=1)
+    justificativa = models.TextField(blank=True, null=True)
+    motivo_atend = models.ForeignKey(MotivoAtendimento, models.DO_NOTHING, db_column='motivo_atend', blank=True, null=True)
+    data_anot = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'atendimento_social'
+
+    def __str__(self):
+        return f"Atendimento {self.id} - Pessoa {self.id_pessoa_id}"
+
+
+class Encaminhamentos(models.Model):
+    id = models.AutoField(primary_key=True)
+    familia = models.ForeignKey(FamiliaDomicilio, models.DO_NOTHING, db_column='familia', blank=True, null=True)
+    num_prontuario = models.ForeignKey(ProntuarioSocial, models.DO_NOTHING, db_column='num_prontuario', blank=True, null=True)
+    id_pessoa = models.ForeignKey(Pessoas, models.DO_NOTHING, db_column='id_pessoa', blank=True, null=True)
+    id_encam = models.PositiveIntegerField(blank=True, null=True)
+    cod_encam = models.PositiveIntegerField(blank=True, null=True) # Geralmente aponta para AtendimentoSocial id
+    unid_org_destino = models.CharField(max_length=90, blank=True, null=True)
+    objetivo_motivo = models.TextField(blank=True, null=True)
+    data_encam = models.DateField(blank=True, null=True)
+    id_profis = models.ForeignKey(RecursosHumanos, models.DO_NOTHING, db_column='id_profis', blank=True, null=True, related_name='encaminhamentos_criados')
+    ind_unid_rede_munic = models.CharField(max_length=3)
+    id_unid_rede = models.PositiveIntegerField(blank=True, null=True)
+    unid_rede_munic = models.CharField(max_length=40, blank=True, null=True)
+    funcao_profis = models.CharField(max_length=55, blank=True, null=True)
+    ativo = models.IntegerField(default=1)
+    id_un_ext = models.PositiveIntegerField(blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
+    profis_atend_id = models.CharField(max_length=15, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'encaminhamentos'

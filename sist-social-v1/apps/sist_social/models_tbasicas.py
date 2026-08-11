@@ -849,5 +849,35 @@ class TipoFaixaEtaria(models.Model):
         return self.label_faixa or f"Faixa Etária {self.id}"
 
 
+class TipoAtendimento(models.Model):
+    id = models.AutoField(primary_key=True)
+    descr_atend = models.CharField(max_length=80)
+    modalidade = models.CharField(max_length=100, blank=True, null=True)
+    ativo = models.IntegerField(default=1)
+    tipo_unidade_id = models.IntegerField(blank=True, null=True)
+    rma_linha = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tipo_atendimento'
+
+    def __str__(self):
+        return self.descr_atend or f"Tipo Atendimento {self.id}"
+
+
+class MotivoAtendimento(models.Model):
+    id = models.AutoField(primary_key=True)
+    descricao = models.CharField(max_length=255)
+    status = models.CharField(max_length=7, blank=True, null=True)
+    ativo = models.IntegerField(default=1)
+
+    class Meta:
+        managed = False
+        db_table = 'motivo_atendimento'
+
+    def __str__(self):
+        return self.descricao or f"Motivo Atendimento {self.id}"
+
+
 
 
