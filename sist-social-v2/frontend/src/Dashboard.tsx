@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 import UserManagement from './UserManagement';
+import MenuManagement from './MenuManagement';
 import { 
   Users, 
   UserCheck, 
@@ -92,6 +93,8 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
         <div className="content-body">
           {activeTab === 'usuarios' ? (
             <UserManagement />
+          ) : activeTab === 'gerenciamento-menus' ? (
+            <MenuManagement />
           ) : (
             <>
               <div className="welcome-section">

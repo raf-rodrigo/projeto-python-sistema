@@ -46,6 +46,7 @@ export default function Sidebar({ onLogout, activeTab, onChangeTab }: SidebarPro
       })
       .then((data: MenuItem[]) => {
         setMenus(data);
+        setSubmenusAbertos({}); // Inicia tudo recolhido por padrão
       })
       .catch((err) => {
         console.error('Erro ao carregar menu dinâmico:', err);

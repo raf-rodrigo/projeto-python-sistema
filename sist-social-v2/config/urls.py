@@ -17,11 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include                           # 1. Adiciona o 'include'
 from rest_framework.routers import DefaultRouter                 # 2. Importa o roteador de DRF
-from core.views import login_view, menu_list_view, UserViewSet  # 3. Importa o UserViewSet
+from core.views import login_view, menu_list_view, UserViewSet, MenuViewSet, GroupViewSet  # 3. Importa os ViewSets
 
-# 4. Criando e registrando a rota do CRUD de usuário
+# 4. Criando e registrando a rota do CRUD de usuário e menus
 router = DefaultRouter()
 router.register(r'usuarios', UserViewSet, basename='usuario')
+router.register(r'gerenciamento-menus', MenuViewSet, basename='gerenciamento-menu')
+router.register(r'grupos', GroupViewSet, basename='grupo')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
