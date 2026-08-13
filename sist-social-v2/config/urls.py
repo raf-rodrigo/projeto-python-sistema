@@ -15,8 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include                           # 1. Adiciona o 'include'
+from rest_framework.routers import DefaultRouter                 # 2. Importa o roteador de DRF
+from core.views import login_view, menu_list_view, UserViewSet  # 3. Importa o UserViewSet
+
+# 4. Criando e registrando a rota do CRUD de usuário
+router = DefaultRouter()
+router.register(r'usuarios', UserViewSet, basename='usuario')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/login/', login_view, name='login'),
+    path('api/menus/', menu_list_view, name='menu-list'),
+    path('api/', include(router.urls)),                        # 5. Incluindo as rotas geradas
 ]

@@ -1,0 +1,201 @@
+import { useState } from 'react';
+import Sidebar from './Sidebar';
+import UserManagement from './UserManagement';
+import { 
+  Users, 
+  UserCheck, 
+  Clock, 
+  PlusCircle, 
+  Search,
+  Building
+} from 'lucide-react';
+
+interface DashboardProps {
+  user: {
+    username: string;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    permissions: string[];
+  };
+  unidadeId: string;
+  onLogout: () => void;
+}
+
+export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps) {
+  const [activeTab, setActiveTab] = useState(() => window.location.hash.replace('#', '') || 'dashboard');
+
+  // Obter o nome legível da unidade
+  const getUnidadeNome = (id: string) => {
+    switch (id) {
+      case '1': return 'CRAS Central';
+      case '2': return 'CREAS Norte';
+      case '3': return 'Unidade de Acolhimento Sul';
+      default: return 'Unidade Geral';
+    }
+  };
+
+  // Função para verificar se o usuário logado possui uma permissão específica
+  // const temPermissao = (permissaoNecessaria: string) => {
+  //   return user.permissions.includes(permissaoNecessaria);
+  // } 
+
+  const usernameDisplay = user.first_name 
+    ? `${user.first_name} ${user.last_name || ''}`.trim() 
+    : user.username;
+
+  // Estatísticas fictícias para preencher o Dashboard
+  const estatisticas = [
+    { title: 'Famílias Cadastradas', value: '1.240', change: '+12% este mês', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { title: 'Atendimentos Hoje', value: '42', change: '8 pendentes', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { title: 'Benefícios Concedidos', value: '850', change: '+3% este mês', icon: UserCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { title: 'Agendamentos', value: '18', change: 'Para amanhã: 12', icon: Clock, color: 'text-purple-600', bg: 'bg-purple-50' },
+  ];
+
+  const atendimentosRecentes = [
+    { id: 1, nome: 'Maria Silva Costa', servico: 'Bolsa Família - Atualização', hora: '10:30', status: 'Concluído' },
+    { id: 2, nome: 'João Santos Oliveira', servico: 'Cesta Básica - Solicitação', hora: '11:15', status: 'Em Andamento' },
+    { id: 3, nome: 'Ana Paula Rodrigues', servico: 'Apoio Psicológico', hora: '11:45', status: 'Aguardando' },
+    { id: 4, nome: 'Carlos Eduardo Souza', servico: 'Encaminhamento BPC', hora: '12:00', status: 'Aguardando' },
+  ];
+
+  return (
+    <div className="dashboard-container">
+      {/* Sidebar Componentizada */}
+      <Sidebar 
+        onLogout={onLogout} 
+        activeTab={activeTab} 
+        onChangeTab={setActiveTab} 
+      />
+
+      {/* Main Content Area */}
+      <main className="main-content">
+        {/* Top Navbar */}
+        <header className="topbar">
+          <div className="unidade-badge">
+            <Building size={16} />
+            <span>{getUnidadeNome(unidadeId)}</span>
+          </div>
+
+          <div className="user-profile">
+            <div className="avatar">
+              {user.username.substring(0, 2).toUpperCase()}
+            </div>
+            <div className="user-info">
+              <span className="user-name">{usernameDisplay}</span>
+              <span className="user-role">Operador</span>
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Pages/Body */}
+        <div className="content-body">
+          {activeTab === 'usuarios' ? (
+            <UserManagement />
+          ) : (
+            <>
+              <div className="welcome-section">
+                <h1 className="welcome-title">Olá, {usernameDisplay}!</h1>
+                <p className="welcome-subtitle">Confira o resumo das atividades e atendimentos da sua unidade hoje.</p>
+              </div>
+
+              {/* Cards de Estatísticas */}
+              <div className="stats-grid">
+                {estatisticas.map((stat, idx) => {
+                  const IconComponent = stat.icon;
+                  return (
+                    <div key={idx} className="stat-card">
+                      <div className="stat-card-header">
+                        <span className="stat-card-title">{stat.title}</span>
+                        <div className={`stat-icon-wrapper ${stat.bg} ${stat.color}`}>
+                          <IconComponent size={20} />
+                        </div>
+                      </div>
+                      <div className="stat-card-body">
+                        <span className="stat-value">{stat.value}</span>
+                        <span className="stat-change">{stat.change}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Seção Principal de Conteúdo */}
+              <div className="dashboard-grid">
+                {/* Atendimentos Recentes */}
+                <div className="dashboard-card main-card">
+                  <div className="card-header">
+                    <h3 className="card-title">Fila de Atendimentos Recentes</h3>
+                    <button className="btn-text">Ver todos</button>
+                  </div>
+                  <div className="card-body">
+                    <div className="table-responsive">
+                      <table className="dashboard-table">
+                        <thead>
+                          <tr>
+                            <th>Nome</th>
+                            <th>Serviço/Solicitação</th>
+                            <th>Horário</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {atendimentosRecentes.map((atendimento) => (
+                            <tr key={atendimento.id}>
+                              <td className="font-semibold">{atendimento.nome}</td>
+                              <td>{atendimento.servico}</td>
+                              <td>{atendimento.hora}</td>
+                              <td>
+                                <span className={`status-badge ${
+                                  atendimento.status === 'Concluído' ? 'status-done' :
+                                  atendimento.status === 'Em Andamento' ? 'status-active' :
+                                  'status-pending'
+                                }`}>
+                                  {atendimento.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ações Rápidas */}
+                <div className="dashboard-card side-card">
+                  <div className="card-header">
+                    <h3 className="card-title">Ações Rápidas</h3>
+                  </div>
+                  <div className="card-body quick-actions-container">
+                    <button className="quick-action-btn">
+                      <PlusCircle size={20} />
+                      <div className="action-text">
+                        <span className="action-title">Novo Atendimento</span>
+                        <span className="action-desc">Registrar atendimento de hoje</span>
+                      </div>
+                    </button>
+                    <button className="quick-action-btn">
+                      <Users size={20} />
+                      <div className="action-text">
+                        <span className="action-title">Novo Cadastro</span>
+                        <span className="action-desc">Inserir uma nova família</span>
+                      </div>
+                    </button>
+                    <button className="quick-action-btn">
+                      <Search size={20} />
+                      <div className="action-text">
+                        <span className="action-title">Buscar Prontuário</span>
+                        <span className="action-desc">Pesquisar histórico social</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}

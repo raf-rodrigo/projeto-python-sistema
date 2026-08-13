@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     # Apps do Projeto
     'core',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +132,7 @@ CORS_ALLOW_ALL_ORIGINS = True # Apenas para desenvolvimento local. Em produção
 # Configuração do REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],

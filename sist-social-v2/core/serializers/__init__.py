@@ -1,0 +1,3 @@
+from .menu_serializers import MenuSerializer, SubmenuSerializer
+from .recurso_humano_serializers import RecursoHumanoSerializer
+from .user_serializers import UserSerializer
