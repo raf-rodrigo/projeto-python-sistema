@@ -32,7 +32,7 @@ class Atendimento(models.Model):
         verbose_name_plural = "Atendimentos"
 
         permissions = [
-            ("visualizar_atendimento_tecnico", "Pode visualizar atendimentos técnicos detalhados"),
+            ("visualizar_atendimento_tecnico", "Can visualizar atendimentos técnicos detalhados"),
         ]
 
     def __str__(self):
