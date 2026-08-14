@@ -897,9 +897,9 @@ export default function PersonManagement() {
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <User className="text-conecta" size={28} />
-            Cadastro de Cidadãos (Pessoas)
+            Cadastro de Pessoa (Munícipe)
           </h2>
-          <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>Cadastre e gerencie o perfil social completo de cada indivíduo atendido.</p>
+          <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>Cadastre e gerencie o perfil de cada munícipe atendido.</p>
         </div>
         <button onClick={abrirNovoModal} className="btn-primary-action">
           <PlusCircle size={18} />
@@ -988,9 +988,9 @@ export default function PersonManagement() {
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0f172a' }}>
-                  {editandoId ? 'Editar Prontuário Cidadão' : 'Novo Prontuário Cidadão'}
+                  {editandoId ? 'Editar Pessoa (Munícipe)' : 'Nova Pessoa (Munícipe)'}
                 </h3>
-                <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Configure os dados de registro social, documentação, saúde, trabalho e rendas.</p>
+                {/* <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>Configure os dados de registro social, documentação, saúde, trabalho e rendas.</p> */}
               </div>
               <button onClick={() => setModalAberto(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#94a3b8', cursor: 'pointer' }}>&times;</button>
             </div>
@@ -1033,7 +1033,11 @@ export default function PersonManagement() {
                 {/* TAB 1: DADOS PESSOAIS */}
                 {activeModalTab === 'pessoais' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Familia *</label>
+                        <select className="form-control"></select>
+                      </div>
                       <div>
                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nome Completo *</label>
                         <input type="text" id="input-nome" className="form-control" value={nome} onChange={e => setNome(e.target.value)} />
