@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import './App.css';
-import Dashboard from './Dashboard';
+import './css/App.css';
+import Dashboard from './components/Dashboard';
 
 interface UserType {
   username: string;
@@ -8,6 +8,7 @@ interface UserType {
   first_name?: string;
   last_name?: string;
   permissions: string[];
+  groups?: string[];
 }
 
 function App() {

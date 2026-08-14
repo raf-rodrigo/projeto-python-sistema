@@ -5,6 +5,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-sist_social_v2}
       POSTGRES_USER: ${POSTGRES_USER:-sist_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sist_password}
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data_v2:/var/lib/postgresql/data
     healthcheck:

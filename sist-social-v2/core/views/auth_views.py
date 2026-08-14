@@ -41,7 +41,8 @@ def login_view(request):
 			'email': user.email,
 			'first_name': user.first_name,
 			'last_name': user.last_name,
-			'permissions': list(user.get_all_permissions())
+			'permissions': list(user.get_all_permissions()),
+			'groups': [g.name for g in user.groups.all()] # Retorna os grupos reais do usuário
 		},
 		'unidade_id': unidade_id
     }, status=status.HTTP_200_OK)

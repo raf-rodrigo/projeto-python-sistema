@@ -98,6 +98,60 @@ export default function UserManagement() {
   const [responsavelOrgao, setResponsavelOrgao] = useState(false);
   const [tipoServidor, setTipoServidor] = useState('');
   const [profissao, setProfissao] = useState('');
+  
+  // Listas de Profissões, Funções e Servidores para os campos de Select
+  interface CboItem {
+    id: number;
+    codigo: number;
+    nome: string;
+  }
+  interface FuncaoItem {
+    id: number;
+    nome: string;
+  }
+  interface ServidorItem {
+    id: number;
+    nome: string;
+  }
+  const [listaCbos, setListaCbos] = useState<CboItem[]>([]);
+  const [listaFuncoes, setListaFuncoes] = useState<FuncaoItem[]>([]);
+  const [listaTiposServidor, setListaTiposServidor] = useState<ServidorItem[]>([]);
+
+  const carregarCbosEFuncoes = async () => {
+    try {
+      const resCbo = await fetch(`${API_URL}/api/cbos/?page_size=3000`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      if (resCbo.ok) {
+        const data = await resCbo.json();
+        const cbos = (data.results || []).sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+        setListaCbos(cbos);
+      }
+
+      const resFuncoes = await fetch(`${API_URL}/api/tipo_funcao/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      if (resFuncoes.ok) {
+        const data = await resFuncoes.json();
+        const rawList = data.results || data || [];
+        const funcoes = rawList.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+        setListaFuncoes(funcoes);
+      }
+
+      const resServidores = await fetch(`${API_URL}/api/tipo_servidor/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      if (resServidores.ok) {
+        const data = await resServidores.json();
+        const rawList = data.results || data || [];
+        const servidores = rawList.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+        setListaTiposServidor(servidores);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar profissões/funções/servidores:', err);
+    }
+  };
+
   const [funcao, setFuncao] = useState('');
   const [numConselhoClasse, setNumConselhoClasse] = useState('');
   const [dataInicioTrabalho, setDataInicioTrabalho] = useState('');
@@ -123,6 +177,7 @@ export default function UserManagement() {
 
   useEffect(() => {
     carregarUsuarios();
+    carregarCbosEFuncoes();
   }, []);
 
   // Fechar o modal de erro e dar foco no campo correto
@@ -500,7 +555,7 @@ export default function UserManagement() {
           <h1 className="welcome-title">Gestão de Recursos Humanos</h1>
           <p className="welcome-subtitle">Gerencie os operadores do sistema, perfis e dados corporativos.</p>
         </div>
-        <button onClick={abrirNovoModal} className="btn-logout" style={{ color: '#ffffff', backgroundColor: '#f5911e', borderColor: '#f5911e', display: 'flex', gap: '8px', alignItems: 'center', width: 'auto' }}>
+        <button onClick={abrirNovoModal} className="btn-primary-action">
           <UserPlus size={18} />
           <span>Novo Operador</span>
         </button>
@@ -787,18 +842,54 @@ export default function UserManagement() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Tipo Servidor *</label>
-                      <input type="text" id="input-tiposervidor" className="form-control" value={tipoServidor} onChange={e => setTipoServidor(e.target.value)} />
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Servidor *</label>
+                      <select
+                        id="input-tiposervidor"
+                        className="form-control"
+                        value={tipoServidor}
+                        onChange={e => setTipoServidor(e.target.value)}
+                      >
+                        <option value="">Selecione o tipo de servidor...</option>
+                        {listaTiposServidor.map(s => (
+                          <option key={s.id} value={s.nome}>
+                            {s.nome}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Profissão *</label>
-                      <input type="text" id="input-profissao" className="form-control" value={profissao} onChange={e => setProfissao(e.target.value)} />
+                      <select
+                        id="input-profissao"
+                        className="form-control"
+                        value={profissao}
+                        onChange={e => setProfissao(e.target.value)}
+                      >
+                        <option value="">Selecione uma profissão...</option>
+                        {listaCbos.map(c => (
+                          <option key={c.id} value={`${c.codigo} - ${c.nome}`}>
+                            {c.codigo} - {c.nome}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Função *</label>
-                      <input type="text" id="input-funcao" className="form-control" value={funcao} onChange={e => setFuncao(e.target.value)} />
+                      <select
+                        id="input-funcao"
+                        className="form-control"
+                        value={funcao}
+                        onChange={e => setFuncao(e.target.value)}
+                      >
+                        <option value="">Selecione uma função...</option>
+                        {listaFuncoes.map(f => (
+                          <option key={f.id} value={f.nome}>
+                            {f.nome}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nº Conselho de Classe *</label>

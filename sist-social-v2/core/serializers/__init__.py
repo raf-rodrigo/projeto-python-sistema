@@ -1,4 +1,7 @@
-from .menu_serializers import MenuSerializer, SubmenuSerializer, GroupSerializer, MenuGerenciamentoSerializer
-from .recurso_humano_serializers import RecursoHumanoSerializer
+from .menu_serializers import MenuSerializer, SubmenuSerializer, MenuGerenciamentoSerializer, GroupSerializer
 from .user_serializers import UserSerializer
-
+from .recurso_humano_serializers import RecursoHumanoSerializer
+from .unidade_serializers import AreaSerializer, UnidadeSerializer
+from .tabela_basica_serializers import EstadoSerializer, MunicipioSerializer, CidSerializer, CboSerializer
+from .familia_serializers import FamiliaDomicilioSerializer
+from .pessoa_serializers import PessoaSerializer

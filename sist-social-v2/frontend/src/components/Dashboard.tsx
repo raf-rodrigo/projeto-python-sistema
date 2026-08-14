@@ -2,6 +2,9 @@ import { useState } from 'react';
 import Sidebar from './Sidebar';
 import UserManagement from './UserManagement';
 import MenuManagement from './MenuManagement';
+import BasicTableManagement from './BasicTableManagement';
+import UnitManagement from './UnitManagement';
+import PersonManagement from './PersonManagement';
 import { 
   Users, 
   UserCheck, 
@@ -18,6 +21,7 @@ interface DashboardProps {
     first_name?: string;
     last_name?: string;
     permissions: string[];
+    groups?: string[];
   };
   unidadeId: string;
   onLogout: () => void;
@@ -36,14 +40,25 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
     }
   };
 
-  // Função para verificar se o usuário logado possui uma permissão específica
-  // const temPermissao = (permissaoNecessaria: string) => {
-  //   return user.permissions.includes(permissaoNecessaria);
-  // } 
-
   const usernameDisplay = user.first_name 
     ? `${user.first_name} ${user.last_name || ''}`.trim() 
     : user.username;
+
+  // Função auxiliar para gerar iniciais reais do operador
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const userInitials = getInitials(usernameDisplay);
+
+  // Exibe o primeiro grupo dele, ou "Operador" se não houver
+  const userRoleDisplay = user.groups && user.groups.length > 0 
+    ? user.groups[0] 
+    : 'Operador';
 
   // Estatísticas fictícias para preencher o Dashboard
   const estatisticas = [
@@ -80,11 +95,11 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
 
           <div className="user-profile">
             <div className="avatar">
-              {user.username.substring(0, 2).toUpperCase()}
+              {userInitials}
             </div>
             <div className="user-info">
               <span className="user-name">{usernameDisplay}</span>
-              <span className="user-role">Operador</span>
+              <span className="user-role">{userRoleDisplay}</span>
             </div>
           </div>
         </header>
@@ -93,8 +108,14 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
         <div className="content-body">
           {activeTab === 'usuarios' ? (
             <UserManagement />
+          ) : activeTab === 'unidades' ? (
+            <UnitManagement />
+          ) : activeTab === 'pessoas' ? (
+            <PersonManagement />
           ) : activeTab === 'gerenciamento-menus' ? (
             <MenuManagement />
+          ) : activeTab === 'tabelas' ? (
+            <BasicTableManagement />
           ) : (
             <>
               <div className="welcome-section">
