@@ -151,6 +151,7 @@ export default function PersonManagement() {
   const [temposRua, setTemposRua] = useState<TabelaBasicaItem[]>([]);
   const [temposCidade, setTemposCidade] = useState<TabelaBasicaItem[]>([]);
   const [contatosParentes, setContatosParentes] = useState<TabelaBasicaItem[]>([]);
+  const [familias, setFamilias] = useState<TabelaBasicaItem[]>([]);
 
   // Estados do Modal
   const [modalAberto, setModalAberto] = useState(false);
@@ -160,6 +161,7 @@ export default function PersonManagement() {
   const [fieldToFocus, setFieldToFocus] = useState<{ id: string; tab: any } | null>(null);
 
   // Estados do Formulário
+  const [familiaDomicilio, setFamiliaDomicilio] = useState('');
   const [nome, setNome] = useState('');
   const [nomeSocial, setNomeSocial] = useState('');
   const [nis, setNis] = useState('');
@@ -375,7 +377,8 @@ export default function PersonManagement() {
         fetchAuxiliar('cbos/?page_size=3000', setCbos),
         fetchAuxiliar('populacoes_ruas_tempo_de_rua/', setTemposRua),
         fetchAuxiliar('tipos_tempos_residencias_cidades_populacoes_ruas/', setTemposCidade),
-        fetchAuxiliar('tipos_contatos_parentes/', setContatosParentes)
+        fetchAuxiliar('tipos_contatos_parentes/', setContatosParentes),
+        fetchAuxiliar('familias_domicilios/', setFamilias)
       ]);
 
     } catch (err) {
@@ -395,6 +398,7 @@ export default function PersonManagement() {
     setFieldToFocus(null);
 
     // Resets
+    setFamiliaDomicilio('');
     setNome('');
     setNomeSocial('');
     setNis('');
@@ -492,6 +496,7 @@ export default function PersonManagement() {
     setActiveModalTab('pessoais');
     setFieldToFocus(null);
 
+    setFamiliaDomicilio(p.familia_domicilio?.toString() || '');
     setNome(p.nome);
     setNomeSocial(p.nome_social || '');
     setNis(p.nis || '');
@@ -694,6 +699,7 @@ export default function PersonManagement() {
 
     const payload = {
       nome,
+      familia_domicilio: familiaDomicilio ? parseInt(familiaDomicilio) : null,
       nome_social: nomeSocial || null,
       nis: nis || null,
       certidao_nascimento_data: certidaoNascimentoData,
@@ -1035,8 +1041,15 @@ export default function PersonManagement() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
                       <div>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Familia *</label>
-                        <select className="form-control"></select>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Família</label>
+                        <select className="form-control" value={familiaDomicilio} onChange={e => setFamiliaDomicilio(e.target.value)}>
+                          <option value="">Selecione...</option>
+                          {familias.map(f => (
+                            <option key={f.id} value={f.id}>
+                              {f.familia_codigo ? `${f.familia_codigo} - ${f.logradouro_nome || ''}` : `Família ${f.id}`}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nome Completo *</label>

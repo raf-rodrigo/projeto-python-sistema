@@ -5,6 +5,7 @@ import MenuManagement from './MenuManagement';
 import BasicTableManagement from './BasicTableManagement';
 import UnitManagement from './UnitManagement';
 import PersonManagement from './PersonManagement';
+import AttendanceManagement from './AttendanceManagement';
 import { 
   Users, 
   UserCheck, 
@@ -112,6 +113,8 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
             <UnitManagement />
           ) : activeTab === 'pessoas' ? (
             <PersonManagement />
+          ) : activeTab === 'atendimentos' ? (
+            <AttendanceManagement userPermissions={user.permissions} />
           ) : activeTab === 'gerenciamento-menus' ? (
             <MenuManagement />
           ) : activeTab === 'tabelas' ? (
@@ -192,14 +195,14 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
                     <h3 className="card-title">Ações Rápidas</h3>
                   </div>
                   <div className="card-body quick-actions-container">
-                    <button className="quick-action-btn">
+                    <button onClick={() => setActiveTab('atendimentos')} className="quick-action-btn">
                       <PlusCircle size={20} />
                       <div className="action-text">
                         <span className="action-title">Novo Atendimento</span>
                         <span className="action-desc">Registrar atendimento de hoje</span>
                       </div>
                     </button>
-                    <button className="quick-action-btn">
+                    <button onClick={() => setActiveTab('pessoas')} className="quick-action-btn">
                       <Users size={20} />
                       <div className="action-text">
                         <span className="action-title">Novo Cadastro</span>
