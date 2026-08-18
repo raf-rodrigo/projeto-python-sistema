@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SearchableSelect from './SearchableSelect';
 import { UserPlus, Edit2, Trash2, Shield, X, AlertCircle } from 'lucide-react';
 
 interface Perfil {
@@ -94,7 +95,7 @@ export default function UserManagement() {
 
   // ABA 4 - DADOS PROFISSIONAIS
   const [unidadeSocioassistencial, setUnidadeSocioassistencial] = useState(false);
-  const [orgao, setOrgao] = useState('');
+  const [selecionadasUnidadesIds, setSelecionadasUnidadesIds] = useState<number[]>([]);
   const [responsavelOrgao, setResponsavelOrgao] = useState(false);
   const [tipoServidor, setTipoServidor] = useState('');
   const [profissao, setProfissao] = useState('');
@@ -113,9 +114,15 @@ export default function UserManagement() {
     id: number;
     nome: string;
   }
+  interface EscolaridadeItem {
+    id: number;
+    nome: string;
+  }
   const [listaCbos, setListaCbos] = useState<CboItem[]>([]);
   const [listaFuncoes, setListaFuncoes] = useState<FuncaoItem[]>([]);
   const [listaTiposServidor, setListaTiposServidor] = useState<ServidorItem[]>([]);
+  const [listaEscolaridades, setListaEscolaridades] = useState<EscolaridadeItem[]>([]);
+  const [unidadesList, setUnidadesList] = useState<any[]>([]);
 
   const carregarCbosEFuncoes = async () => {
     try {
@@ -146,6 +153,25 @@ export default function UserManagement() {
         const rawList = data.results || data || [];
         const servidores = rawList.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
         setListaTiposServidor(servidores);
+      }
+
+      const resUnidades = await fetch(`${API_URL}/api/unidades/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      if (resUnidades.ok) {
+        const data = await resUnidades.json();
+        const rawList = data.results || data || [];
+        setUnidadesList(rawList);
+      }
+
+      const resEscolaridade = await fetch(`${API_URL}/api/tipo_escolaridade/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      if (resEscolaridade.ok) {
+        const data = await resEscolaridade.json();
+        const rawList = data.results || data || [];
+        const escolaridades = rawList.sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+        setListaEscolaridades(escolaridades);
       }
     } catch (err) {
       console.error('Erro ao carregar profissões/funções/servidores:', err);
@@ -272,7 +298,7 @@ export default function UserManagement() {
 
     // Reset aba 4
     setUnidadeSocioassistencial(false);
-    setOrgao('');
+    setSelecionadasUnidadesIds([]);
     setResponsavelOrgao(false);
     setTipoServidor('');
     setProfissao('');
@@ -323,7 +349,7 @@ export default function UserManagement() {
       setUf(perfil.uf || '');
 
       setUnidadeSocioassistencial(perfil.unidade_socioassistencial || false);
-      setOrgao(perfil.orgao || '');
+      setSelecionadasUnidadesIds(perfil.unidades || []);
       setResponsavelOrgao(perfil.responsavel_orgao || false);
       setTipoServidor(perfil.tipo_servidor || '');
       setProfissao(perfil.profissao || '');
@@ -390,9 +416,9 @@ export default function UserManagement() {
     }
 
     // Aba 4 (Novas Validações Profissionais solicitadas)
-    if (!orgao.trim()) {
-      setFieldToFocus({ id: 'input-orgao', tab: 'profissionais' });
-      setErrorModalMsg('O campo Órgão / Unidade é obrigatório.');
+    if (selecionadasUnidadesIds.length === 0) {
+      setFieldToFocus({ id: 'input-unidades', tab: 'profissionais' });
+      setErrorModalMsg('Selecione ao menos uma Unidade de Atendimento.');
       return;
     }
     if (!tipoServidor.trim()) {
@@ -433,7 +459,7 @@ export default function UserManagement() {
         titulo_eleitor: tituloEleitor || null,
         telefone: telefone || null,
         celular: celular || null,
-        escolaridade: escolaridade || null,
+        escolaridade: escolaridade ? parseInt(escolaridade) : null,
         cep: cep,
         tipo_logradouro: tipoLogradouro || null,
         logradouro: logradouro || null,
@@ -443,7 +469,7 @@ export default function UserManagement() {
         municipio: municipio || null,
         uf: uf || null,
         unidade_socioassistencial: unidadeSocioassistencial,
-        orgao: orgao,
+        unidades: selecionadasUnidadesIds,
         responsavel_orgao: responsavelOrgao,
         tipo_servidor: tipoServidor,
         profissao: profissao,
@@ -722,6 +748,12 @@ export default function UserManagement() {
                             setCpf(valorLimpo);
                           }
                         }} 
+                        onBlur={() => {
+                          if (cpf.trim() && !validarCPF(cpf)) {
+                            setFieldToFocus({ id: 'input-cpf', tab: 'pessoais' });
+                            setErrorModalMsg('CPF inválido. Por favor, digite um CPF matematicamente correto.');
+                          }
+                        }}
                       />
                     </div>
                     <div>
@@ -732,20 +764,44 @@ export default function UserManagement() {
                       </select>
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Data de Nascimento</label>
                       <input type="date" className="form-control" value={dataNascimento} onChange={e => setDataNascimento(e.target.value)} />
                     </div>
                     <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Escolaridade</label>
-                      <input type="text" className="form-control" value={escolaridade} onChange={e => setEscolaridade(e.target.value)} />
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Escolaridade *</label>
+                      <SearchableSelect 
+                        options={listaEscolaridades.map(o => ({ id: o.id, label: o.nome }))} 
+                        value={escolaridade} 
+                        onChange={val => setEscolaridade(val.toString())} 
+                        placeholder="Pesquise a escolaridade..." 
+                        required 
+                      />
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>RG</label>
-                      <input type="text" className="form-control" value={rg} onChange={e => setRg(e.target.value)} />
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={rg} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 9);
+                          // Aplica máscara xx.xxx.xxx-x
+                          let masked = val;
+                          if (val.length > 8) {
+                            masked = `${val.slice(0, 2)}.${val.slice(2, 5)}.${val.slice(5, 8)}-${val.slice(8)}`;
+                          } else if (val.length > 5) {
+                            masked = `${val.slice(0, 2)}.${val.slice(2, 5)}.${val.slice(5)}`;
+                          } else if (val.length > 2) {
+                            masked = `${val.slice(0, 2)}.${val.slice(2)}`;
+                          }
+                          setRg(masked);
+                        }} 
+                        placeholder="00.000.000-0"
+                      />
                     </div>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Órgão Expedidor</label>
@@ -759,7 +815,23 @@ export default function UserManagement() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                     <div style={{ gridColumn: 'span 1' }}>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Título Eleitor</label>
-                      <input type="text" className="form-control" value={tituloEleitor} onChange={e => setTituloEleitor(e.target.value)} />
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={tituloEleitor} 
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 12);
+                          // Aplica máscara xxxx xxxx xxxx
+                          let masked = val;
+                          if (val.length > 8) {
+                            masked = `${val.slice(0, 4)} ${val.slice(4, 8)} ${val.slice(8)}`;
+                          } else if (val.length > 4) {
+                            masked = `${val.slice(0, 4)} ${val.slice(4)}`;
+                          }
+                          setTituloEleitor(masked);
+                        }} 
+                        placeholder="0000 0000 0000"
+                      />
                     </div>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Telefone</label>
@@ -837,59 +909,61 @@ export default function UserManagement() {
                     </div>
                   </div>
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Órgão / Unidade *</label>
-                    <input type="text" id="input-orgao" className="form-control" value={orgao} onChange={e => setOrgao(e.target.value)} />
+                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade(s) de Atendimento *</label>
+                    <div id="input-unidades" style={{ maxHeight: '120px', overflowY: 'auto', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px', backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {unidadesList.map(u => {
+                        const isChecked = selecionadasUnidadesIds.includes(u.id);
+                        return (
+                          <label key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', cursor: 'pointer' }}>
+                            <input 
+                              type="checkbox" 
+                              checked={isChecked} 
+                              onChange={() => {
+                                if (isChecked) {
+                                  setSelecionadasUnidadesIds(selecionadasUnidadesIds.filter(id => id !== u.id));
+                                } else {
+                                  setSelecionadasUnidadesIds([...selecionadasUnidadesIds, u.id]);
+                                }
+                              }} 
+                            />
+                            {u.nome_conhecido}
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Servidor *</label>
-                      <select
-                        id="input-tiposervidor"
-                        className="form-control"
-                        value={tipoServidor}
-                        onChange={e => setTipoServidor(e.target.value)}
-                      >
-                        <option value="">Selecione o tipo de servidor...</option>
-                        {listaTiposServidor.map(s => (
-                          <option key={s.id} value={s.nome}>
-                            {s.nome}
-                          </option>
-                        ))}
-                      </select>
+                      <SearchableSelect 
+                        options={listaTiposServidor.map(s => ({ id: s.nome, label: s.nome }))} 
+                        value={tipoServidor} 
+                        onChange={val => setTipoServidor(val.toString())} 
+                        placeholder="Pesquise o tipo de servidor..." 
+                        required 
+                      />
                     </div>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Profissão *</label>
-                      <select
-                        id="input-profissao"
-                        className="form-control"
-                        value={profissao}
-                        onChange={e => setProfissao(e.target.value)}
-                      >
-                        <option value="">Selecione uma profissão...</option>
-                        {listaCbos.map(c => (
-                          <option key={c.id} value={`${c.codigo} - ${c.nome}`}>
-                            {c.codigo} - {c.nome}
-                          </option>
-                        ))}
-                      </select>
+                      <SearchableSelect 
+                        options={listaCbos.map(c => ({ id: `${c.codigo} - ${c.nome}`, label: `${c.codigo} - ${c.nome}` }))} 
+                        value={profissao} 
+                        onChange={val => setProfissao(val.toString())} 
+                        placeholder="Pesquise a profissão..." 
+                        required 
+                      />
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Função *</label>
-                      <select
-                        id="input-funcao"
-                        className="form-control"
-                        value={funcao}
-                        onChange={e => setFuncao(e.target.value)}
-                      >
-                        <option value="">Selecione uma função...</option>
-                        {listaFuncoes.map(f => (
-                          <option key={f.id} value={f.nome}>
-                            {f.nome}
-                          </option>
-                        ))}
-                      </select>
+                      <SearchableSelect 
+                        options={listaFuncoes.map(f => ({ id: f.nome, label: f.nome }))} 
+                        value={funcao} 
+                        onChange={val => setFuncao(val.toString())} 
+                        placeholder="Pesquise a função..." 
+                        required 
+                      />
                     </div>
                     <div>
                       <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nº Conselho de Classe *</label>

@@ -1,4 +1,4 @@
-from .auth_views import login_view
+from .auth_views import login_view, obter_unidades_usuario_login
 from .menu_views import menu_list_view, MenuViewSet, GroupViewSet
 from .user_views import UserViewSet
 from .tabela_basica_views import *

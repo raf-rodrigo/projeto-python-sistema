@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import UserManagement from './UserManagement';
 import MenuManagement from './MenuManagement';
@@ -6,6 +6,7 @@ import BasicTableManagement from './BasicTableManagement';
 import UnitManagement from './UnitManagement';
 import PersonManagement from './PersonManagement';
 import AttendanceManagement from './AttendanceManagement';
+import FamilyManagement from './FamilyManagement';
 import { 
   Users, 
   UserCheck, 
@@ -31,14 +32,26 @@ interface DashboardProps {
 export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps) {
   const [activeTab, setActiveTab] = useState(() => window.location.hash.replace('#', '') || 'dashboard');
 
-  // Obter o nome legível da unidade
+  const [unidadesList, setUnidadesList] = useState<any[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch(`${API_URL}/api/unidades/`, {
+      headers: { 'Authorization': `Token ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setUnidadesList(data.results || data || []);
+      })
+      .catch(err => console.error(err));
+  }, []);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+
+  // Obter o nome real da unidade ativa
   const getUnidadeNome = (id: string) => {
-    switch (id) {
-      case '1': return 'CRAS Central';
-      case '2': return 'CREAS Norte';
-      case '3': return 'Unidade de Acolhimento Sul';
-      default: return 'Unidade Geral';
-    }
+    const match = unidadesList.find(u => u.id.toString() === id.toString());
+    return match ? match.nome_conhecido : 'Carregando unidade...';
   };
 
   const usernameDisplay = user.first_name 
@@ -113,6 +126,8 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
             <UnitManagement />
           ) : activeTab === 'pessoas' ? (
             <PersonManagement />
+          ) : activeTab === 'familias' ? (
+            <FamilyManagement />
           ) : activeTab === 'atendimentos' ? (
             <AttendanceManagement userPermissions={user.permissions} />
           ) : activeTab === 'gerenciamento-menus' ? (
@@ -149,6 +164,36 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
 
               {/* Seção Principal de Conteúdo */}
               <div className="dashboard-grid">
+                {/* Ações Rápidas */}
+                <div className="dashboard-card side-card">
+                  <div className="card-header">
+                    <h3 className="card-title">Ações Rápidas</h3>
+                  </div>
+                  <div className="card-body quick-actions-container">
+                    <button onClick={() => setActiveTab('atendimentos')} className="quick-action-btn">
+                      <PlusCircle size={20} />
+                      <div className="action-text">
+                        <span className="action-title">Novo Atendimento</span>
+                        <span className="action-desc">Registrar atendimento de hoje</span>
+                      </div>
+                    </button>
+                    <button onClick={() => setActiveTab('pessoas')} className="quick-action-btn">
+                      <Users size={20} />
+                      <div className="action-text">
+                        <span className="action-title">Novo Cadastro</span>
+                        <span className="action-desc">Inserir uma nova família</span>
+                      </div>
+                    </button>
+                    <button className="quick-action-btn">
+                      <Search size={20} />
+                      <div className="action-text">
+                        <span className="action-title">Buscar Prontuário</span>
+                        <span className="action-desc">Pesquisar histórico social</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Atendimentos Recentes */}
                 <div className="dashboard-card main-card">
                   <div className="card-header">
@@ -186,36 +231,6 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
                         </tbody>
                       </table>
                     </div>
-                  </div>
-                </div>
-
-                {/* Ações Rápidas */}
-                <div className="dashboard-card side-card">
-                  <div className="card-header">
-                    <h3 className="card-title">Ações Rápidas</h3>
-                  </div>
-                  <div className="card-body quick-actions-container">
-                    <button onClick={() => setActiveTab('atendimentos')} className="quick-action-btn">
-                      <PlusCircle size={20} />
-                      <div className="action-text">
-                        <span className="action-title">Novo Atendimento</span>
-                        <span className="action-desc">Registrar atendimento de hoje</span>
-                      </div>
-                    </button>
-                    <button onClick={() => setActiveTab('pessoas')} className="quick-action-btn">
-                      <Users size={20} />
-                      <div className="action-text">
-                        <span className="action-title">Novo Cadastro</span>
-                        <span className="action-desc">Inserir uma nova família</span>
-                      </div>
-                    </button>
-                    <button className="quick-action-btn">
-                      <Search size={20} />
-                      <div className="action-text">
-                        <span className="action-title">Buscar Prontuário</span>
-                        <span className="action-desc">Pesquisar histórico social</span>
-                      </div>
-                    </button>
                   </div>
                 </div>
               </div>

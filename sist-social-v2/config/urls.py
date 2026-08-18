@@ -56,6 +56,7 @@ for name, obj in inspect.getmembers(views):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login/', views.login_view, name='login'),
+    path('api/login/unidades/', views.obter_unidades_usuario_login, name='login-unidades'),
     path('api/menus/', views.menu_list_view, name='menu-list'),
     path('api/', include(router.urls)),                        # 5. Incluindo as rotas geradas
 ]

@@ -14,7 +14,7 @@ class RecursoHumano(models.Model):
     titulo_eleitor = models.CharField(max_length=20, blank=True, null=True, verbose_name="Título de Eleitor")
     telefone = models.CharField(max_length=15, blank=True, null=True, verbose_name="Telefone")
     celular = models.CharField(max_length=15, blank=True, null=True, verbose_name="Celular")
-    escolaridade = models.CharField(max_length=50, blank=True, null=True, verbose_name="Escolaridade")
+    escolaridade = models.ForeignKey('TipoEscolaridade', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Escolaridade")
 
     # --- ENDEREÇO ---
     cep = models.CharField(max_length=9, verbose_name="CEP")
@@ -28,8 +28,8 @@ class RecursoHumano(models.Model):
 
     # --- DADOS PROFISSIONAIS ---
     unidade_socioassistencial = models.BooleanField(default=False, verbose_name="Unidade Socioassistencial?")
-    orgao = models.CharField(max_length=100, blank=True, null=True, verbose_name="Órgão") 
-    responsavel_orgao = models.BooleanField(default=False, verbose_name="Responsável pelo Órgão?")
+    unidades = models.ManyToManyField('Unidade', blank=True, related_name='profissionais', verbose_name="Unidades")
+    responsavel_orgao = models.BooleanField(default=False, verbose_name="Responsável pela Unidade?")
     tipo_servidor = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tipo de Servidor")
     profissao = models.CharField(max_length=100, blank=True, null=True, verbose_name="Profissão")
     funcao = models.CharField(max_length=100, blank=True, null=True, verbose_name="Função")

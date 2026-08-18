@@ -259,6 +259,12 @@ class TiposAtendimentosSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class MotivoAtendimentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MotivoAtendimento
+        fields = '__all__'
+
+
 class TipoServicoProtecaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = TipoServicoProtecao

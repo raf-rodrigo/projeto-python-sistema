@@ -543,13 +543,32 @@ class Feriado(models.Model):
 
 
 class TiposAtendimentos(models.Model):
+    MODALIDADE_CHOICES = [
+        ('Simplificado', 'Simplificado'),
+        ('Tecnico', 'Técnico'),
+        ('Ambos', 'Ambos'),
+    ]
     nome = models.CharField(max_length=255, verbose_name="Nome")
+    modalidade = models.CharField(max_length=15, choices=MODALIDADE_CHOICES, default='Ambos', verbose_name="Modalidade de Filtro")
     ativo = models.BooleanField(default=True, verbose_name="Ativo")
     
     class Meta:
         db_table = 'tipos_atendimentos'
         verbose_name = "TiposAtendimentos"
         verbose_name_plural = "TiposAtendimentoss"
+        
+    def __str__(self):
+        return self.nome
+
+
+class MotivoAtendimento(models.Model):
+    nome = models.CharField(max_length=255, verbose_name="Nome")
+    ativo = models.BooleanField(default=True, verbose_name="Ativo")
+    
+    class Meta:
+        db_table = 'motivo_atendimento'
+        verbose_name = "MotivoAtendimento"
+        verbose_name_plural = "MotivosAtendimentos"
         
     def __str__(self):
         return self.nome

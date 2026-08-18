@@ -51,7 +51,7 @@ class FamiliaDomicilio(models.Model):
     localizacao_domicilio = models.CharField(max_length=10, choices=LOCALIZACAO_CHOICES, null=True, blank=True, verbose_name="Localização Domicílio")
     area_risco = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Área de Risco?")
     area_conflito_violencia = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Área de Conflito/Violência?")
-    tipo_unidade_atendimento_familia = models.ForeignKey(TipoUnidadeAtendimentoFamilia, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo Unidade Atendimento")
+    unidade_atendimento_social_familia = models.ForeignKey(Unidade, on_delete=models.SET_NULL, null=True, blank=True, related_name='familias_atendidas', verbose_name="Unidade Atendimento da Família")
     beneficio_bolsa_familia = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Bolsa Família?")
     data_cadastro = models.DateField(auto_now_add=True, verbose_name="Data de Cadastro")
     origem_cadastro = models.ForeignKey(TipoOrigemCadastro, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Origem Cadastro")
@@ -129,8 +129,8 @@ class FamiliaDomicilio(models.Model):
         return self.familia_codigo or f"Família {self.id}"
 
     def save(self, *args, **kwargs):
-        # Gera o codigo de familia automaticamente (FAM_1, FAM_2, etc.) na criacao
+        # Gera o codigo de familia automaticamente (FAM-1, FAM-2, etc.) na criacao
         super().save(*args, **kwargs)
         if not self.familia_codigo:
-            self.familia_codigo = f"FAM_{self.id}"
+            self.familia_codigo = f"FAM-{self.id}"
             super().save(update_fields=['familia_codigo'])

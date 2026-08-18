@@ -17,6 +17,7 @@ function App() {
   const [unidade, setUnidade] = useState(localStorage.getItem('unidade') || '');
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [unidadesList, setUnidadesList] = useState<any[]>([]);
 
   // Estados de Autenticação
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -31,12 +32,33 @@ function App() {
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
-  // Simulação de lista de unidades (no futuro virá da API)
-  const unidades = [
-    { id: '1', nome: 'CRAS Central' },
-    { id: '2', nome: 'CREAS Norte' },
-    { id: '3', nome: 'Unidade de Acolhimento Sul' }
-  ];
+  // Carrega as unidades associadas ao usuário inserido no input de login
+  const buscarUnidadesDoUsuario = async (username: string) => {
+    if (!username.trim()) {
+      setUnidadesList([]);
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/login/unidades/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+      });
+      if (res.ok) {
+        const data: any[] = await res.json();
+        setUnidadesList(data || []);
+        
+        // Regra: se o usuário tiver apenas 1 unidade vinculada, seleciona ela automaticamente
+        if (data && data.length === 1) {
+          setUnidade(data[0].id.toString());
+        } else {
+          setUnidade('');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,6 +89,9 @@ function App() {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('unidade', data.unidade_id);
 
+      // Redireciona para o dashboard principal limpando hash anterior
+      window.location.hash = 'dashboard';
+
       setToken(data.token);
       setUser(data.user);
     } catch (err: any) {
@@ -88,6 +113,46 @@ function App() {
 
   // Se já estiver logado, renderiza o Dashboard
   if (token && user) {
+    // Administradores ou superusuários têm acesso irrestrito
+    const eAdmin = user.permissions.includes('superuser') || 
+                   user.permissions.includes('auth.change_user') ||
+                   user.groups?.some(g => g.toLowerCase() === 'administradores' || g.toLowerCase() === 'admin') || 
+                   user.username.toLowerCase() === 'admin';
+
+    const semUnidade = !unidade;
+    const semProfissional = user.tem_profissional === false;
+    const semPerfilAcesso = !user.groups || user.groups.length === 0;
+
+    if (!eAdmin && (semUnidade || semProfissional || semPerfilAcesso)) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f8fafc', padding: '24px', fontFamily: 'sans-serif' }}>
+          <div style={{ backgroundColor: '#ffffff', maxWidth: '480px', width: '100%', padding: '40px', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+            <div style={{ fontSize: '3.5rem', color: '#ef4444', marginBottom: '16px' }}>⚠️</div>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1e293b', marginBottom: '12px' }}>Acesso Restrito</h2>
+            <p style={{ fontSize: '0.95rem', color: '#64748b', lineHeight: '1.6', marginBottom: '24px' }}>
+              {semPerfilAcesso ? (
+                <>
+                  Detectamos que sua conta não possui nenhum <strong>Perfil de Acesso</strong> (Grupo) atribuído.
+                </>
+              ) : (
+                <>
+                  Detectamos que sua conta não possui uma <strong>Unidade de Atendimento</strong> selecionada ou faltam os dados obrigatórios do seu perfil profissional (Aba Profissionais). 
+                </>
+              )}
+              <br /><br />
+              Por favor, procure o seu <strong>gestor</strong> para regularizar o seu cadastro no sistema.
+            </p>
+            <button 
+              onClick={handleLogout} 
+              style={{ padding: '10px 20px', backgroundColor: '#ef4444', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}
+            >
+              Voltar para Login
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Dashboard 
         user={user} 
@@ -127,14 +192,18 @@ function App() {
                   </div>
                 )}
 
-                <div className="form-group">
+                 <div className="form-group">
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Usuário"
                     id="usuario"
                     value={usuario}
-                    onChange={(e) => setUsuario(e.target.value)}
+                    onChange={(e) => {
+                      setUsuario(e.target.value);
+                      buscarUnidadesDoUsuario(e.target.value);
+                    }}
+                    onBlur={() => buscarUnidadesDoUsuario(usuario)}
                     required
                   />
                 </div>
@@ -160,7 +229,7 @@ function App() {
                     required
                   >
                     <option value="">-- Selecione a Unidade --</option>
-                    {unidades.map((un) => (
+                    {unidadesList.map((un) => (
                       <option key={un.id} value={un.id}>
                         {un.nome}
                       </option>

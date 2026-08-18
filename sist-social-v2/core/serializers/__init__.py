@@ -5,5 +5,5 @@ from .unidade_serializers import AreaSerializer, UnidadeSerializer
 from .tabela_basica_serializers import EstadoSerializer, MunicipioSerializer, CidSerializer, CboSerializer
 from .familia_serializers import FamiliaDomicilioSerializer
 from .pessoa_serializers import PessoaSerializer
-from .atendimento_serializers import AtendimentoSerializer
+from .atendimento_serializers import AtendimentoSocialSerializer
 

@@ -1,16 +1,21 @@
 from rest_framework import serializers
 from core.models import RecursoHumano
 
+from core.serializers.tabela_basica_serializers import TipoEscolaridadeSerializer
+
 class RecursoHumanoSerializer(serializers.ModelSerializer):
+    escolaridade_details = TipoEscolaridadeSerializer(source='escolaridade', read_only=True)
+
     class Meta:
         model = RecursoHumano
         exclude = ['usuario']
         extra_kwargs = {
-            'orgao': {'required': True, 'allow_null': False, 'allow_blank': False},
+            'unidades': {'required': True, 'allow_null': False},
             'tipo_servidor': {'required': True, 'allow_null': False, 'allow_blank': False},
             'profissao': {'required': True, 'allow_null': False, 'allow_blank': False},
             'funcao': {'required': True, 'allow_null': False, 'allow_blank': False},
             'num_conselho_classe': {'required': True, 'allow_null': False, 'allow_blank': False},
+            'escolaridade': {'required': True, 'allow_null': False}
         }
 
     # Validação matemática do campo CPF

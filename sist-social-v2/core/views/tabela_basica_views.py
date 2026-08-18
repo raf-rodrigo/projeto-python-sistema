@@ -394,10 +394,25 @@ class FeriadoViewSet(viewsets.ModelViewSet):
         instance.ativo = False
         instance.save()
 class TiposAtendimentosViewSet(viewsets.ModelViewSet):
-    queryset = TiposAtendimentos.objects.filter(ativo=True)
     serializer_class = TiposAtendimentosSerializer
 
+    def get_queryset(self):
+        queryset = TiposAtendimentos.objects.filter(ativo=True)
+        modalidade = self.request.query_params.get('modalidade')
+        if modalidade:
+            # Filtra por aquela modalidade ou que atenda a Ambos
+            from django.db.models import Q
+            queryset = queryset.filter(Q(modalidade=modalidade) | Q(modalidade='Ambos'))
+        return queryset.order_by('nome')
 
+    def perform_destroy(self, instance):
+        instance.ativo = False
+        instance.save()
+
+
+class MotivoAtendimentoViewSet(viewsets.ModelViewSet):
+    queryset = MotivoAtendimento.objects.filter(ativo=True).order_by('nome')
+    serializer_class = MotivoAtendimentoSerializer
 
     def perform_destroy(self, instance):
         instance.ativo = False

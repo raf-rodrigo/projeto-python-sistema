@@ -458,7 +458,7 @@ body {
 /* Dashboard Grid layouts */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 24px;
 }
 

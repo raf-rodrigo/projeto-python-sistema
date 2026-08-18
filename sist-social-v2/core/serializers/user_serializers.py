@@ -62,7 +62,10 @@ class UserSerializer(serializers.ModelSerializer):
 
         # Cria o Perfil de Recurso Humano vinculado
         if perfil_data:
-            RecursoHumano.objects.create(usuario=user, **perfil_data)
+            unidades_ids = perfil_data.pop('unidades', [])
+            rh = RecursoHumano.objects.create(usuario=user, **perfil_data)
+            if unidades_ids:
+                rh.unidades.set(unidades_ids)
         else:
             RecursoHumano.objects.create(usuario=user)
 
@@ -88,8 +91,11 @@ class UserSerializer(serializers.ModelSerializer):
         # Atualiza o Perfil do Recurso Humano relacionado
         if perfil_data:
             perfil_instance, created = RecursoHumano.objects.get_or_create(usuario=instance)
+            unidades_ids = perfil_data.pop('unidades', None)
             for attr, value in perfil_data.items():
                 setattr(perfil_instance, attr, value)
             perfil_instance.save()
+            if unidades_ids is not None:
+                perfil_instance.unidades.set(unidades_ids)
 
         return instance
