@@ -6,4 +6,5 @@ from .tabela_basica_serializers import EstadoSerializer, MunicipioSerializer, Ci
 from .familia_serializers import FamiliaDomicilioSerializer
 from .pessoa_serializers import PessoaSerializer
 from .atendimento_serializers import AtendimentoSocialSerializer
+from .transferencia_serializers import TransferenciaUnidadeSerializer
 

@@ -143,6 +143,78 @@ class Pessoa(models.Model):
     def __str__(self):
         return f"{self.nome} (CPF: {self.cpf})"
 
+    def save(self, *args, **kwargs):
+        from core.middleware import get_current_user
+        from core.models.auditoria import AuditoriaLog
+        from django.forms.models import model_to_dict
+
+        is_new = self.pk is None
+        old_values = {}
+
+        if not is_new:
+            try:
+                orig = Pessoa.objects.get(pk=self.pk)
+                old_values = model_to_dict(orig)
+            except Pessoa.DoesNotExist:
+                pass
+
+        super().save(*args, **kwargs)
+
+        new_values = model_to_dict(self)
+        modificacoes = {}
+        
+        user = get_current_user()
+        db_user = user if (user and user.is_authenticated) else None
+
+        if is_new:
+            for key, val in new_values.items():
+                if val is not None and val != '':
+                    modificacoes[key] = {"antigo": None, "novo": str(val)}
+            
+            AuditoriaLog.objects.create(
+                usuario=db_user,
+                modelo="Pessoa",
+                registro_id=self.id,
+                acao="CREATE",
+                modificacoes=modificacoes
+            )
+        else:
+            for key, val in new_values.items():
+                old_val = old_values.get(key)
+                if str(old_val) != str(val):
+                    modificacoes[key] = {"antigo": str(old_val) if old_val is not None else None, "novo": str(val) if val is not None else None}
+
+            if modificacoes:
+                AuditoriaLog.objects.create(
+                    usuario=db_user,
+                    modelo="Pessoa",
+                    registro_id=self.id,
+                    acao="UPDATE",
+                    modificacoes=modificacoes
+                )
+
+    def delete(self, *args, **kwargs):
+        from core.middleware import get_current_user
+        from core.models.auditoria import AuditoriaLog
+        from django.forms.models import model_to_dict
+
+        user = get_current_user()
+        db_user = user if (user and user.is_authenticated) else None
+        
+        old_values = model_to_dict(self)
+        modificacoes = {k: {"antigo": str(v) if v is not None else None, "novo": None} for k, v in old_values.items()}
+
+        registro_id = self.id
+        super().delete(*args, **kwargs)
+
+        AuditoriaLog.objects.create(
+            usuario=db_user,
+            modelo="Pessoa",
+            registro_id=registro_id,
+            acao="DELETE",
+            modificacoes=modificacoes
+        )
+
 
 class PessoaSituacaoRua(models.Model):
     SIM_NAO_CHOICES = [

@@ -1,42 +1,26 @@
-import { useState, useEffect, useRef } from 'react';
-import 'leaflet/dist/leaflet.css';
-import SearchableSelect from './SearchableSelect';
-import { 
-  Building, 
-  PlusCircle, 
-  Edit3, 
-  Trash2, 
-  MapPin, 
-  Search
-} from 'lucide-react';
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import { useState, useEffect } from 'react';
+import { Building, PlusCircle } from 'lucide-react';
 
-// Correção para ícones padrão do Leaflet no React
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
-import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-  iconUrl,
-  iconRetinaUrl,
-  shadowUrl,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import { FamilyTable } from './familia-domicilio/FamilyTable';
+import { FamilyDialogs } from './familia-domicilio/FamilyDialogs';
+import { FamilyEditModal } from './familia-domicilio/FamilyEditModal';
 
 interface TabelaBasicaItem {
   id: number;
   nome: string;
 }
 
-  interface FamiliaDomicilio {
+interface TransferenciaUnidadeItem {
   id: number;
-  familia_codigo?: string;
+  unidade_anterior_nome: string;
+  unidade_nova_nome: string;
+  operador_nome: string;
+  data_transferencia: string;
+  justificativa: string;
+}
+
+interface DomicilioDetails {
+  id?: number;
   logradouro_cep?: string;
   logradouro_nome?: string;
   logradouro_numero?: string;
@@ -46,6 +30,29 @@ interface TabelaBasicaItem {
   estado?: string;
   latitude?: string;
   longitude?: string;
+  complemento_adicional_endereco?: string;
+  referencia_para_localizacao?: string;
+}
+
+interface FamiliaDomicilio {
+  id: number;
+  familia_codigo?: string;
+  codigo_cadunico?: string;
+  data_atualizacao?: string;
+  domicilio?: number;
+  domicilio_details?: DomicilioDetails;
+  
+  // Mantemos compatibilidade caso campos planos cheguem do backend legados
+  logradouro_cep?: string;
+  logradouro_nome?: string;
+  logradouro_numero?: string;
+  logradouro_complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  latitude?: string;
+  longitude?: string;
+
   tempo_moradia_anos?: string;
   tempo_moradia_meses?: string;
   localizacao_domicilio?: 'Urbana' | 'Rural';
@@ -62,15 +69,13 @@ interface TabelaBasicaItem {
   responsavel_cadastro?: number;
   responsavel_cadastro_details?: { id: number; username: string; first_name?: string; last_name?: string };
   observacoes?: string;
-}
-
-// Componente auxiliar para atualizar a visualização do Leaflet Map
-function MapController({ coords }: { coords: [number, number] }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(coords, 16);
-  }, [coords, map]);
-  return null;
+  responsavel_familiar_nome?: string;
+  nis?: string;
+  cpf?: string;
+  telefone?: string;
+  pbf?: string;
+  ext_pobreza?: string;
+  transferencias_details?: TransferenciaUnidadeItem[];
 }
 
 export default function FamilyManagement() {
@@ -88,7 +93,7 @@ export default function FamilyManagement() {
   const [tiposUnidadeAtendimento, setTiposUnidadeAtendimento] = useState<TabelaBasicaItem[]>([]);
   const [unidades, setUnidades] = useState<any[]>([]);
 
-  // Form Fields (Conforme o Mockup da Imagem)
+  // Form Fields
   const [cep, setCep] = useState('');
   const [logradouro, setLogradouro] = useState('');
   const [numero, setNumero] = useState('');
@@ -97,8 +102,6 @@ export default function FamilyManagement() {
   const [uf, setUf] = useState('SP');
   const [complemento, setComplemento] = useState('');
 
-  // Coordenadas para o Mapa interativo Leaflet
-  // Itapevi/São Paulo padrão se vazio [-23.5489, -46.6388]
   const [mapCoords, setMapCoords] = useState<[number, number]>([-23.5489, -46.6388]);
   const [latitudeVal, setLatitudeVal] = useState('');
   const [longitudeVal, setLongitudeVal] = useState('');
@@ -118,20 +121,45 @@ export default function FamilyManagement() {
   const [unidadeCadastroLabel, setUnidadeCadastroLabel] = useState('CREAS ITAPEGICA');
   const [responsavelCadastroLabel, setResponsavelCadastroLabel] = useState('Rafael Doimo');
 
-  // Controle de abas da tela de edição (estilo imagem 12-42-25)
-  const [activeEditTab, setActiveEditTab] = useState('endereco'); // 'endereco' selecionado por padrão na imagem
+  // Controle de abas da tela de edição
+  const [activeEditTab, setActiveEditTab] = useState('inicio');
   const [codigoFamiliaExibicao, setCodigoFamiliaExibicao] = useState('');
   const [responsavelFamiliarNome, setResponsavelFamiliarNome] = useState('MARCELO DA SILVA');
+  const [codigoCadUnico, setCodigoCadUnico] = useState('');
+  const [dataUltAtualizacao, setDataUltAtualizacao] = useState('');
+
+  // Controle de Transferência de Unidade
+  const [transferenciaModalAberto, setTransferenciaModalAberto] = useState(false);
+  const [unidadeDestinoPendente, setUnidadeDestinoPendente] = useState('');
+  const [justificativaTransferencia, setJustificativaTransferencia] = useState('');
+  const [unidadeOrigemNomeExibicao, setUnidadeOrigemNomeExibicao] = useState('');
+  const [localTransferencias, setLocalTransferencias] = useState<TransferenciaUnidadeItem[]>([]);
+
+  // Estados da Aba Composição Familiar
+  const [membrosFamilia, setMembrosFamilia] = useState<any[]>([]);
+  const [modalEscolhaInclusao, setModalEscolhaInclusao] = useState(false);
+  const [modalIncluirExistente, setModalIncluirExistente] = useState(false);
+  const [modalTransferirPessoa, setModalTransferirPessoa] = useState(false);
+  
+  // Pesquisa de Pessoas Existentes
+  const [buscaPessoasQuery, setBuscaPessoasQuery] = useState('');
+  const [pessoasFiltradas, setPessoasFiltradas] = useState<any[]>([]);
+  
+  // Pessoa selecionada para vinculação/transferência
+  const [pessoaSelecionadaPendente, setPessoaSelecionadaPendente] = useState<any>(null);
+  const [novoParentescoId, setNovoParentescoId] = useState('');
+  const [motivoTransferenciaPessoa, setMotivoTransferenciaPessoa] = useState('');
+  const [observacoesTransferenciaPessoa, setObservacoesTransferenciaPessoa] = useState('');
+  const [parentescosDisponiveis, setParentescosDisponiveis] = useState<any[]>([]);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
   const token = localStorage.getItem('token');
 
-  // Consulta endereço e coordenadas com Nominatim (OpenStreetMap) a partir do CEP
+  // Consulta endereço e coordenadas CEP
   const consultarCep = async (cepDigitado: string) => {
     const limpo = cepDigitado.replace(/\D/g, '');
     if (limpo.length === 8) {
       try {
-        // Busca do ViaCEP para preencher campos rápidos
         const resVia = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
         if (resVia.ok) {
           const dadosVia = await resVia.json();
@@ -141,7 +169,6 @@ export default function FamilyManagement() {
             setCidade(dadosVia.localidade || '');
             setUf(dadosVia.uf || 'SP');
 
-            // Busca coordenadas de latitude/longitude usando Nominatim (OSM)
             const query = `${dadosVia.logradouro}, ${dadosVia.bairro}, ${dadosVia.localidade}, Brasil`;
             const resGeocode = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
             if (resGeocode.ok) {
@@ -201,6 +228,14 @@ export default function FamilyManagement() {
         const resJson = await resUnidades.json();
         setUnidades(resJson.results || resJson || []);
       }
+
+      const resParentescos = await fetch(`${API_URL}/api/tipo_parentesco/`, {
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      if (resParentescos.ok) {
+        const resJson = await resParentescos.json();
+        setParentescosDisponiveis(resJson.results || resJson || []);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -211,6 +246,21 @@ export default function FamilyManagement() {
   useEffect(() => {
     carregarDados();
   }, [busca]);
+
+  // Intercepta retorno para manter o modal aberto na aba composição
+  useEffect(() => {
+    const deFamilia = localStorage.getItem('veioDeFamiliaVinculo');
+    const familiaId = localStorage.getItem('familiaPendenteVinculoId');
+    if (deFamilia === 'true' && familiaId && familias.length > 0) {
+      localStorage.removeItem('veioDeFamiliaVinculo');
+      localStorage.removeItem('familiaPendenteVinculoId');
+      
+      const fam = familias.find(f => f.id.toString() === familiaId.toString());
+      if (fam) {
+        abrirEditarModal(fam, 'composicao');
+      }
+    }
+  }, [familias]);
 
   const abrirNovoModal = () => {
     setEditandoId(null);
@@ -234,10 +284,12 @@ export default function FamilyManagement() {
     setTipoUnidadeAtendimentoId(sessionUnidadeId || '');
     setOrigemCadastroId('');
     setDataCadastro(new Date().toISOString().split('T')[0]);
-    // Recupera dados do operador logado da sessão para autopreencher
+    setCodigoCadUnico('');
+    setDataUltAtualizacao('');
+    setLocalTransferencias([]);
+    setMembrosFamilia([]);
+
     const sessionUser = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    // Obtém o nome conhecido da unidade ativa
     if (sessionUnidadeId) {
       const match = unidades.find(u => u.id.toString() === sessionUnidadeId.toString());
       setUnidadeCadastroLabel(match ? match.nome_conhecido : 'Unidade Geral');
@@ -251,24 +303,28 @@ export default function FamilyManagement() {
         : sessionUser.username || 'Operador'
     );
 
+    setActiveEditTab('inicio');
     setErrorMsg(null);
     setModalAberto(true);
   };
 
-  const abrirEditarModal = (f: FamiliaDomicilio) => {
+  const abrirEditarModal = (f: FamiliaDomicilio, defaultTab: string = 'inicio') => {
+    const dom = f.domicilio_details || {};
     setEditandoId(f.id);
-    setCep(f.logradouro_cep || '');
-    setLogradouro(f.logradouro_nome || '');
-    setNumero(f.logradouro_numero || '');
-    setBairro(f.bairro || '');
-    setCidade(f.cidade || '');
-    setUf(f.estado || 'SP');
-    setComplemento(f.logradouro_complemento || '');
+    setCep(dom.logradouro_cep || f.logradouro_cep || '');
+    setLogradouro(dom.logradouro_nome || f.logradouro_nome || '');
+    setNumero(dom.logradouro_numero || f.logradouro_numero || '');
+    setBairro(dom.bairro || f.bairro || '');
+    setCidade(dom.cidade || f.cidade || '');
+    setUf(dom.estado || f.estado || 'SP');
+    setComplemento(dom.logradouro_complemento || f.logradouro_complemento || '');
     
-    if (f.latitude && f.longitude) {
-      setMapCoords([parseFloat(f.latitude), parseFloat(f.longitude)]);
-      setLatitudeVal(f.latitude);
-      setLongitudeVal(f.longitude);
+    const lat = dom.latitude || f.latitude;
+    const lon = dom.longitude || f.longitude;
+    if (lat && lon) {
+      setMapCoords([parseFloat(lat), parseFloat(lon)]);
+      setLatitudeVal(lat);
+      setLongitudeVal(lon);
     } else {
       setMapCoords([-23.5489, -46.6388]);
       setLatitudeVal('');
@@ -284,6 +340,8 @@ export default function FamilyManagement() {
     setTipoUnidadeAtendimentoId(f.unidade_atendimento_social_familia?.toString() || '');
     setOrigemCadastroId(f.origem_cadastro?.toString() || '');
     setDataCadastro(f.data_cadastro || new Date().toISOString().split('T')[0]);
+    setCodigoCadUnico(f.codigo_cadunico || '');
+    setDataUltAtualizacao(f.data_atualizacao || '');
     
     setUnidadeCadastroLabel(f.unidade_cadastro_details?.nome_conhecido || 'CREAS ITAPEGICA');
     setResponsavelCadastroLabel(
@@ -292,13 +350,37 @@ export default function FamilyManagement() {
         : f.responsavel_cadastro_details?.username || 'Rafael Doimo'
     );
     
-    // Configura cabeçalho específico de edição
     setCodigoFamiliaExibicao(f.familia_codigo || `Fam-${f.id}`);
     setResponsavelFamiliarNome(f.responsavel_familiar_nome || 'NÃO CADASTRADO');
-    setActiveEditTab('inicio');
+    setMembrosFamilia(f.membros_details || []);
+    
+    if (f.transferencias_details) {
+      setLocalTransferencias(f.transferencias_details);
+    } else {
+      setLocalTransferencias([]);
+    }
 
+    setActiveEditTab(defaultTab);
     setErrorMsg(null);
     setModalAberto(true);
+  };
+
+  const deletarFamilia = async (id: number) => {
+    if (confirm('Tem certeza que deseja excluir esta família permanentemente?')) {
+      try {
+        const res = await fetch(`${API_URL}/api/familias_domicilios/${id}/`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Token ${token}` }
+        });
+        if (res.ok) {
+          setFamilias(prev => prev.filter(f => f.id !== id));
+        } else {
+          alert('Erro ao excluir família.');
+        }
+      } catch (err) {
+        alert('Erro ao se conectar com a API.');
+      }
+    }
   };
 
   const salvarFamilia = async (e: React.FormEvent) => {
@@ -312,6 +394,18 @@ export default function FamilyManagement() {
     const sessionUnidadeId = localStorage.getItem('unidade');
 
     const payload = {
+      domicilio_details: {
+        logradouro_cep: cep,
+        logradouro_nome: logradouro,
+        logradouro_numero: numero,
+        logradouro_complemento: complemento,
+        bairro,
+        cidade,
+        estado: uf,
+        latitude: latitudeVal,
+        longitude: longitudeVal,
+      },
+      // Campos planos legados mantidos para retrocompatibilidade provisória do DRF
       logradouro_cep: cep,
       logradouro_nome: logradouro,
       logradouro_numero: numero,
@@ -321,6 +415,7 @@ export default function FamilyManagement() {
       estado: uf,
       latitude: latitudeVal,
       longitude: longitudeVal,
+      
       tempo_moradia_anos: tempoMoradiaAnos,
       tempo_moradia_meses: tempoMoradiaMeses,
       localizacao_domicilio: localizacaoDomicilio,
@@ -331,7 +426,9 @@ export default function FamilyManagement() {
       origem_cadastro: parseInt(origemCadastroId),
       data_cadastro: dataCadastro,
       unidade_cadastro: sessionUnidadeId ? parseInt(sessionUnidadeId) : null,
-      responsavel_cadastro: sessionUser.id || null
+      responsavel_cadastro: sessionUser.id || null,
+      codigo_cadunico: codigoCadUnico || null,
+      justificativa_transferencia: justificativaTransferencia || null
     };
 
     try {
@@ -349,8 +446,6 @@ export default function FamilyManagement() {
       if (res.ok) {
         const savedData = await res.json();
         carregarDados();
-        
-        // Em vez de fechar o modal, abre imediatamente no modo de edição estruturado em abas
         setEditandoId(savedData.id);
         setCodigoFamiliaExibicao(savedData.familia_codigo || `FAM-${savedData.id}`);
         setResponsavelFamiliarNome(savedData.responsavel_familiar_nome || 'NÃO CADASTRADO');
@@ -361,6 +456,43 @@ export default function FamilyManagement() {
       }
     } catch (err) {
       setErrorMsg('Erro de conexão com a API.');
+    }
+  };
+
+  const confirmarTransferenciaUnidade = async () => {
+    if (!justificativaTransferencia.trim()) {
+      alert('Justificativa de transferência é obrigatória!');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/familias_domicilios/${editandoId}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`
+        },
+        body: JSON.stringify({
+          unidade_atendimento_social_familia: parseInt(unidadeDestinoPendente),
+          justificativa_transferencia: justificativaTransferencia
+        })
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setTipoUnidadeAtendimentoId(unidadeDestinoPendente);
+        setTransferenciaModalAberto(false);
+        alert('Unidade de atendimento transferida com sucesso!');
+        
+        if (updated.transferencias_details) {
+          setLocalTransferencias(updated.transferencias_details);
+        }
+        carregarDados();
+      } else {
+        alert('Erro ao registrar a transferência.');
+      }
+    } catch (err) {
+      alert('Erro de conexão com o servidor.');
     }
   };
 
@@ -393,340 +525,162 @@ export default function FamilyManagement() {
         />
       </div>
 
-      {/* Tabela de Famílias */}
-      {carregando ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Carregando dados...</div>
-      ) : familias.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#ffffff', borderRadius: '12px', color: '#64748b' }}>
-          Nenhuma família cadastrada no sistema.
-        </div>
-      ) : (
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-          <table className="dashboard-table">
-            <thead>
-              <tr style={{ backgroundColor: '#f1f5f9' }}>
-                <th style={{ padding: '14px 16px' }}>Código da Família</th>
-                <th>Endereço / Localização</th>
-                <th>Coordenadas (Lat/Lon)</th>
-                <th>Unidade Responsável</th>
-                <th style={{ width: '100px', textAlign: 'center' }}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {familias.map(f => (
-                <tr key={f.id}>
-                  <td style={{ padding: '14px 16px', fontWeight: 600 }}>{f.familia_codigo || `FAM-${f.id}`}</td>
-                  <td>
-                    <div>{f.logradouro_nome}, {f.logradouro_numero || 'S/N'}</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>{f.bairro} - {f.cidade}/{f.estado}</div>
-                  </td>
-                  <td style={{ fontSize: '12px', color: '#475569' }}>
-                    {f.latitude && f.longitude ? `${parseFloat(f.latitude).toFixed(4)}, ${parseFloat(f.longitude).toFixed(4)}` : 'Sem coordenadas'}
-                  </td>
-                  <td>{f.unidade_atendimento_social_familia_details?.nome_conhecido || 'Unidade Geral'}</td>
-                  <td>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                      <button onClick={() => abrirEditarModal(f)} style={{ border: 'none', backgroundColor: '#f1f5f9', color: '#475569', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}>
-                        <Edit3 size={16} />
-                      </button>
-                      <button onClick={() => deletarFamilia(f.id)} style={{ border: 'none', backgroundColor: '#fee2e2', color: '#ef4444', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Tabela Principal */}
+      <FamilyTable 
+        familias={familias}
+        carregando={carregando}
+        abrirEditarModal={abrirEditarModal}
+        deletarFamilia={deletarFamilia}
+      />
+
+      {/* Modal Principal de Edição com as Abas */}
+      {modalAberto && (
+        <FamilyEditModal 
+          editandoId={editandoId}
+          codigoFamiliaExibicao={codigoFamiliaExibicao}
+          responsavelFamiliarNome={responsavelFamiliarNome}
+          activeEditTab={activeEditTab}
+          setActiveEditTab={setActiveEditTab}
+          setModalAberto={setModalAberto}
+          salvarFamilia={salvarFamilia}
+          errorMsg={errorMsg}
+          unidades={unidades}
+          origensCadastro={origensCadastro}
+          tipoUnidadeAtendimentoId={tipoUnidadeAtendimentoId}
+          origemCadastroId={origemCadastroId}
+          dataCadastro={dataCadastro}
+          codigoCadUnico={codigoCadUnico}
+          dataUltAtualizacao={dataUltAtualizacao}
+          unidadeCadastroLabel={unidadeCadastroLabel}
+          responsavelCadastroLabel={responsavelCadastroLabel}
+          familias={familias}
+          setTipoUnidadeAtendimentoId={setTipoUnidadeAtendimentoId}
+          setOrigemCadastroId={setOrigemCadastroId}
+          setDataCadastro={setDataCadastro}
+          setCodigoCadUnico={setCodigoCadUnico}
+          setUnidadeOrigemNomeExibicao={setUnidadeOrigemNomeExibicao}
+          setUnidadeDestinoPendente={setUnidadeDestinoPendente}
+          setJustificativaTransferencia={setJustificativaTransferencia}
+          setTransferenciaModalAberto={setTransferenciaModalAberto}
+          membrosFamilia={membrosFamilia}
+          token={token}
+          API_URL={API_URL}
+          setMembrosFamilia={setMembrosFamilia}
+          carregarDados={carregarDados}
+          setModalEscolhaInclusao={setModalEscolhaInclusao}
+          setPessoaSelecionadaPendente={setPessoaSelecionadaPendente}
+          setNovoParentescoId={setNovoParentescoId}
+          setMotivoTransferenciaPessoa={setMotivoTransferenciaPessoa}
+          setObservacoesTransferenciaPessoa={setObservacoesTransferenciaPessoa}
+          setModalTransferirPessoa={setModalTransferirPessoa}
+          cep={cep}
+          logradouro={logradouro}
+          numero={numero}
+          bairro={bairro}
+          cidade={cidade}
+          uf={uf}
+          complemento={complemento}
+          mapCoords={mapCoords}
+          latitudeVal={latitudeVal}
+          longitudeVal={longitudeVal}
+          tempoMoradiaAnos={tempoMoradiaAnos}
+          tempoMoradiaMeses={tempoMoradiaMeses}
+          setCep={setCep}
+          setLogradouro={setLogradouro}
+          setNumero={setNumero}
+          setBairro={setBairro}
+          setCidade={setCidade}
+          setUf={setUf}
+          setComplemento={setComplemento}
+          setTempoMoradiaAnos={setTempoMoradiaAnos}
+          setTempoMoradiaMeses={setTempoMoradiaMeses}
+          localizacaoDomicilio={localizacaoDomicilio}
+          setLocalizacaoDomicilio={setLocalizacaoDomicilio}
+          areaRisco={areaRisco}
+          setAreaRisco={setAreaRisco}
+          areaConflito={areaConflito}
+          setAreaConflito={setAreaConflito}
+          beneficioBolsaFamilia={beneficioBolsaFamilia}
+          setBeneficioBolsaFamilia={setBeneficioBolsaFamilia}
+          localTransferencias={localTransferencias}
+        />
       )}
 
-      {/* MODAL CADASTRAR FAMÍLIA (Mockup V1) */}
-      {modalAberto && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
-          <div style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '1100px', borderRadius: '16px', display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}>
-            
-             {/* Header com Código Família, RF e Ações */}
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px', backgroundColor: '#ffffff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>
-                    Família Domicilio
-                  </h3>
-                  {editandoId && (
-                    <div style={{ fontSize: '13px', color: '#475569', display: 'flex', gap: '16px' }}>
-                      <span><strong>Código Família:</strong> <span style={{ color: '#2563eb', fontWeight: 600 }}>{codigoFamiliaExibicao}</span></span>
-                      <span><strong>RF:</strong> <span style={{ color: '#2563eb', fontWeight: 600 }}>{responsavelFamiliarNome}</span></span>
-                    </div>
-                  )}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {editandoId && (
-                    <>
-                      <button type="button" style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        👁️ Visualizar Documentos
-                      </button>
-                      <button type="button" style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#2563eb', border: 'none', borderRadius: '6px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        🖨️ Imprimir Ficha
-                      </button>
-                    </>
-                  )}
-                  <button onClick={() => setModalAberto(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#94a3b8', cursor: 'pointer', marginLeft: '10px' }}>&times;</button>
-                </div>
-              </div>
+      {/* Modais de suporte orquestrados */}
+      <FamilyDialogs 
+        API_URL={API_URL}
+        token={token}
+        editandoId={editandoId}
+        codigoFamiliaExibicao={codigoFamiliaExibicao}
+        modalEscolhaInclusao={modalEscolhaInclusao}
+        setModalEscolhaInclusao={setModalEscolhaInclusao}
+        setModalIncluirExistente={setModalIncluirExistente}
+        modalIncluirExistente={modalIncluirExistente}
+        setModalIncluirExistenteOnly={setModalIncluirExistente}
+        buscaPessoasQuery={buscaPessoasQuery}
+        setBuscaPessoasQuery={setBuscaPessoasQuery}
+        pessoasFiltradas={pessoasFiltradas}
+        setPessoasFiltradas={setPessoasFiltradas}
+        setPessoaSelecionadaPendente={setPessoaSelecionadaPendente}
+        setNovoParentescoId={setNovoParentescoId}
+        setMotivoTransferenciaPessoa={setMotivoTransferenciaPessoa}
+        setObservacoesTransferenciaPessoa={setObservacoesTransferenciaPessoa}
+        setModalTransferirPessoa={setModalTransferirPessoa}
+        setMembrosFamilia={setMembrosFamilia}
+        modalTransferirPessoa={modalTransferirPessoa}
+        pessoaSelecionadaPendente={pessoaSelecionadaPendente}
+        setModalTransferirPessoaOnly={setModalTransferirPessoa}
+        parentescosDisponiveis={parentescosDisponiveis}
+        novoParentescoId={novoParentescoId}
+        motivoTransferenciaPessoa={motivoTransferenciaPessoa}
+        observacoesTransferenciaPessoa={observacoesTransferenciaPessoa}
+        carregarDadosFamilia={carregarDados}
+      />
 
-              {/* Barra de 11 Abas da Família (Estilo imagem 12-42-25) */}
-              {editandoId && (
-                <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px', borderBottom: '1px solid #e2e8f0', scrollbarWidth: 'thin' }}>
-                  {[
-                    { id: 'inicio', label: '➡ Início' },
-                    { id: 'composicao', label: '👥 Composição Familiar' },
-                    { id: 'endereco', label: '🗺 Endereço' },
-                    { id: 'habitacionais', label: '🏠 Condições Habitacionais' },
-                    { id: 'etnia', label: '🎨 Etnia do Grupo Familiar' },
-                    { id: 'despesas', label: '💵 Despesas' },
-                    { id: 'socioassistenciais', label: '🤝 Condições Socioassistenciais' },
-                    { id: 'observacoes', label: '📝 Observações' },
-                    { id: 'historico_atendimento', label: '📋 Histórico de Atendimento' },
-                    { id: 'historico_transferencia', label: '🔄 Histórico de Transferência' },
-                    { id: 'beneficios', label: '🤝 Benefícios Recebidos' },
-                  ].map(tab => {
-                    const isSelected = activeEditTab === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveEditTab(tab.id)}
-                        style={{
-                          padding: '8px 14px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                          border: 'none',
-                          borderTopLeftRadius: '6px',
-                          borderTopRightRadius: '6px',
-                          backgroundColor: isSelected ? '#10b981' : '#f3f4f6',
-                          color: isSelected ? '#ffffff' : '#475569',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s'
-                        }}
-                      >
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+      {/* Modal 4: Confirmação de Transferência de Unidade */}
+      {transferenciaModalAberto && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000 }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '90%', maxWidth: '500px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', fontWeight: 700, color: '#dc2626' }}>
+              Confirmar Transferência de Unidade
+            </h3>
+            <p style={{ fontSize: '14px', color: '#475569', marginBottom: '20px', lineHeight: 1.5 }}>
+              Você está alterando a Unidade de Atendimento da família de <strong>{unidadeOrigemNomeExibicao}</strong> para <strong>{unidades.find(u => u.id.toString() === unidadeDestinoPendente.toString())?.nome_conhecido}</strong>.
+            </p>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
+                Justificativa da alteração: *
+              </label>
+              <textarea 
+                className="form-control" 
+                rows={4} 
+                required 
+                value={justificativaTransferencia} 
+                onChange={e => setJustificativaTransferencia(e.target.value)} 
+                placeholder="Informe o motivo da transferência de unidade..." 
+                style={{ width: '100%', resize: 'none' }}
+              />
             </div>
-
-            {/* Form */}
-            <form onSubmit={salvarFamilia} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', padding: '24px', gap: '20px' }}>
-              {errorMsg && (
-                <div style={{ backgroundColor: '#fee2e2', color: '#ef4444', padding: '12px', borderRadius: '8px', fontSize: '0.875rem' }}>
-                  {errorMsg}
-                </div>
-              )}
-
-              {/* Aba 3: Endereço (Será visível quando o modo for Criação OU Aba Ativa for 'endereco') */}
-              {(!editandoId || activeEditTab === 'endereco') && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'start' }}>
-                  
-                  {/* Endereço Box */}
-                  <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '20px', backgroundColor: '#ffffff' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Cep: *</label>
-                      <input 
-                        type="text" 
-                        className="form-control" 
-                        value={cep} 
-                        onChange={e => {
-                          const val = e.target.value.replace(/\D/g, '');
-                          if (val.length <= 8) setCep(val);
-                        }} 
-                        required 
-                        placeholder="Apenas números (8 dígitos)" 
-                      />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Logradouro:</label>
-                      <input type="text" className="form-control" value={logradouro} onChange={e => setLogradouro(e.target.value)} />
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div>
-                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Número:</label>
-                        <input type="text" className="form-control" value={numero} onChange={e => setNumero(e.target.value)} />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Bairro:</label>
-                        <input type="text" className="form-control" value={bairro} onChange={e => setBairro(e.target.value)} />
-                      </div>
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Cidade:</label>
-                      <input type="text" className="form-control" value={cidade} onChange={e => setCidade(e.target.value)} />
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div>
-                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>UF:</label>
-                        <input type="text" className="form-control" value={uf} onChange={e => setUf(e.target.value)} />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Complemento:</label>
-                        <input type="text" className="form-control" value={complemento} onChange={e => setComplemento(e.target.value)} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mapa Leaflet Box */}
-                <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden', height: '390px', position: 'relative' }}>
-                  <MapContainer 
-                    center={mapCoords} 
-                    zoom={15} 
-                    style={{ width: '100%', height: '100%', zIndex: 1 }}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={mapCoords} />
-                    <MapController coords={mapCoords} />
-                  </MapContainer>
-                  {latitudeVal && (
-                    <div style={{ position: 'absolute', bottom: '10px', left: '10px', backgroundColor: 'rgba(255,255,255,0.9)', padding: '6px 12px', borderRadius: '4px', fontSize: '11px', fontWeight: 600, color: '#334155', zIndex: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                      Lat: {parseFloat(latitudeVal).toFixed(6)} | Lon: {parseFloat(longitudeVal).toFixed(6)}
-                    </div>
-                  )}
-                </div>
-              </div>
-              )}
-
-              {/* Box 2: Indicadores e Dados Socioassistenciais (Será visível quando o modo for Criação OU Aba Ativa for 'endereco') */}
-              {(!editandoId || activeEditTab === 'endereco') && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '20px', alignItems: 'center' }}>
-                    {/* Tempo Moradia */}
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>Tempo Moradia:</label>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input type="number" className="form-control" value={tempoMoradiaAnos} onChange={e => setTempoMoradiaAnos(e.target.value)} style={{ width: '80px' }} />
-                        <span style={{ fontSize: '11px', color: '#64748b' }}>Anos</span>
-                        <input type="number" className="form-control" value={tempoMoradiaMeses} onChange={e => setTempoMoradiaMeses(e.target.value)} style={{ width: '80px' }} />
-                        <span style={{ fontSize: '11px', color: '#64748b' }}>Meses</span>
-                      </div>
-                    </div>
-
-                    {/* Localização Domicilio (Radios) */}
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>Localização do Domicílio</label>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="localizacaoDomicilio" checked={localizacaoDomicilio === 'Urbana'} onChange={() => setLocalizacaoDomicilio('Urbana')} /> Urbana
-                        </label>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="localizacaoDomicilio" checked={localizacaoDomicilio === 'Rural'} onChange={() => setLocalizacaoDomicilio('Rural')} /> Rural
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Área Risco (Radios) */}
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>Área de Risco</label>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="areaRisco" checked={areaRisco === 'Sim'} onChange={() => setAreaRisco('Sim')} /> Sim
-                        </label>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="areaRisco" checked={areaRisco === 'Não'} onChange={() => setAreaRisco('Não')} /> Não
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Área Conflito (Radios) */}
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>Área Conflito / Violência</label>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="areaConflito" checked={areaConflito === 'Sim'} onChange={() => setAreaConflito('Sim')} /> Sim
-                        </label>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="areaConflito" checked={areaConflito === 'Não'} onChange={() => setAreaConflito('Não')} /> Não
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', alignItems: 'center' }}>
-                    {/* Unidade Atendimento */}
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade Atendimento da Família: *</label>
-                      <SearchableSelect 
-                        options={unidades.map(u => ({ id: u.id, label: u.nome_conhecido }))} 
-                        value={tipoUnidadeAtendimentoId} 
-                        onChange={val => setTipoUnidadeAtendimentoId(val.toString())} 
-                        placeholder="Selecione a Unidade..." 
-                        required 
-                      />
-                    </div>
-
-                    {/* Bolsa Família (Radios) */}
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>Benef. Bolsa Família</label>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="beneficioBolsaFamilia" checked={beneficioBolsaFamilia === 'Sim'} onChange={() => setBeneficioBolsaFamilia('Sim')} /> Sim
-                        </label>
-                        <label style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-                          <input type="radio" name="beneficioBolsaFamilia" checked={beneficioBolsaFamilia === 'Não'} onChange={() => setBeneficioBolsaFamilia('Não')} /> Não
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Data Cadastro: *</label>
-                      <input type="date" className="form-control" value={dataCadastro} onChange={e => setDataCadastro(e.target.value)} required />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Origem do Cadastro: *</label>
-                      <SearchableSelect 
-                        options={origensCadastro.map(o => ({ id: o.id, label: o.nome }))} 
-                        value={origemCadastroId} 
-                        onChange={val => setOrigemCadastroId(val.toString())} 
-                        placeholder="Selecione a Origem..." 
-                        required 
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade Cadastro:</label>
-                      <input type="text" className="form-control" value={unidadeCadastroLabel} disabled style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Responsável pelo Cadastro:</label>
-                      <input type="text" className="form-control" value={responsavelCadastroLabel} disabled style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
-              {/* Botões de Ação */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '10px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
-                <button type="button" onClick={() => setModalAberto(false)} style={{ padding: '8px 16px', backgroundColor: '#f3f4f6', border: 'none', borderRadius: '4px', color: '#dc2626', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
-                  Cancelar
-                </button>
-                <button type="submit" style={{ padding: '8px 16px', backgroundColor: '#10b981', border: 'none', borderRadius: '4px', color: '#ffffff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}>
-                  Salvar
-                </button>
-              </div>
-
-            </form>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setTransferenciaModalAberto(false);
+                  const familiaOriginal = familias.find(f => f.id === editandoId);
+                  setTipoUnidadeAtendimentoId(familiaOriginal?.unidade_atendimento_social_familia?.toString() || '');
+                }} 
+                style={{ padding: '8px 16px', backgroundColor: '#f3f4f6', border: 'none', borderRadius: '6px', color: '#475569', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                onClick={confirmarTransferenciaUnidade} 
+                style={{ padding: '8px 16px', backgroundColor: '#dc2626', border: 'none', borderRadius: '6px', color: '#ffffff', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Confirmar Transferência
+              </button>
+            </div>
           </div>
         </div>
       )}

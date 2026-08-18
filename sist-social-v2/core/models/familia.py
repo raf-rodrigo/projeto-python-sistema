@@ -9,6 +9,55 @@ from core.models.tabela_basica import (
 )
 from core.models.unidade import Unidade
 
+class Domicilio(models.Model):
+    CALCAMENTO_CHOICES = [
+        ('Total', 'Total'),
+        ('Parcial', 'Parcial'),
+        ('Não Existe', 'Não Existe'),
+    ]
+    AREA_RISCO_CHOICES = [
+        ('Sim', 'Sim'),
+        ('Não', 'Não'),
+    ]
+
+    logradouro_cep = models.CharField(max_length=9, null=True, blank=True, verbose_name="CEP")
+    logradouro_nome = models.CharField(max_length=255, null=True, blank=True, verbose_name="Logradouro")
+    logradouro_numero = models.CharField(max_length=20, null=True, blank=True, verbose_name="Número")
+    logradouro_complemento = models.CharField(max_length=150, null=True, blank=True, verbose_name="Complemento")
+    bairro = models.CharField(max_length=100, null=True, blank=True, verbose_name="Bairro")
+    cidade = models.CharField(max_length=100, null=True, blank=True, verbose_name="Cidade")
+    estado = models.CharField(max_length=2, null=True, blank=True, verbose_name="Estado (UF)")
+    latitude = models.CharField(max_length=50, null=True, blank=True, verbose_name="Latitude")
+    longitude = models.CharField(max_length=50, null=True, blank=True, verbose_name="Longitude")
+    complemento_adicional_endereco = models.CharField(max_length=255, null=True, blank=True, verbose_name="Complemento Adicional")
+    referencia_para_localizacao = models.CharField(max_length=255, null=True, blank=True, verbose_name="Ponto de Referência")
+    
+    # Condições Habitacionais
+    tipo_especie_domicilio = models.ForeignKey(TipoEspecieDomicilio, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Espécie do Domicílio")
+    tipo_residencia = models.ForeignKey(TipoResidencia, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo de Residência")
+    tipo_piso_domicilio = models.ForeignKey(TipoPisoDomicilio, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo de Piso")
+    tipo_construcao_domicilio = models.ForeignKey(TipoConstrucaoDomicilio, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo de Construção")
+    tipo_iluminacao_domicilio = models.ForeignKey(TipoIluminacaoDomicilio, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo de Iluminação")
+    agua_canalizada = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Água Canalizada?")
+    tipo_abastecimento_agua = models.ForeignKey(TipoAbastecimentoAgua, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Abastecimento de Água")
+    possue_banheiro = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Possui Banheiro?")
+    tipo_escoamento_sanitario = models.ForeignKey(TipoEscoamentoSanitario, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Escoamento Sanitário")
+    tipo_coleta_lixo = models.ForeignKey(TipoColetaLixo, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Coleta de Lixo")
+    calcamento_na_frente_domicilio = models.CharField(max_length=15, choices=CALCAMENTO_CHOICES, null=True, blank=True, verbose_name="Calçamento em frente?")
+    area_dificil_acesso = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Área de difícil acesso?")
+    tipo_acessibilidade_domicilio = models.ForeignKey(TipoAcessibilidadeDomicilio, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Acessibilidade Domicílio")
+    tipo_animal = models.ForeignKey(TiposAnimais, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Animais no Domicílio")
+    ativo = models.BooleanField(default=True, verbose_name="Ativo")
+
+    class Meta:
+        db_table = 'domicilios'
+        verbose_name = "Domicílio"
+        verbose_name_plural = "Domicílios"
+
+    def __str__(self):
+        return f"{self.logradouro_nome or 'Sem rua'}, {self.logradouro_numero or 'S/N'} - {self.bairro or 'Sem bairro'}"
+
+
 class FamiliaDomicilio(models.Model):
     LOCALIZACAO_CHOICES = [
         ('Urbana', 'Urbana'),
@@ -29,7 +78,10 @@ class FamiliaDomicilio(models.Model):
         ('Baixo', 'Baixo'),
     ]
 
+    domicilio = models.ForeignKey(Domicilio, on_delete=models.SET_NULL, null=True, blank=True, related_name='familias', verbose_name="Domicílio / Endereço")
     familia_codigo = models.CharField(max_length=50, null=True, blank=True, verbose_name="Código da Família")
+    codigo_cadunico = models.CharField(max_length=50, null=True, blank=True, verbose_name="Código CadÚnico")
+    data_atualizacao = models.DateField(auto_now=True, verbose_name="Data da Última Atualização")
 
     # ENDEREÇO
     logradouro_cep = models.CharField(max_length=9, null=True, blank=True, verbose_name="CEP")
@@ -129,8 +181,89 @@ class FamiliaDomicilio(models.Model):
         return self.familia_codigo or f"Família {self.id}"
 
     def save(self, *args, **kwargs):
-        # Gera o codigo de familia automaticamente (FAM-1, FAM-2, etc.) na criacao
+        from core.middleware import get_current_user
+        from core.models.auditoria import AuditoriaLog
+        from django.forms.models import model_to_dict
+        import json
+
+        is_new = self.pk is None
+        old_values = {}
+
+        if not is_new:
+            try:
+                # Obtém o estado anterior do banco de dados
+                orig = FamiliaDomicilio.objects.get(pk=self.pk)
+                old_values = model_to_dict(orig)
+            except FamiliaDomicilio.DoesNotExist:
+                pass
+
+        # Executa o salvamento real no banco
         super().save(*args, **kwargs)
+
+        # Gera o codigo de familia automaticamente (FAM-1, FAM-2, etc.) na criacao
         if not self.familia_codigo:
             self.familia_codigo = f"FAM-{self.id}"
             super().save(update_fields=['familia_codigo'])
+
+        # Gera log de auditoria
+        new_values = model_to_dict(self)
+        modificacoes = {}
+        
+        user = get_current_user()
+        # Se for usuário anônimo ou não autenticado
+        db_user = user if (user and user.is_authenticated) else None
+
+        if is_new:
+            # Para criação, salvamos todos os campos preenchidos
+            for key, val in new_values.items():
+                if val is not None and val != '':
+                    modificacoes[key] = {"antigo": None, "novo": str(val)}
+            
+            AuditoriaLog.objects.create(
+                usuario=db_user,
+                modelo="FamiliaDomicilio",
+                registro_id=self.id,
+                acao="CREATE",
+                modificacoes=modificacoes
+            )
+        else:
+            # Compara campos para ver quais foram atualizados
+            for key, val in new_values.items():
+                # Ignora campos de controle internos ou não relevantes
+                if key in ['data_atualizacao']:
+                    continue
+                old_val = old_values.get(key)
+                if str(old_val) != str(val):
+                    modificacoes[key] = {"antigo": str(old_val) if old_val is not None else None, "novo": str(val) if val is not None else None}
+
+            if modificacoes:
+                AuditoriaLog.objects.create(
+                    usuario=db_user,
+                    modelo="FamiliaDomicilio",
+                    registro_id=self.id,
+                    acao="UPDATE",
+                    modificacoes=modificacoes
+                )
+
+    def delete(self, *args, **kwargs):
+        from core.middleware import get_current_user
+        from core.models.auditoria import AuditoriaLog
+        from django.forms.models import model_to_dict
+
+        user = get_current_user()
+        db_user = user if (user and user.is_authenticated) else None
+        
+        # Guarda valores antes de apagar
+        old_values = model_to_dict(self)
+        modificacoes = {k: {"antigo": str(v) if v is not None else None, "novo": None} for k, v in old_values.items()}
+
+        registro_id = self.id
+        super().delete(*args, **kwargs)
+
+        AuditoriaLog.objects.create(
+            usuario=db_user,
+            modelo="FamiliaDomicilio",
+            registro_id=registro_id,
+            acao="DELETE",
+            modificacoes=modificacoes
+        )

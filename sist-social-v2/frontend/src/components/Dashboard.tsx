@@ -35,6 +35,16 @@ export default function Dashboard({ user, unidadeId, onLogout }: DashboardProps)
   const [unidadesList, setUnidadesList] = useState<any[]>([]);
 
   useEffect(() => {
+    const handleHashChange = () => {
+      const tab = window.location.hash.replace('#', '') || 'dashboard';
+      setActiveTab(tab);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem('token');
     fetch(`${API_URL}/api/unidades/`, {
       headers: { 'Authorization': `Token ${token}` }
