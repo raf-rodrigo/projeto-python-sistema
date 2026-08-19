@@ -75,53 +75,59 @@ export const TabInicio: React.FC<TabInicioProps> = ({
             style={editandoId ? { backgroundColor: '#f1f5f9', color: '#64748b' } : {}}
           />
         </div>
-        <div>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Data de Última Atualização do Cadastro:</label>
-          <input 
-            type="date" 
-            className="form-control" 
-            value={dataUltAtualizacao ? dataUltAtualizacao.split('T')[0] : ''} 
-            disabled 
-            style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
-          />
-        </div>
+        {editandoId && (
+          <div>
+            <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Data de Última Atualização do Cadastro:</label>
+            <input 
+              type="date" 
+              className="form-control" 
+              value={dataUltAtualizacao ? dataUltAtualizacao.split('T')[0] : ''} 
+              disabled 
+              style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
+            />
+          </div>
+        )}
       </div>
 
       {/* Coluna 2: Dados do Profissional e Unidade */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade Cadastro:</label>
-          <input 
-            type="text" 
-            className="form-control" 
-            value={unidadeCadastroLabel} 
-            disabled 
-            style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
-          />
-        </div>
-        <div>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Responsável pelo Cadastro:</label>
-          <input 
-            type="text" 
-            className="form-control" 
-            value={responsavelCadastroLabel} 
-            disabled 
-            style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
-          />
-        </div>
-        <div>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Origem Cadastro:</label>
-          <input 
-            type="text" 
-            className="form-control" 
-            value={
-              origensCadastro.find(o => o.id.toString() === origemCadastroId.toString())?.nome || 
-              (origemCadastroId ? 'Carregando...' : 'Espontâneo')
-            } 
-            disabled 
-            style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
-          />
-        </div>
+        {editandoId && (
+          <>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade Cadastro:</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                value={unidadeCadastroLabel} 
+                disabled 
+                style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Responsável pelo Cadastro:</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                value={responsavelCadastroLabel} 
+                disabled 
+                style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Origem Cadastro:</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                value={
+                  origensCadastro.find(o => o.id.toString() === origemCadastroId.toString())?.nome || 
+                  (origemCadastroId ? 'Carregando...' : 'Espontâneo')
+                } 
+                disabled 
+                style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} 
+              />
+            </div>
+          </>
+        )}
         <div>
           <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade de Atendimento da Família: *</label>
           <SearchableSelect 
