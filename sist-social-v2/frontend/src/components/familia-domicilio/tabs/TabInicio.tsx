@@ -54,13 +54,13 @@ export const TabInicio: React.FC<TabInicioProps> = ({
       {/* Coluna 1: Campos do Cadastro */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Número do NIS (Responsável)*:</label>
+          <label style={{ fontSize: '11px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Código Cadastro Único - CadUnico:</label>
           <input 
             type="text" 
             className="form-control" 
             value={codigoCadUnico} 
             onChange={e => setCodigoCadUnico(e.target.value)} 
-            placeholder="Digite o NIS ou NIS do Responsável..." 
+            placeholder="CadUnico" 
           />
         </div>
         <div>

@@ -650,7 +650,7 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '0 16px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', padding: '16px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
           {[
             { id: 'pessoais', label: 'Dados Pessoais' },
             { id: 'filiacao', label: 'Filiação & Origem' },
@@ -659,25 +659,30 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
             { id: 'saude_edu', label: 'Saúde & Educação' },
             { id: 'trabalho', label: 'Trabalho & Rendas' },
             { id: 'observacoes', label: 'Observações' }
-          ].map(t => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setActiveModalTab(t.id as any)}
-              style={{
-                padding: '12px 16px',
-                border: 'none',
-                background: 'none',
-                borderBottom: activeModalTab === t.id ? '2px solid #f5911e' : '2px solid transparent',
-                color: activeModalTab === t.id ? '#f5911e' : '#64748b',
-                fontWeight: activeModalTab === t.id ? 600 : 500,
-                fontSize: '0.82rem',
-                cursor: 'pointer'
-              }}
-            >
-              {t.label}
-            </button>
-          ))}
+          ].map(t => {
+            const isSelected = activeModalTab === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActiveModalTab(t.id as any)}
+                style={{
+                  padding: '8px 14px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: isSelected ? '#10b981' : '#f3f4f6',
+                  color: isSelected ? '#ffffff' : '#475569',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+              >
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Form */}
