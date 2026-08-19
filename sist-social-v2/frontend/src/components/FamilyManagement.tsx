@@ -393,6 +393,29 @@ export default function FamilyManagement() {
         : sessionUser.username || 'Operador'
     );
 
+    setEspecieDomicilioId('');
+    setTipoResidenciaId('');
+    setTipoConstrucaoId('');
+    setTipoPisoId('');
+    setTipoIluminacaoId('');
+    setAcessibilidadeId('');
+    setAnimalId('');
+    setAguaCanalizada('');
+    setAbastecimentoAguaId('');
+    setPossuiBanheiro('');
+    setEscoamentoSanitarioId('');
+    setColetaLixoId('');
+    setCalcamentoFrente('');
+    setDificilAcesso('');
+    setNumeroComodos('');
+    setNumeroDormitorios('');
+    setPessoasDormitorio('');
+    setTotalPessoas('');
+    setTotalFamilias('');
+    setPessoas0a17('');
+    setPessoas18a64('');
+    setPessoas65mais('');
+
     setActiveEditTab('inicio');
     setErrorMsg(null);
     setModalAberto(true);
