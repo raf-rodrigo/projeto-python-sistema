@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Menu
+from .models import Menu, Configuracao
 
 class SubmenuInline(admin.TabularInline):
     model = Menu
@@ -16,4 +16,10 @@ class MenuAdmin(admin.ModelAdmin):
     ordering = ('pai', 'ordem', 'nome')
     filter_horizontal = ('grupos',)
     inlines = [SubmenuInline]
+
+@admin.register(Configuracao)
+class ConfiguracaoAdmin(admin.ModelAdmin):
+    list_display = ('chave', 'descricao', 'valor', 'validacao')
+    search_fields = ('chave', 'descricao', 'valor')
+
 
