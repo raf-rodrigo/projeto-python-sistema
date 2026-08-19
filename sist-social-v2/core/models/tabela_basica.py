@@ -806,3 +806,16 @@ class PopulacoesRuasTempoDeRua(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class Pais(models.Model):
+    nome = models.CharField(max_length=255, verbose_name="Nome")
+    ativo = models.BooleanField(default=True, verbose_name="Ativo")
+
+    class Meta:
+        db_table = 'pais'
+        verbose_name = "País"
+        verbose_name_plural = "Países"
+
+    def __str__(self):
+        return self.nome

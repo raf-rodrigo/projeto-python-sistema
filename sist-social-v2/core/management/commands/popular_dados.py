@@ -172,6 +172,18 @@ class Command(BaseCommand):
             )
         self.stdout.write(self.style.SUCCESS("Configurações do Sistema sincronizadas!"))
 
+        # 1.6 Países
+        from core.models.tabela_basica import Pais
+        self.stdout.write("Sincronizando Países...")
+        paises_nomes = [
+            "Brasil", "Argentina", "Paraguai", "Uruguai", "Venezuela", "Colômbia", 
+            "Bolívia", "Chile", "Peru", "Equador", "Haiti", "Angola", "Estados Unidos",
+            "Japão", "Itália", "Portugal", "Alemanha", "Espanha", "França", "China"
+        ]
+        for p_nome in paises_nomes:
+            Pais.objects.get_or_create(nome=p_nome, defaults={"ativo": True})
+        self.stdout.write(self.style.SUCCESS("Países sincronizados!"))
+
 
 
         # Pasta padrão para os CSVs

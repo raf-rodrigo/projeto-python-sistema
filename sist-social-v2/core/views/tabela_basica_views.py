@@ -577,3 +577,12 @@ class PopulacoesRuasTempoDeRuaViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.ativo = False
         instance.save()
+
+
+class PaisViewSet(viewsets.ModelViewSet):
+    queryset = Pais.objects.filter(ativo=True).order_by('nome')
+    serializer_class = PaisSerializer
+
+    def perform_destroy(self, instance):
+        instance.ativo = False
+        instance.save()

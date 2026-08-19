@@ -371,3 +371,9 @@ class PopulacoesRuasTempoDeRuaSerializer(serializers.ModelSerializer):
     class Meta:
         model = PopulacoesRuasTempoDeRua
         fields = '__all__'
+
+
+class PaisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pais
+        fields = '__all__'

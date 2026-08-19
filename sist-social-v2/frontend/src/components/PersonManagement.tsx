@@ -56,6 +56,7 @@ export default function PersonManagement() {
   const [temposCidade, setTemposCidade] = useState<TabelaBasicaItem[]>([]);
   const [contatosParentes, setContatosParentes] = useState<TabelaBasicaItem[]>([]);
   const [familias, setFamilias] = useState<TabelaBasicaItem[]>([]);
+  const [paises, setPaises] = useState<TabelaBasicaItem[]>([]);
 
   // Estados do Modal
   const [modalAberto, setModalAberto] = useState(false);
@@ -163,6 +164,9 @@ export default function PersonManagement() {
   const [tipoLocalNascimento, setTipoLocalNascimento] = useState('');
   const [estadoId, setEstadoId] = useState('');
   const [municipioId, setMunicipioId] = useState('');
+  const [paisId, setPaisId] = useState('');
+  const [idCidadePadrao, setIdCidadePadrao] = useState('3898');
+  const [idEstadoPadrao, setIdEstadoPadrao] = useState('25');
 
   // Tab 3: Documentação
   const [rg, setRg] = useState('');
@@ -365,6 +369,21 @@ export default function PersonManagement() {
         const fData = await responseFamilias.json();
         setFamilias(fData.results || fData || []);
       }
+
+      const responsePaises = await fetch(`${API_URL}/api/pais/`, { headers: { 'Authorization': `Token ${token}` } });
+      if (responsePaises.ok) {
+        const d = await responsePaises.json();
+        setPaises(d.results || d || []);
+      }
+
+      const responseConfig = await fetch(`${API_URL}/api/configuracao/`, { headers: { 'Authorization': `Token ${token}` } });
+      if (responseConfig.ok) {
+        const list = await responseConfig.json();
+        const idCidadeCfg = list.find((c: any) => c.chave === 'IDCIDADE')?.valor;
+        if (idCidadeCfg) {
+          setIdCidadePadrao(idCidadeCfg.toString());
+        }
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -375,6 +394,18 @@ export default function PersonManagement() {
   useEffect(() => {
     carregarDados();
   }, [busca]);
+
+  useEffect(() => {
+    if (idCidadePadrao && municipios.length > 0 && estados.length > 0) {
+      const matchMun = municipios.find((m: any) => m.id.toString() === idCidadePadrao.toString());
+      if (matchMun && matchMun.codigo_uf) {
+        const matchEst = estados.find((est: any) => est.cod_ibge === matchMun.codigo_uf);
+        if (matchEst) {
+          setIdEstadoPadrao(matchEst.id.toString());
+        }
+      }
+    }
+  }, [idCidadePadrao, municipios, estados]);
 
   // Vínculo reativo e travamento vindo de adicionar membro de família
   useEffect(() => {
@@ -861,6 +892,7 @@ export default function PersonManagement() {
       tipo_local_nascimento: tipoLocalNascimento ? parseInt(tipoLocalNascimento) : null,
       estado: estadoId ? parseInt(estadoId) : null,
       municipio: municipioId ? parseInt(municipioId) : null,
+      pais_id: paisId ? parseInt(paisId) : null,
       rg: rg || null,
       rg_digito: rgDigito || null,
       rg_orgao_emissor: rgOrgaoEmissor || null,
@@ -1170,6 +1202,11 @@ export default function PersonManagement() {
           setEstadoId={setEstadoId}
           municipioId={municipioId}
           setMunicipioId={setMunicipioId}
+          paises={paises}
+          paisId={paisId}
+          setPaisId={setPaisId}
+          idCidadePadrao={idCidadePadrao}
+          idEstadoPadrao={idEstadoPadrao}
           rg={rg}
           setRg={setRg}
           rgDigito={rgDigito}

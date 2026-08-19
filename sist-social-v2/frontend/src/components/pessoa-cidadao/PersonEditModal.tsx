@@ -213,6 +213,11 @@ interface PersonEditModalProps {
   setEstadoId: (val: string) => void;
   municipioId: string;
   setMunicipioId: (val: string) => void;
+  paises: any[];
+  paisId: string;
+  setPaisId: (val: string) => void;
+  idCidadePadrao: string;
+  idEstadoPadrao: string;
 
   // Documentos
   rg: string;
@@ -517,6 +522,11 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
   setEstadoId,
   municipioId,
   setMunicipioId,
+  paises,
+  paisId,
+  setPaisId,
+  idCidadePadrao,
+  idEstadoPadrao,
   rg,
   setRg,
   rgDigito,
@@ -843,6 +853,11 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 municipioId={municipioId}
                 setMunicipioId={setMunicipioId}
                 municipios={municipios}
+                paises={paises}
+                paisId={paisId}
+                setPaisId={setPaisId}
+                idCidadePadrao={idCidadePadrao}
+                idEstadoPadrao={idEstadoPadrao}
               />
             )}
 

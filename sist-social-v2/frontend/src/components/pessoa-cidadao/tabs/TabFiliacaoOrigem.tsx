@@ -23,6 +23,11 @@ interface TabFiliacaoOrigemProps {
   municipioId: string;
   setMunicipioId: (val: string) => void;
   municipios: TabelaBasicaItem[];
+  paises: TabelaBasicaItem[];
+  paisId: string;
+  setPaisId: (val: string) => void;
+  idCidadePadrao: string;
+  idEstadoPadrao: string;
 }
 
 export const TabFiliacaoOrigem: React.FC<TabFiliacaoOrigemProps> = ({
@@ -38,8 +43,26 @@ export const TabFiliacaoOrigem: React.FC<TabFiliacaoOrigemProps> = ({
   estados,
   municipioId,
   setMunicipioId,
-  municipios
+  municipios,
+  paises,
+  paisId,
+  setPaisId,
+  idCidadePadrao,
+  idEstadoPadrao
 }) => {
+  React.useEffect(() => {
+    if (tipoLocalNascimento === '1') { // Neste município
+      setEstadoId(idEstadoPadrao);
+      setMunicipioId(idCidadePadrao);
+      setPaisId('1'); // Brasil
+    } else if (tipoLocalNascimento === '3') { // Em outro país
+      setEstadoId('');
+      setMunicipioId('');
+    } else {
+      setPaisId('1'); // Brasil
+    }
+  }, [tipoLocalNascimento, idCidadePadrao, idEstadoPadrao, setEstadoId, setMunicipioId, setPaisId]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div>
@@ -59,25 +82,48 @@ export const TabFiliacaoOrigem: React.FC<TabFiliacaoOrigemProps> = ({
             {locaisNascimento.map(l => <option key={l.id} value={l.id}>{l.nome}</option>)}
           </select>
         </div>
-        <div>
-          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Estado (UF)</label>
-          <select className="form-control" value={estadoId} onChange={e => setEstadoId(e.target.value)}>
-            <option value="">Selecione...</option>
-            {estados.map(est => <option key={est.id} value={est.id}>{est.nome}</option>)}
-          </select>
-        </div>
-        <div>
-          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Município de Nascimento</label>
-          <select className="form-control" value={municipioId} onChange={e => setMunicipioId(e.target.value)}>
-            <option value="">Selecione...</option>
-            {(() => {
-              const selectedCodIbge = estados.find(e => e.id.toString() === estadoId)?.cod_ibge;
-              return municipios
-                .filter(m => !estadoId || m.codigo_uf === selectedCodIbge)
-                .map(mun => <option key={mun.id} value={mun.id}>{mun.municipio}</option>);
-            })()}
-          </select>
-        </div>
+
+        {tipoLocalNascimento === '3' ? (
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>País onde nasceu</label>
+            <select className="form-control" value={paisId} onChange={e => setPaisId(e.target.value)}>
+              <option value="">Selecione...</option>
+              {paises.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
+            </select>
+          </div>
+        ) : (
+          <>
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Estado (UF)</label>
+              <select 
+                className="form-control" 
+                value={estadoId} 
+                onChange={e => setEstadoId(e.target.value)}
+                disabled={tipoLocalNascimento === '1'}
+              >
+                <option value="">Selecione...</option>
+                {estados.map(est => <option key={est.id} value={est.id}>{est.nome}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Município de Nascimento</label>
+              <select 
+                className="form-control" 
+                value={municipioId} 
+                onChange={e => setMunicipioId(e.target.value)}
+                disabled={tipoLocalNascimento === '1'}
+              >
+                <option value="">Selecione...</option>
+                {(() => {
+                  const selectedCodIbge = estados.find(e => e.id.toString() === estadoId)?.cod_ibge;
+                  return municipios
+                    .filter(m => !estadoId || m.codigo_uf === selectedCodIbge)
+                    .map(mun => <option key={mun.id} value={mun.id}>{mun.municipio}</option>);
+                })()}
+              </select>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
