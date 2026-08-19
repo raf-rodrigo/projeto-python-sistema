@@ -163,6 +163,24 @@ export default function FamilyManagement() {
   const [codigoComunidadeQuilombola, setCodigoComunidadeQuilombola] = useState('');
   const [comunidadeQuilombola, setComunidadeQuilombola] = useState('');
 
+  // Despesas
+  const [despesaEnergiaEletrica, setDespesaEnergiaEletrica] = useState('0.00');
+  const [despesaAguaEsgoto, setDespesaAguaEsgoto] = useState('0.00');
+  const [despesaGasCarvaoLenha, setDespesaGasCarvaoLenha] = useState('0.00');
+  const [despesaAlimentacaoHigieneLimpeza, setDespesaAlimentacaoHigieneLimpeza] = useState('0.00');
+  const [despesaTransporte, setDespesaTransporte] = useState('0.00');
+  const [despesaAluguel, setDespesaAluguel] = useState('0.00');
+  const [despesaMedicamentoUsoRegular, setDespesaMedicamentoUsoRegular] = useState('0.00');
+  const [despesaCombustivel, setDespesaCombustivel] = useState('0.00');
+  const [despesaFinanciamentoImovel, setDespesaFinanciamentoImovel] = useState('0.00');
+  const [despesaFinanciamentoVeiculo, setDespesaFinanciamentoVeiculo] = useState('0.00');
+  const [despesaCelular, setDespesaCelular] = useState('0.00');
+  const [despesaAssinaturaTv, setDespesaAssinaturaTv] = useState('0.00');
+  const [despesaTelefoneFixo, setDespesaTelefoneFixo] = useState('0.00');
+  const [despesaEmprestimo, setDespesaEmprestimo] = useState('0.00');
+  const [despesaSaude, setDespesaSaude] = useState('0.00');
+  const [despesaEducacao, setDespesaEducacao] = useState('0.00');
+
   // Valores padrão/somente leitura carregados da sessão
   const [unidadeCadastroLabel, setUnidadeCadastroLabel] = useState('CREAS ITAPEGICA');
   const [responsavelCadastroLabel, setResponsavelCadastroLabel] = useState('Rafael Doimo');
@@ -429,6 +447,22 @@ export default function FamilyManagement() {
     setReservaIndigena('');
     setCodigoComunidadeQuilombola('');
     setComunidadeQuilombola('');
+    setDespesaEnergiaEletrica('0.00');
+    setDespesaAguaEsgoto('0.00');
+    setDespesaGasCarvaoLenha('0.00');
+    setDespesaAlimentacaoHigieneLimpeza('0.00');
+    setDespesaTransporte('0.00');
+    setDespesaAluguel('0.00');
+    setDespesaMedicamentoUsoRegular('0.00');
+    setDespesaCombustivel('0.00');
+    setDespesaFinanciamentoImovel('0.00');
+    setDespesaFinanciamentoVeiculo('0.00');
+    setDespesaCelular('0.00');
+    setDespesaAssinaturaTv('0.00');
+    setDespesaTelefoneFixo('0.00');
+    setDespesaEmprestimo('0.00');
+    setDespesaSaude('0.00');
+    setDespesaEducacao('0.00');
 
     setActiveEditTab('inicio');
     setErrorMsg(null);
@@ -512,6 +546,22 @@ export default function FamilyManagement() {
     setReservaIndigena(f.reserva_indigena || '');
     setCodigoComunidadeQuilombola(f.codigo_comunidade_quilombola || '');
     setComunidadeQuilombola(f.comunidade_quilombola || '');
+    setDespesaEnergiaEletrica(f.despesa_energia_eletrica || '0.00');
+    setDespesaAguaEsgoto(f.despesa_agua_esgoto || '0.00');
+    setDespesaGasCarvaoLenha(f.despesa_gas_carvao_lenha || '0.00');
+    setDespesaAlimentacaoHigieneLimpeza(f.despesa_alimentacao_higiene_limpeza || '0.00');
+    setDespesaTransporte(f.despesa_transporte || '0.00');
+    setDespesaAluguel(f.despesa_aluguel || '0.00');
+    setDespesaMedicamentoUsoRegular(f.despesa_medicamento_uso_regular || '0.00');
+    setDespesaCombustivel(f.despesa_combustivel || '0.00');
+    setDespesaFinanciamentoImovel(f.despesa_financiamento_imovel || '0.00');
+    setDespesaFinanciamentoVeiculo(f.despesa_financiamento_veiculo || '0.00');
+    setDespesaCelular(f.despesa_celular || '0.00');
+    setDespesaAssinaturaTv(f.despesa_assinatura_tv || '0.00');
+    setDespesaTelefoneFixo(f.despesa_telefone_fixo || '0.00');
+    setDespesaEmprestimo(f.despesa_emprestimo || '0.00');
+    setDespesaSaude(f.despesa_saude || '0.00');
+    setDespesaEducacao(f.despesa_educacao || '0.00');
     
     if (f.transferencias_details) {
       setLocalTransferencias(f.transferencias_details);
@@ -624,6 +674,22 @@ export default function FamilyManagement() {
       reserva_indigena: reservaIndigena || null,
       codigo_comunidade_quilombola: codigoComunidadeQuilombola || null,
       comunidade_quilombola: comunidadeQuilombola || null,
+      despesa_energia_eletrica: despesaEnergiaEletrica || '0.00',
+      despesa_agua_esgoto: despesaAguaEsgoto || '0.00',
+      despesa_gas_carvao_lenha: despesaGasCarvaoLenha || '0.00',
+      despesa_alimentacao_higiene_limpeza: despesaAlimentacaoHigieneLimpeza || '0.00',
+      despesa_transporte: despesaTransporte || '0.00',
+      despesa_aluguel: despesaAluguel || '0.00',
+      despesa_medicamento_uso_regular: despesaMedicamentoUsoRegular || '0.00',
+      despesa_combustivel: despesaCombustivel || '0.00',
+      despesa_financiamento_imovel: despesaFinanciamentoImovel || '0.00',
+      despesa_financiamento_veiculo: despesaFinanciamentoVeiculo || '0.00',
+      despesa_celular: despesaCelular || '0.00',
+      despesa_assinatura_tv: despesaAssinaturaTv || '0.00',
+      despesa_telefone_fixo: despesaTelefoneFixo || '0.00',
+      despesa_emprestimo: despesaEmprestimo || '0.00',
+      despesa_saude: despesaSaude || '0.00',
+      despesa_educacao: despesaEducacao || '0.00',
     };
 
     try {
@@ -864,6 +930,38 @@ export default function FamilyManagement() {
           setReservaIndigena={setReservaIndigena}
           setCodigoComunidadeQuilombola={setCodigoComunidadeQuilombola}
           setComunidadeQuilombola={setComunidadeQuilombola}
+          despesaEnergiaEletrica={despesaEnergiaEletrica}
+          despesaAguaEsgoto={despesaAguaEsgoto}
+          despesaGasCarvaoLenha={despesaGasCarvaoLenha}
+          despesaAlimentacaoHigieneLimpeza={despesaAlimentacaoHigieneLimpeza}
+          despesaTransporte={despesaTransporte}
+          despesaAluguel={despesaAluguel}
+          despesaMedicamentoUsoRegular={despesaMedicamentoUsoRegular}
+          despesaCombustivel={despesaCombustivel}
+          despesaFinanciamentoImovel={despesaFinanciamentoImovel}
+          despesaFinanciamentoVeiculo={despesaFinanciamentoVeiculo}
+          despesaCelular={despesaCelular}
+          despesaAssinaturaTv={despesaAssinaturaTv}
+          despesaTelefoneFixo={despesaTelefoneFixo}
+          despesaEmprestimo={despesaEmprestimo}
+          despesaSaude={despesaSaude}
+          despesaEducacao={despesaEducacao}
+          setDespesaEnergiaEletrica={setDespesaEnergiaEletrica}
+          setDespesaAguaEsgoto={setDespesaAguaEsgoto}
+          setDespesaGasCarvaoLenha={setDespesaGasCarvaoLenha}
+          setDespesaAlimentacaoHigieneLimpeza={setDespesaAlimentacaoHigieneLimpeza}
+          setDespesaTransporte={setDespesaTransporte}
+          setDespesaAluguel={setDespesaAluguel}
+          setDespesaMedicamentoUsoRegular={setDespesaMedicamentoUsoRegular}
+          setDespesaCombustivel={setDespesaCombustivel}
+          setDespesaFinanciamentoImovel={setDespesaFinanciamentoImovel}
+          setDespesaFinanciamentoVeiculo={setDespesaFinanciamentoVeiculo}
+          setDespesaCelular={setDespesaCelular}
+          setDespesaAssinaturaTv={setDespesaAssinaturaTv}
+          setDespesaTelefoneFixo={setDespesaTelefoneFixo}
+          setDespesaEmprestimo={setDespesaEmprestimo}
+          setDespesaSaude={setDespesaSaude}
+          setDespesaEducacao={setDespesaEducacao}
         />
       )}
 

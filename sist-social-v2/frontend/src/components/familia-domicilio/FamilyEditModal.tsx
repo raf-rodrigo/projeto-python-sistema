@@ -6,6 +6,7 @@ import { TabEndereco } from './tabs/TabEndereco';
 import { TabHistoricoTransferencia } from './tabs/TabHistoricoTransferencia';
 import { TabCondicoesHabitacionais } from './tabs/TabCondicoesHabitacionais';
 import { TabEtnia } from './tabs/TabEtnia';
+import { TabDespesas } from './tabs/TabDespesas';
 
 interface FamilyEditModalProps {
   editandoId: number | null;
@@ -154,7 +155,39 @@ interface FamilyEditModalProps {
   setCodigoReservaIndigena: (val: string) => void;
   setReservaIndigena: (val: string) => void;
   setCodigoComunidadeQuilombola: (val: string) => void;
-  setComunidadeQuilombola: (val: string) => void;
+  setComunidadeQuilombola: (val: string) => void;  // Despesas
+  despesaEnergiaEletrica: string;
+  despesaAguaEsgoto: string;
+  despesaGasCarvaoLenha: string;
+  despesaAlimentacaoHigieneLimpeza: string;
+  despesaTransporte: string;
+  despesaAluguel: string;
+  despesaMedicamentoUsoRegular: string;
+  despesaCombustivel: string;
+  despesaFinanciamentoImovel: string;
+  despesaFinanciamentoVeiculo: string;
+  despesaCelular: string;
+  despesaAssinaturaTv: string;
+  despesaTelefoneFixo: string;
+  despesaEmprestimo: string;
+  despesaSaude: string;
+  despesaEducacao: string;
+  setDespesaEnergiaEletrica: (val: string) => void;
+  setDespesaAguaEsgoto: (val: string) => void;
+  setDespesaGasCarvaoLenha: (val: string) => void;
+  setDespesaAlimentacaoHigieneLimpeza: (val: string) => void;
+  setDespesaTransporte: (val: string) => void;
+  setDespesaAluguel: (val: string) => void;
+  setDespesaMedicamentoUsoRegular: (val: string) => void;
+  setDespesaCombustivel: (val: string) => void;
+  setDespesaFinanciamentoImovel: (val: string) => void;
+  setDespesaFinanciamentoVeiculo: (val: string) => void;
+  setDespesaCelular: (val: string) => void;
+  setDespesaAssinaturaTv: (val: string) => void;
+  setDespesaTelefoneFixo: (val: string) => void;
+  setDespesaEmprestimo: (val: string) => void;
+  setDespesaSaude: (val: string) => void;
+  setDespesaEducacao: (val: string) => void;
 
   // States necessários para Histórico Transferência
   localTransferencias: any[];
@@ -293,7 +326,39 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
   setCodigoReservaIndigena,
   setReservaIndigena,
   setCodigoComunidadeQuilombola,
-  setComunidadeQuilombola
+  setComunidadeQuilombola,
+  despesaEnergiaEletrica,
+  despesaAguaEsgoto,
+  despesaGasCarvaoLenha,
+  despesaAlimentacaoHigieneLimpeza,
+  despesaTransporte,
+  despesaAluguel,
+  despesaMedicamentoUsoRegular,
+  despesaCombustivel,
+  despesaFinanciamentoImovel,
+  despesaFinanciamentoVeiculo,
+  despesaCelular,
+  despesaAssinaturaTv,
+  despesaTelefoneFixo,
+  despesaEmprestimo,
+  despesaSaude,
+  despesaEducacao,
+  setDespesaEnergiaEletrica,
+  setDespesaAguaEsgoto,
+  setDespesaGasCarvaoLenha,
+  setDespesaAlimentacaoHigieneLimpeza,
+  setDespesaTransporte,
+  setDespesaAluguel,
+  setDespesaMedicamentoUsoRegular,
+  setDespesaCombustivel,
+  setDespesaFinanciamentoImovel,
+  setDespesaFinanciamentoVeiculo,
+  setDespesaCelular,
+  setDespesaAssinaturaTv,
+  setDespesaTelefoneFixo,
+  setDespesaEmprestimo,
+  setDespesaSaude,
+  setDespesaEducacao
 }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
@@ -631,6 +696,44 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
               setReservaIndigena={setReservaIndigena}
               setCodigoComunidadeQuilombola={setCodigoComunidadeQuilombola}
               setComunidadeQuilombola={setComunidadeQuilombola}
+            />
+          )}
+
+          {/* Aba: Despesas */}
+          {editandoId && activeEditTab === 'despesas' && (
+            <TabDespesas 
+              despesaEnergiaEletrica={despesaEnergiaEletrica}
+              despesaAguaEsgoto={despesaAguaEsgoto}
+              despesaGasCarvaoLenha={despesaGasCarvaoLenha}
+              despesaAlimentacaoHigieneLimpeza={despesaAlimentacaoHigieneLimpeza}
+              despesaTransporte={despesaTransporte}
+              despesaAluguel={despesaAluguel}
+              despesaMedicamentoUsoRegular={despesaMedicamentoUsoRegular}
+              despesaCombustivel={despesaCombustivel}
+              despesaFinanciamentoImovel={despesaFinanciamentoImovel}
+              despesaFinanciamentoVeiculo={despesaFinanciamentoVeiculo}
+              despesaCelular={despesaCelular}
+              despesaAssinaturaTv={despesaAssinaturaTv}
+              despesaTelefoneFixo={despesaTelefoneFixo}
+              despesaEmprestimo={despesaEmprestimo}
+              despesaSaude={despesaSaude}
+              despesaEducacao={despesaEducacao}
+              setDespesaEnergiaEletrica={setDespesaEnergiaEletrica}
+              setDespesaAguaEsgoto={setDespesaAguaEsgoto}
+              setDespesaGasCarvaoLenha={setDespesaGasCarvaoLenha}
+              setDespesaAlimentacaoHigieneLimpeza={setDespesaAlimentacaoHigieneLimpeza}
+              setDespesaTransporte={setDespesaTransporte}
+              setDespesaAluguel={setDespesaAluguel}
+              setDespesaMedicamentoUsoRegular={setDespesaMedicamentoUsoRegular}
+              setDespesaCombustivel={setDespesaCombustivel}
+              setDespesaFinanciamentoImovel={setDespesaFinanciamentoImovel}
+              setDespesaFinanciamentoVeiculo={setDespesaFinanciamentoVeiculo}
+              setDespesaCelular={setDespesaCelular}
+              setDespesaAssinaturaTv={setDespesaAssinaturaTv}
+              setDespesaTelefoneFixo={setDespesaTelefoneFixo}
+              setDespesaEmprestimo={setDespesaEmprestimo}
+              setDespesaSaude={setDespesaSaude}
+              setDespesaEducacao={setDespesaEducacao}
             />
           )}
 
