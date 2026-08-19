@@ -8,5 +8,6 @@ from .atendimento import AtendimentoSocial
 from .auditoria import AuditoriaLog
 from .transferencia import TransferenciaUnidade
 from .transferencia_pessoa import TransferenciaPessoa
+from .configuracao import Configuracao
 
 

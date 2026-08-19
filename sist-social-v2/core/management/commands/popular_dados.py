@@ -118,6 +118,60 @@ class Command(BaseCommand):
             TipoUnidadeAtendimentoFamilia.objects.create(nome="Outra Unidade", ativo=True)
             self.stdout.write(self.style.SUCCESS("Tipos de Unidade criados!"))
 
+        # 1.5 Configurações do Sistema
+        from core.models.configuracao import Configuracao
+        self.stdout.write("Sincronizando Configurações do Sistema...")
+        configs = [
+            {"chave": "NOMESISTEMA", "descricao": "Nome do Sistema", "valor": "Plataforma SistSocial"},
+            {"chave": "COORDSISTEMA", "descricao": "Coordenadas iniciais do mapa do sistema", "valor": '{"lat":-23.5489,"lng":-46.6388}'},
+            {"chave": "IDCIDADE", "descricao": "ID da cidade em que o sistema está localizado", "valor": "3898"},
+            {"chave": "AEPETI_NOTIFICACAO_GERAL", "descricao": "Caso esteja marcado como Sim, o sistema ira notificar todos os usuários de to", "valor": "S"},
+            {"chave": "PIA_NOTIFICACAO_GERAL", "descricao": "Caso esteja marcado como Sim, o sistema ira notificar todos os usuários de to", "valor": "S"},
+            {"chave": "NOME_PREFEITURA", "descricao": "Nome da Prefeitura", "valor": "Prefeitura Municipal"},
+            {"chave": "SUBTITULO_PREFEITURA", "descricao": "Nome da Secretaria", "valor": "Secretaria Municipal de Assistência Social"},
+            {"chave": "TITULO_MENU", "descricao": "Sigla Secretaria", "valor": "SMADS"},
+            {"chave": "APIGOOGLEMAPS", "descricao": "Chave API Google Maps", "valor": None},
+            {"chave": "BRASAOPM", "descricao": "Caminho imagem brasão", "valor": None},
+            {"chave": "TIPOPRONTUARIO", "descricao": "Tipo de Prontuário Utilizado pelo Sistema (SUAS / CUSTOM)", "valor": "1"},
+            {"chave": "LINKSUPORTE", "descricao": "Link para Suporte Secretaria - Vision", "valor": None},
+            {"chave": "RODAPE_RELATORIO", "descricao": "Rodape Relatorios", "valor": "SistSocial - Gestão de Assistência Social"},
+            {"chave": "APIGOOGLEAGENDA", "descricao": "agenda google", "valor": "mlou45meftojtkt720e2euv98s@group.calendar.google.com"},
+            {"chave": "SUBTITULO_MENU", "descricao": "Sub", "valor": "Campo Limpo Paulista"},
+            {"chave": "RM_LGMENU_FOOTER", "descricao": "Retirar brasão e rodapé do sistsocial", "valor": "1"},
+            {"chave": "TESTE_IMG", "descricao": "asd", "valor": "/var/www/html/ci/sist_central/assets/img/sistema/Captura de tela de 2023-08-", "validacao": "img"},
+            {"chave": "IMAGEM_LOGIN", "descricao": "Imagem da prefeitura vigente", "valor": None, "validacao": "img"},
+            {"chave": "IMAGEM_RELATORIO", "descricao": "imagem rel", "valor": "../../../ci/arquivos/sist_social/sistema/imagens/brasao-relatorio.png"},
+            {"chave": "VERIFICACAO_CPF", "descricao": "0 - Não valida CPF | 1 - Valida CPF e não permite 999... | 2 - Valida CPF e permil", "valor": "2"},
+            {"chave": "EDITA_ENDERECO_NA_CRIACO_FAMILIA", "descricao": "Permite a edição dos campos relativo ao endereço após preenchimento auton", "valor": "0"},
+            {"chave": "REENCAMINHAMENTO_TECNICO", "descricao": "Deverá condicionar se o botão de reencaminhamento estará disponível pra es", "valor": "1"},
+            {"chave": "CONF_SELECT", "descricao": "TESTE", "valor": "1"},
+            {"chave": "ATEND_INDIVIDUAL", "descricao": "Atendimento individual", "valor": "1"},
+            {"chave": "etnia_required", "descricao": "0-Campo 'Etnia' não será obrigatório | 1 - Campo 'Etnia' será obrigatório", "valor": "0"},
+            {"chave": "PERFIL_CADASTRO_BAIRRO_OFICIAL", "descricao": "Perfil com permissoes para acessar a interface de Bairros Oficiais", "valor": "Adm Sist Social"},
+            {"chave": "LOGIN_VISION", "descricao": "valor 0: Não Possibilita login no Vision, valor 1: Possibilita login no Vision", "valor": "1"},
+            {"chave": "LOGIN_BETHA", "descricao": "1: Renderiza botão de login com a Betha. 0: Não renderiza.", "valor": "0"},
+            {"chave": "CREAS_RELATORIO_MENSAL_VISUALIZACA", "descricao": "O Perfis separados por virgula. O primeiro perfil pode ver todas as unidades e", "valor": "Adm Sist Social,Técnico Grupos,Tecnicos,Gestores,Coordenador Tecnico"},
+            {"chave": "CRAS_RELATORIO_MENSAL_VISUALIZACAC", "descricao": "O Perfis separados por virgula. O primeiro perfil pode ver todas as unidades e", "valor": "Adm Sist Social,Técnico Grupos,Tecnicos,Gestores,Coordenador Tecnico"},
+            {"chave": "LINHA_EXTREMA_POBREZA", "descricao": "Limite máximo de Linha de Extrema Pobreza", "valor": "209,00"},
+            {"chave": "LINHA_POBREZA", "descricao": "Valor Teto Pobreza (mês)", "valor": "605,00"},
+            {"chave": "LOGIN_SIST", "descricao": "1:Renderiza botão de login. 0:Não renderiza.", "valor": "1"},
+            {"chave": "LOGIN_RECUPERA_SENHA", "descricao": "1:Renderiza link de recuperação de senha. 0:Não renderiza.", "valor": "1"},
+            {"chave": "CHAMADO_ABERTO_ALERTA", "descricao": "Alerta o usuario caso existe algum chamado não concluído com a data anteri", "valor": "1"},
+            {"chave": "CHAMADO_ABERTO_ALERTA_TEMPO", "descricao": "Intervalo em minutos que o usuário será alertado sobre a existência de chama", "valor": "3"},
+            {"chave": "CHAMADO_ABERTO_ALERTA_INTERVALO", "descricao": "Intervalo em horas que um chamado aberto pode gerar um alerta.", "valor": "1"},
+            {"chave": "PERMITE_DATA_RETROATIVA", "descricao": "1 : permite data retroativa na cricao e edição de atendimento técnico. 0: não p", "valor": "1"},
+        ]
+        for cfg in configs:
+            Configuracao.objects.get_or_create(
+                chave=cfg["chave"],
+                defaults={
+                    "descricao": cfg["descricao"],
+                    "valor": cfg.get("valor"),
+                    "validacao": cfg.get("validacao")
+                }
+            )
+        self.stdout.write(self.style.SUCCESS("Configurações do Sistema sincronizadas!"))
+
 
 
         # Pasta padrão para os CSVs

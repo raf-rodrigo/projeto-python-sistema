@@ -6,3 +6,4 @@ from .unidade_views import AreaViewSet, UnidadeViewSet
 from .familia_views import FamiliaDomicilioViewSet
 from .pessoa_views import PessoaViewSet
 from .atendimento_views import AtendimentoViewSet
+from .configuracao_views import ConfiguracaoViewSet
