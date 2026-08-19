@@ -155,6 +155,14 @@ export default function FamilyManagement() {
   const [pessoas18a64, setPessoas18a64] = useState('');
   const [pessoas65mais, setPessoas65mais] = useState('');
 
+  // Etnia
+  const [codigoPovoIndigena, setCodigoPovoIndigena] = useState('');
+  const [povoIndigena, setPovoIndigena] = useState('');
+  const [codigoReservaIndigena, setCodigoReservaIndigena] = useState('');
+  const [reservaIndigena, setReservaIndigena] = useState('');
+  const [codigoComunidadeQuilombola, setCodigoComunidadeQuilombola] = useState('');
+  const [comunidadeQuilombola, setComunidadeQuilombola] = useState('');
+
   // Valores padrão/somente leitura carregados da sessão
   const [unidadeCadastroLabel, setUnidadeCadastroLabel] = useState('CREAS ITAPEGICA');
   const [responsavelCadastroLabel, setResponsavelCadastroLabel] = useState('Rafael Doimo');
@@ -415,6 +423,12 @@ export default function FamilyManagement() {
     setPessoas0a17('');
     setPessoas18a64('');
     setPessoas65mais('');
+    setCodigoPovoIndigena('');
+    setPovoIndigena('');
+    setCodigoReservaIndigena('');
+    setReservaIndigena('');
+    setCodigoComunidadeQuilombola('');
+    setComunidadeQuilombola('');
 
     setActiveEditTab('inicio');
     setErrorMsg(null);
@@ -492,6 +506,12 @@ export default function FamilyManagement() {
     setPessoas0a17(f.pessoas_de_zero_a_dezessete || '');
     setPessoas18a64(f.pessoas_de_dezoito_a_sessenta_e_quatro || '');
     setPessoas65mais(f.pessoas_com_mais_de_sessenta_e_cinco || '');
+    setCodigoPovoIndigena(f.codigo_povo_indigena || '');
+    setPovoIndigena(f.povo_indigena || '');
+    setCodigoReservaIndigena(f.codigo_reserva_indigena || '');
+    setReservaIndigena(f.reserva_indigena || '');
+    setCodigoComunidadeQuilombola(f.codigo_comunidade_quilombola || '');
+    setComunidadeQuilombola(f.comunidade_quilombola || '');
     
     if (f.transferencias_details) {
       setLocalTransferencias(f.transferencias_details);
@@ -598,7 +618,12 @@ export default function FamilyManagement() {
       pessoas_de_zero_a_dezessete: pessoas0a17 || null,
       pessoas_de_dezoito_a_sessenta_e_quatro: pessoas18a64 || null,
       pessoas_com_mais_de_sessenta_e_cinco: pessoas65mais || null,
-
+      codigo_povo_indigena: codigoPovoIndigena || null,
+      povo_indigena: povoIndigena || null,
+      codigo_reserva_indigena: codigoReservaIndigena || null,
+      reserva_indigena: reservaIndigena || null,
+      codigo_comunidade_quilombola: codigoComunidadeQuilombola || null,
+      comunidade_quilombola: comunidadeQuilombola || null,
     };
 
     try {
@@ -827,6 +852,18 @@ export default function FamilyManagement() {
           setPessoas0a17={setPessoas0a17}
           setPessoas18a64={setPessoas18a64}
           setPessoas65mais={setPessoas65mais}
+          codigoPovoIndigena={codigoPovoIndigena}
+          povoIndigena={povoIndigena}
+          codigoReservaIndigena={codigoReservaIndigena}
+          reservaIndigena={reservaIndigena}
+          codigoComunidadeQuilombola={codigoComunidadeQuilombola}
+          comunidadeQuilombola={comunidadeQuilombola}
+          setCodigoPovoIndigena={setCodigoPovoIndigena}
+          setPovoIndigena={setPovoIndigena}
+          setCodigoReservaIndigena={setCodigoReservaIndigena}
+          setReservaIndigena={setReservaIndigena}
+          setCodigoComunidadeQuilombola={setCodigoComunidadeQuilombola}
+          setComunidadeQuilombola={setComunidadeQuilombola}
         />
       )}
 

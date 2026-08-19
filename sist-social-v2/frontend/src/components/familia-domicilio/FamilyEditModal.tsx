@@ -5,6 +5,7 @@ import { TabComposicaoFamiliar } from './tabs/TabComposicaoFamiliar';
 import { TabEndereco } from './tabs/TabEndereco';
 import { TabHistoricoTransferencia } from './tabs/TabHistoricoTransferencia';
 import { TabCondicoesHabitacionais } from './tabs/TabCondicoesHabitacionais';
+import { TabEtnia } from './tabs/TabEtnia';
 
 interface FamilyEditModalProps {
   editandoId: number | null;
@@ -141,7 +142,19 @@ interface FamilyEditModalProps {
   setPessoas0a17: (val: string) => void;
   setPessoas18a64: (val: string) => void;
   setPessoas65mais: (val: string) => void;
-
+  // Etnia
+  codigoPovoIndigena: string;
+  povoIndigena: string;
+  codigoReservaIndigena: string;
+  reservaIndigena: string;
+  codigoComunidadeQuilombola: string;
+  comunidadeQuilombola: string;
+  setCodigoPovoIndigena: (val: string) => void;
+  setPovoIndigena: (val: string) => void;
+  setCodigoReservaIndigena: (val: string) => void;
+  setReservaIndigena: (val: string) => void;
+  setCodigoComunidadeQuilombola: (val: string) => void;
+  setComunidadeQuilombola: (val: string) => void;
 
   // States necessários para Histórico Transferência
   localTransferencias: any[];
@@ -268,7 +281,19 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
   setTotalFamilias,
   setPessoas0a17,
   setPessoas18a64,
-  setPessoas65mais
+  setPessoas65mais,
+  codigoPovoIndigena,
+  povoIndigena,
+  codigoReservaIndigena,
+  reservaIndigena,
+  codigoComunidadeQuilombola,
+  comunidadeQuilombola,
+  setCodigoPovoIndigena,
+  setPovoIndigena,
+  setCodigoReservaIndigena,
+  setReservaIndigena,
+  setCodigoComunidadeQuilombola,
+  setComunidadeQuilombola
 }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
@@ -588,6 +613,24 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
               cep={cep}
               logradouro={logradouro}
               numero={numero}
+            />
+          )}
+
+          {/* Aba: Etnia do Grupo Familiar */}
+          {editandoId && activeEditTab === 'etnia' && (
+            <TabEtnia 
+              codigoPovoIndigena={codigoPovoIndigena}
+              povoIndigena={povoIndigena}
+              codigoReservaIndigena={codigoReservaIndigena}
+              reservaIndigena={reservaIndigena}
+              codigoComunidadeQuilombola={codigoComunidadeQuilombola}
+              comunidadeQuilombola={comunidadeQuilombola}
+              setCodigoPovoIndigena={setCodigoPovoIndigena}
+              setPovoIndigena={setPovoIndigena}
+              setCodigoReservaIndigena={setCodigoReservaIndigena}
+              setReservaIndigena={setReservaIndigena}
+              setCodigoComunidadeQuilombola={setCodigoComunidadeQuilombola}
+              setComunidadeQuilombola={setComunidadeQuilombola}
             />
           )}
 

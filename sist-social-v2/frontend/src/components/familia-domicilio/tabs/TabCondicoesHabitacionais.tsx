@@ -192,7 +192,7 @@ export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps>
       {/* GRUPO 1: Características Físicas e Tipo de Habitação */}
       <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', backgroundColor: '#f8fafc' }}>
         <h4 style={{ margin: '0 0 16px 0', fontSize: '13px', fontWeight: 700, color: '#1e293b', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
-          🏠 Grupo 1: Características Físicas e Tipo de Habitação
+          Características Físicas e Tipo de Habitação
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
           <div>
@@ -264,7 +264,7 @@ export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps>
       {/* GRUPO 2: Saneamento e Infraestrutura Urbana */}
       <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', backgroundColor: '#f8fafc' }}>
         <h4 style={{ margin: '0 0 16px 0', fontSize: '13px', fontWeight: 700, color: '#1e293b', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
-          💧 Grupo 2: Saneamento e Infraestrutura Urbana
+          Saneamento e Infraestrutura Urbana
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
           <div>
@@ -333,7 +333,7 @@ export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps>
       {/* GRUPO 3: Cômodos e Densidade de Residentes */}
       <div style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', backgroundColor: '#f8fafc' }}>
         <h4 style={{ margin: '0 0 16px 0', fontSize: '13px', fontWeight: 700, color: '#1e293b', borderBottom: '1px solid #cbd5e1', paddingBottom: '8px' }}>
-          👥 Grupo 3: Cômodos e Densidade de Residentes
+          Cômodos e Densidade de Residentes
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
           <div>
