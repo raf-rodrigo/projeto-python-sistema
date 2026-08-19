@@ -92,6 +92,16 @@ export default function FamilyManagement() {
   const [origensCadastro, setOrigensCadastro] = useState<TabelaBasicaItem[]>([]);
   const [tiposUnidadeAtendimento, setTiposUnidadeAtendimento] = useState<TabelaBasicaItem[]>([]);
   const [unidades, setUnidades] = useState<any[]>([]);
+  const [especiesDomicilio, setEspeciesDomicilio] = useState<any[]>([]);
+  const [tiposResidencia, setTiposResidencia] = useState<any[]>([]);
+  const [tiposPiso, setTiposPiso] = useState<any[]>([]);
+  const [tiposConstrucao, setTiposConstrucao] = useState<any[]>([]);
+  const [tiposIluminacao, setTiposIluminacao] = useState<any[]>([]);
+  const [tiposAbastecimentoAgua, setTiposAbastecimentoAgua] = useState<any[]>([]);
+  const [tiposEscoamentoSanitario, setTiposEscoamentoSanitario] = useState<any[]>([]);
+  const [tiposColetaLixo, setTiposColetaLixo] = useState<any[]>([]);
+  const [tiposAcessibilidade, setTiposAcessibilidade] = useState<any[]>([]);
+  const [tiposAnimais, setTiposAnimais] = useState<any[]>([]);
 
   // Form Fields
   const [cep, setCep] = useState('');
@@ -116,6 +126,34 @@ export default function FamilyManagement() {
   const [tipoUnidadeAtendimentoId, setTipoUnidadeAtendimentoId] = useState('');
   const [origemCadastroId, setOrigemCadastroId] = useState('');
   const [dataCadastro, setDataCadastro] = useState(() => new Date().toISOString().split('T')[0]);
+
+  // Grupo 1: Características Físicas
+  const [especieDomicilioId, setEspecieDomicilioId] = useState('');
+  const [tipoResidenciaId, setTipoResidenciaId] = useState('');
+  const [tipoConstrucaoId, setTipoConstrucaoId] = useState('');
+  const [tipoPisoId, setTipoPisoId] = useState('');
+  const [tipoIluminacaoId, setTipoIluminacaoId] = useState('');
+  const [acessibilidadeId, setAcessibilidadeId] = useState('');
+  const [animalId, setAnimalId] = useState('');
+
+  // Grupo 2: Saneamento e Infraestrutura
+  const [aguaCanalizada, setAguaCanalizada] = useState('');
+  const [abastecimentoAguaId, setAbastecimentoAguaId] = useState('');
+  const [possuiBanheiro, setPossuiBanheiro] = useState('');
+  const [escoamentoSanitarioId, setEscoamentoSanitarioId] = useState('');
+  const [coletaLixoId, setColetaLixoId] = useState('');
+  const [calcamentoFrente, setCalcamentoFrente] = useState('');
+  const [dificilAcesso, setDificilAcesso] = useState('');
+
+  // Grupo 3: Cômodos e Residentes
+  const [numeroComodos, setNumeroComodos] = useState('');
+  const [numeroDormitorios, setNumeroDormitorios] = useState('');
+  const [pessoasDormitorio, setPessoasDormitorio] = useState('');
+  const [totalPessoas, setTotalPessoas] = useState('');
+  const [totalFamilias, setTotalFamilias] = useState('');
+  const [pessoas0a17, setPessoas0a17] = useState('');
+  const [pessoas18a64, setPessoas18a64] = useState('');
+  const [pessoas65mais, setPessoas65mais] = useState('');
 
   // Valores padrão/somente leitura carregados da sessão
   const [unidadeCadastroLabel, setUnidadeCadastroLabel] = useState('CREAS ITAPEGICA');
@@ -205,6 +243,58 @@ export default function FamilyManagement() {
       }
 
       // Tabelas Básicas
+
+      // 1. Espécie do Domicílio
+      const resEspecies = await fetch(`${API_URL}/api/tipo_especie_domicilio/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resEspecies.ok) setEspeciesDomicilio(await resEspecies.json());
+
+      // 2. Tipo de Residência
+      const resResidencia = await fetch(`${API_URL}/api/tipo_residencia/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resResidencia.ok) setTiposResidencia(await resResidencia.json());
+
+      // 3. Tipo de Piso
+      const resPiso = await fetch(`${API_URL}/api/tipo_piso_domicilio/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resPiso.ok) setTiposPiso(await resPiso.json());
+
+      // 4. Tipo de Construção
+      const resConstrucao = await fetch(`${API_URL}/api/tipo_construcao_domicilio/?no_pagination=true`, {
+      headers: { 'Authorization': `Token ${token}` } });
+      if (resConstrucao.ok) setTiposConstrucao(await resConstrucao.json());
+
+      // 5. Tipo de Iluminação
+      const resIluminacao = await fetch(`${API_URL}/api/tipo_iluminacao_domicilio/?no_pagination=true`, {
+      headers: { 'Authorization': `Token ${token}` } });
+      if (resIluminacao.ok) setTiposIluminacao(await resIluminacao.json());
+
+      // 6. Abastecimento de Água
+      const resAgua = await fetch(`${API_URL}/api/tipo_abastecimento_agua/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resAgua.ok) setTiposAbastecimentoAgua(await resAgua.json());
+
+      // 7. Escoamento Sanitário
+      const resEscoamento = await fetch(`${API_URL}/api/tipo_escoamento_sanitario/?no_pagination=true`, {
+      headers: { 'Authorization': `Token ${token}` } });
+      if (resEscoamento.ok) setTiposEscoamentoSanitario(await resEscoamento.json());
+
+      // 8. Coleta de Lixo
+      const resLixo = await fetch(`${API_URL}/api/tipo_coleta_lixo/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resLixo.ok) setTiposColetaLixo(await resLixo.json());
+
+      // 9. Acessibilidade
+      const resAcessibilidade = await fetch(`${API_URL}/api/tipo_acessibilidade_domicilio/?no_pagination=true`, {
+      headers: { 'Authorization': `Token ${token}` } });
+      if (resAcessibilidade.ok) setTiposAcessibilidade(await resAcessibilidade.json());
+
+      // 10. Animais
+      const resAnimais = await fetch(`${API_URL}/api/tipos_animais/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resAnimais.ok) setTiposAnimais(await resAnimais.json());
+
+
       const resOrigem = await fetch(`${API_URL}/api/tipo_origem_cadastro/`, {
         headers: { 'Authorization': `Token ${token}` }
       });
@@ -353,6 +443,32 @@ export default function FamilyManagement() {
     setCodigoFamiliaExibicao(f.familia_codigo || `Fam-${f.id}`);
     setResponsavelFamiliarNome(f.responsavel_familiar_nome || 'NÃO CADASTRADO');
     setMembrosFamilia(f.membros_details || []);
+
+    // Carrega dados habitacionais na edição
+    setEspecieDomicilioId(f.tipo_especie_domicilio?.toString() || '');
+    setTipoResidenciaId(f.tipo_residencia?.toString() || '');
+    setTipoConstrucaoId(f.tipo_construcao_domicilio?.toString() || '');
+    setTipoPisoId(f.tipo_piso_domicilio?.toString() || '');
+    setTipoIluminacaoId(f.tipo_iluminacao_domicilio?.toString() || '');
+    setAcessibilidadeId(f.tipo_acessibilidade_domicilio?.toString() || '');
+    setAnimalId(f.tipo_animal?.toString() || '');
+
+    setAguaCanalizada(f.agua_canalizada || 'Não');
+    setAbastecimentoAguaId(f.tipo_abastecimento_agua?.toString() || '');
+    setPossuiBanheiro(f.possue_banheiro || 'Não');
+    setEscoamentoSanitarioId(f.tipo_escoamento_sanitario?.toString() || '');
+    setColetaLixoId(f.tipo_coleta_lixo?.toString() || '');
+    setCalcamentoFrente(f.calcamento_na_frente_domicilio || 'Não Existe');
+    setDificilAcesso(f.area_dificil_acesso || 'Não');
+
+    setNumeroComodos(f.numero_comodos || '');
+    setNumeroDormitorios(f.numero_dormitorio || '');
+    setPessoasDormitorio(f.numero_pessoa_dormitorio || '');
+    setTotalPessoas(f.total_pessoa_domicilio || '');
+    setTotalFamilias(f.total_familia_domicilio || '');
+    setPessoas0a17(f.pessoas_de_zero_a_dezessete || '');
+    setPessoas18a64(f.pessoas_de_dezoito_a_sessenta_e_quatro || '');
+    setPessoas65mais(f.pessoas_com_mais_de_sessenta_e_cinco || '');
     
     if (f.transferencias_details) {
       setLocalTransferencias(f.transferencias_details);
@@ -428,7 +544,38 @@ export default function FamilyManagement() {
       unidade_cadastro: sessionUnidadeId ? parseInt(sessionUnidadeId) : null,
       responsavel_cadastro: sessionUser.id || null,
       codigo_cadunico: codigoCadUnico || null,
-      justificativa_transferencia: justificativaTransferencia || null
+      justificativa_transferencia: justificativaTransferencia || null,
+      unidade_cadastro: sessionUnidadeId ? parseInt(sessionUnidadeId) : null,
+      responsavel_cadastro: sessionUser.id || null,
+      codigo_cadunico: codigoCadUnico || null,
+      justificativa_transferencia: justificativaTransferencia || null,
+
+      // --- NOVOS CAMPOS HABITACIONAIS ---
+      tipo_especie_domicilio: especieDomicilioId ? parseInt(especieDomicilioId) : null,
+      tipo_residencia: tipoResidenciaId ? parseInt(tipoResidenciaId) : null,
+      tipo_construcao_domicilio: tipoConstrucaoId ? parseInt(tipoConstrucaoId) : null,
+      tipo_piso_domicilio: tipoPisoId ? parseInt(tipoPisoId) : null,
+      tipo_iluminacao_domicilio: tipoIluminacaoId ? parseInt(tipoIluminacaoId) : null,
+      tipo_acessibilidade_domicilio: acessibilidadeId ? parseInt(acessibilidadeId) : null,
+      tipo_animal: animalId ? parseInt(animalId) : null,
+
+      agua_canalizada: aguaCanalizada || null,
+      tipo_abastecimento_agua: abastecimentoAguaId ? parseInt(abastecimentoAguaId) : null,
+      possue_banheiro: possuiBanheiro || null,
+      tipo_escoamento_sanitario: escoamentoSanitarioId ? parseInt(escoamentoSanitarioId) : null,
+      tipo_coleta_lixo: coletaLixoId ? parseInt(coletaLixoId) : null,
+      calcamento_na_frente_domicilio: calcamentoFrente || null,
+      area_dificil_acesso: dificilAcesso || null,
+
+      numero_comodos: numeroComodos || null,
+      numero_dormitorio: numeroDormitorios || null,
+      numero_pessoa_dormitorio: pessoasDormitorio || null,
+      total_pessoa_domicilio: totalPessoas || null,
+      total_familia_domicilio: totalFamilias || null,
+      pessoas_de_zero_a_dezessete: pessoas0a17 || null,
+      pessoas_de_dezoito_a_sessenta_e_quatro: pessoas18a64 || null,
+      pessoas_com_mais_de_sessenta_e_cinco: pessoas65mais || null,
+
     };
 
     try {
@@ -603,6 +750,60 @@ export default function FamilyManagement() {
           beneficioBolsaFamilia={beneficioBolsaFamilia}
           setBeneficioBolsaFamilia={setBeneficioBolsaFamilia}
           localTransferencias={localTransferencias}
+          especiesDomicilio={especiesDomicilio}
+          tiposResidencia={tiposResidencia}
+          tiposPiso={tiposPiso}
+          tiposConstrucao={tiposConstrucao}
+          tiposIluminacao={tiposIluminacao}
+          tiposAbastecimentoAgua={tiposAbastecimentoAgua}
+          tiposEscoamentoSanitario={tiposEscoamentoSanitario}
+          tiposColetaLixo={tiposColetaLixo}
+          tiposAcessibilidade={tiposAcessibilidade}
+          tiposAnimais={tiposAnimais}
+          especieDomicilioId={especieDomicilioId}
+          tipoResidenciaId={tipoResidenciaId}
+          tipoConstrucaoId={tipoConstrucaoId}
+          tipoPisoId={tipoPisoId}
+          tipoIluminacaoId={tipoIluminacaoId}
+          acessibilidadeId={acessibilidadeId}
+          animalId={animalId}
+          aguaCanalizada={aguaCanalizada}
+          abastecimentoAguaId={abastecimentoAguaId}
+          possuiBanheiro={possuiBanheiro}
+          escoamentoSanitarioId={escoamentoSanitarioId}
+          coletaLixoId={coletaLixoId}
+          calcamentoFrente={calcamentoFrente}
+          dificilAcesso={dificilAcesso}
+          numeroComodos={numeroComodos}
+          numeroDormitorios={numeroDormitorios}
+          pessoasDormitorio={pessoasDormitorio}
+          totalPessoas={totalPessoas}
+          totalFamilias={totalFamilias}
+          pessoas0a17={pessoas0a17}
+          pessoas18a64={pessoas18a64}
+          pessoas65mais={pessoas65mais}
+          setEspecieDomicilioId={setEspecieDomicilioId}
+          setTipoResidenciaId={setTipoResidenciaId}
+          setTipoConstrucaoId={setTipoConstrucaoId}
+          setTipoPisoId={setTipoPisoId}
+          setTipoIluminacaoId={setTipoIluminacaoId}
+          setAcessibilidadeId={setAcessibilidadeId}
+          setAnimalId={setAnimalId}
+          setAguaCanalizada={setAguaCanalizada}
+          setAbastecimentoAguaId={setAbastecimentoAguaId}
+          setPossuiBanheiro={setPossuiBanheiro}
+          setEscoamentoSanitarioId={setEscoamentoSanitarioId}
+          setColetaLixoId={setColetaLixoId}
+          setCalcamentoFrente={setCalcamentoFrente}
+          setDificilAcesso={setDificilAcesso}
+          setNumeroComodos={setNumeroComodos}
+          setNumeroDormitorios={setNumeroDormitorios}
+          setPessoasDormitorio={setPessoasDormitorio}
+          setTotalPessoas={setTotalPessoas}
+          setTotalFamilias={setTotalFamilias}
+          setPessoas0a17={setPessoas0a17}
+          setPessoas18a64={setPessoas18a64}
+          setPessoas65mais={setPessoas65mais}
         />
       )}
 

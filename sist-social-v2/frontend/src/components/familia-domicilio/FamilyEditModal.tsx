@@ -4,6 +4,7 @@ import { TabInicio } from './tabs/TabInicio';
 import { TabComposicaoFamiliar } from './tabs/TabComposicaoFamiliar';
 import { TabEndereco } from './tabs/TabEndereco';
 import { TabHistoricoTransferencia } from './tabs/TabHistoricoTransferencia';
+import { TabCondicoesHabitacionais } from './tabs/TabCondicoesHabitacionais';
 
 interface FamilyEditModalProps {
   editandoId: number | null;
@@ -81,6 +82,67 @@ interface FamilyEditModalProps {
   beneficioBolsaFamilia: 'Sim' | 'Não';
   setBeneficioBolsaFamilia: (val: 'Sim' | 'Não') => void;
 
+  // Listas aux
+  especiesDomicilio: any[];
+  tiposResidencia: any[];
+  tiposPiso: any[];
+  tiposConstrucao: any[];
+  tiposIluminacao: any[];
+  tiposAbastecimentoAgua: any[];
+  tiposEscoamentoSanitario: any[];
+  tiposColetaLixo: any[];
+  tiposAcessibilidade: any[];
+  tiposAnimais: any[];
+
+  // Estados
+  especieDomicilioId: string;
+  tipoResidenciaId: string;
+  tipoConstrucaoId: string;
+  tipoPisoId: string;
+  tipoIluminacaoId: string;
+  acessibilidadeId: string;
+  animalId: string;
+  aguaCanalizada: string;
+  abastecimentoAguaId: string;
+  possuiBanheiro: string;
+  escoamentoSanitarioId: string;
+  coletaLixoId: string;
+  calcamentoFrente: string;
+  dificilAcesso: string;
+  numeroComodos: string;
+  numeroDormitorios: string;
+  pessoasDormitorio: string;
+  totalPessoas: string;
+  totalFamilias: string;
+  pessoas0a17: string;
+  pessoas18a64: string;
+  pessoas65mais: string;
+
+  // Setters
+  setEspecieDomicilioId: (val: string) => void;
+  setTipoResidenciaId: (val: string) => void;
+  setTipoConstrucaoId: (val: string) => void;
+  setTipoPisoId: (val: string) => void;
+  setTipoIluminacaoId: (val: string) => void;
+  setAcessibilidadeId: (val: string) => void;
+  setAnimalId: (val: string) => void;
+  setAguaCanalizada: (val: string) => void;
+  setAbastecimentoAguaId: (val: string) => void;
+  setPossuiBanheiro: (val: string) => void;
+  setEscoamentoSanitarioId: (val: string) => void;
+  setColetaLixoId: (val: string) => void;
+  setCalcamentoFrente: (val: string) => void;
+  setDificilAcesso: (val: string) => void;
+  setNumeroComodos: (val: string) => void;
+  setNumeroDormitorios: (val: string) => void;
+  setPessoasDormitorio: (val: string) => void;
+  setTotalPessoas: (val: string) => void;
+  setTotalFamilias: (val: string) => void;
+  setPessoas0a17: (val: string) => void;
+  setPessoas18a64: (val: string) => void;
+  setPessoas65mais: (val: string) => void;
+
+
   // States necessários para Histórico Transferência
   localTransferencias: any[];
 }
@@ -152,7 +214,61 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
   setAreaConflito,
   beneficioBolsaFamilia,
   setBeneficioBolsaFamilia,
-  localTransferencias
+  localTransferencias,
+  especiesDomicilio,
+  tiposResidencia,
+  tiposPiso,
+  tiposConstrucao,
+  tiposIluminacao,
+  tiposAbastecimentoAgua,
+  tiposEscoamentoSanitario,
+  tiposColetaLixo,
+  tiposAcessibilidade,
+  tiposAnimais,
+  especieDomicilioId,
+  tipoResidenciaId,
+  tipoConstrucaoId,
+  tipoPisoId,
+  tipoIluminacaoId,
+  acessibilidadeId,
+  animalId,
+  aguaCanalizada,
+  abastecimentoAguaId,
+  possuiBanheiro,
+  escoamentoSanitarioId,
+  coletaLixoId,
+  calcamentoFrente,
+  dificilAcesso,
+  numeroComodos,
+  numeroDormitorios,
+  pessoasDormitorio,
+  totalPessoas,
+  totalFamilias,
+  pessoas0a17,
+  pessoas18a64,
+  pessoas65mais,
+  setEspecieDomicilioId,
+  setTipoResidenciaId,
+  setTipoConstrucaoId,
+  setTipoPisoId,
+  setTipoIluminacaoId,
+  setAcessibilidadeId,
+  setAnimalId,
+  setAguaCanalizada,
+  setAbastecimentoAguaId,
+  setPossuiBanheiro,
+  setEscoamentoSanitarioId,
+  setColetaLixoId,
+  setCalcamentoFrente,
+  setDificilAcesso,
+  setNumeroComodos,
+  setNumeroDormitorios,
+  setPessoasDormitorio,
+  setTotalPessoas,
+  setTotalFamilias,
+  setPessoas0a17,
+  setPessoas18a64,
+  setPessoas65mais
 }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
@@ -407,6 +523,66 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
           {/* Aba 10: Histórico de Transferência */}
           {editandoId && activeEditTab === 'historico_transferencia' && (
             <TabHistoricoTransferencia localTransferencias={localTransferencias} />
+          )}
+
+          {/* Aba: Condições Habitacionais */}
+          {editandoId && activeEditTab === 'habitacionais' && (
+            <TabCondicoesHabitacionais 
+              especiesDomicilio={especiesDomicilio}
+              tiposResidencia={tiposResidencia}
+              tiposPiso={tiposPiso}
+              tiposConstrucao={tiposConstrucao}
+              tiposIluminacao={tiposIluminacao}
+              tiposAbastecimentoAgua={tiposAbastecimentoAgua}
+              tiposEscoamentoSanitario={tiposEscoamentoSanitario}
+              tiposColetaLixo={tiposColetaLixo}
+              tiposAcessibilidade={tiposAcessibilidade}
+              tiposAnimais={tiposAnimais}
+              especieDomicilioId={especieDomicilioId}
+              tipoResidenciaId={tipoResidenciaId}
+              tipoConstrucaoId={tipoConstrucaoId}
+              tipoPisoId={tipoPisoId}
+              tipoIluminacaoId={tipoIluminacaoId}
+              acessibilidadeId={acessibilidadeId}
+              animalId={animalId}
+              aguaCanalizada={aguaCanalizada}
+              abastecimentoAguaId={abastecimentoAguaId}
+              possuiBanheiro={possuiBanheiro}
+              escoamentoSanitarioId={escoamentoSanitarioId}
+              coletaLixoId={coletaLixoId}
+              calcamentoFrente={calcamentoFrente}
+              dificilAcesso={dificilAcesso}
+              numeroComodos={numeroComodos}
+              numeroDormitorios={numeroDormitorios}
+              pessoasDormitorio={pessoasDormitorio}
+              totalPessoas={totalPessoas}
+              totalFamilias={totalFamilias}
+              pessoas0a17={pessoas0a17}
+              pessoas18a64={pessoas18a64}
+              pessoas65mais={pessoas65mais}
+              setEspecieDomicilioId={setEspecieDomicilioId}
+              setTipoResidenciaId={setTipoResidenciaId}
+              setTipoConstrucaoId={setTipoConstrucaoId}
+              setTipoPisoId={setTipoPisoId}
+              setTipoIluminacaoId={setTipoIluminacaoId}
+              setAcessibilidadeId={setAcessibilidadeId}
+              setAnimalId={setAnimalId}
+              setAguaCanalizada={setAguaCanalizada}
+              setAbastecimentoAguaId={setAbastecimentoAguaId}
+              setPossuiBanheiro={setPossuiBanheiro}
+              setEscoamentoSanitarioId={setEscoamentoSanitarioId}
+              setColetaLixoId={setColetaLixoId}
+              setCalcamentoFrente={setCalcamentoFrente}
+              setDificilAcesso={setDificilAcesso}
+              setNumeroComodos={setNumeroComodos}
+              setNumeroDormitorios={setNumeroDormitorios}
+              setPessoasDormitorio={setPessoasDormitorio}
+              setTotalPessoas={setTotalPessoas}
+              setTotalFamilias={setTotalFamilias}
+              setPessoas0a17={setPessoas0a17}
+              setPessoas18a64={setPessoas18a64}
+              setPessoas65mais={setPessoas65mais}
+            />
           )}
 
           {/* Botões de Ação */}
