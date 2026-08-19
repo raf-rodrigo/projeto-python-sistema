@@ -116,9 +116,12 @@ export const TabFiliacaoOrigem: React.FC<TabFiliacaoOrigemProps> = ({
                 <option value="">Selecione...</option>
                 {(() => {
                   const selectedCodIbge = estados.find(e => e.id.toString() === estadoId)?.cod_ibge;
-                  return municipios
-                    .filter(m => !estadoId || m.codigo_uf === selectedCodIbge)
-                    .map(mun => <option key={mun.id} value={mun.id}>{mun.municipio}</option>);
+                  const list = municipios.filter(m => !estadoId || m.codigo_uf === selectedCodIbge);
+                  if (tipoLocalNascimento === '1' && !list.some(m => m.id.toString() === idCidadePadrao.toString())) {
+                    const defaultMun = municipios.find(m => m.id.toString() === idCidadePadrao.toString());
+                    if (defaultMun) list.push(defaultMun);
+                  }
+                  return list.map(mun => <option key={mun.id} value={mun.id}>{mun.municipio}</option>);
                 })()}
               </select>
             </div>
