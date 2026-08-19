@@ -292,7 +292,7 @@ export default function PersonManagement() {
         setEstados(d.results || d || []);
       }
 
-      const responseMunicipios = await fetch(`${API_URL}/api/municipios/`, { headers: { 'Authorization': `Token ${token}` } });
+      const responseMunicipios = await fetch(`${API_URL}/api/municipios/?no_pagination=true`, { headers: { 'Authorization': `Token ${token}` } });
       if (responseMunicipios.ok) {
         const d = await responseMunicipios.json();
         setMunicipios(d.results || d || []);

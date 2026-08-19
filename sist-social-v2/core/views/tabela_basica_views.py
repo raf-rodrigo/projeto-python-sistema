@@ -33,6 +33,11 @@ class MunicipioViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(codigo_uf=codigo_uf)
         return queryset
 
+    def paginate_queryset(self, queryset):
+        if self.request.query_params.get('no_pagination') == 'true':
+            return None
+        return super().paginate_queryset(queryset)
+
 class CidViewSet(viewsets.ModelViewSet):
     queryset = Cid.objects.all().order_by('codigo')
     serializer_class = CidSerializer
