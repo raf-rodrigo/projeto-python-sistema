@@ -253,58 +253,112 @@ export default function PersonManagement() {
 
       // Tabelas Básicas
       const responseParentesco = await fetch(`${API_URL}/api/tipo_parentesco/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseParentesco.ok) setParentescos((await responseParentesco.json()).results || []);
+      if (responseParentesco.ok) {
+        const d = await responseParentesco.json();
+        setParentescos(d.results || d || []);
+      }
 
       const responseRaca = await fetch(`${API_URL}/api/raca/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseRaca.ok) setRacas((await responseRaca.json()).results || []);
+      if (responseRaca.ok) {
+        const d = await responseRaca.json();
+        setRacas(d.results || d || []);
+      }
 
       const responseOrientacao = await fetch(`${API_URL}/api/orientacao_sexual/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseOrientacao.ok) setOrientacoesSexuais((await responseOrientacao.json()).results || []);
+      if (responseOrientacao.ok) {
+        const d = await responseOrientacao.json();
+        setOrientacoesSexuais(d.results || d || []);
+      }
 
       const responseEstadoCivil = await fetch(`${API_URL}/api/tipo_estado_civil/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseEstadoCivil.ok) setEstadosCivis((await responseEstadoCivil.json()).results || []);
+      if (responseEstadoCivil.ok) {
+        const d = await responseEstadoCivil.json();
+        setEstadosCivis(d.results || d || []);
+      }
 
       const responseLocalNascimento = await fetch(`${API_URL}/api/tipo_local_nascimento/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseLocalNascimento.ok) setLocaisNascimento((await responseLocalNascimento.json()).results || []);
+      if (responseLocalNascimento.ok) {
+        const d = await responseLocalNascimento.json();
+        setLocaisNascimento(d.results || d || []);
+      }
 
       const responseEstados = await fetch(`${API_URL}/api/estados/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseEstados.ok) setEstados((await responseEstados.json()).results || []);
+      if (responseEstados.ok) {
+        const d = await responseEstados.json();
+        setEstados(d.results || d || []);
+      }
 
       const responseMunicipios = await fetch(`${API_URL}/api/municipios/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseMunicipios.ok) setMunicipios((await responseMunicipios.json()).results || []);
+      if (responseMunicipios.ok) {
+        const d = await responseMunicipios.json();
+        setMunicipios(d.results || d || []);
+      }
 
       const responseRegistroCivil = await fetch(`${API_URL}/api/tipo_registro_civil/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseRegistroCivil.ok) setRegistrosCivis((await responseRegistroCivil.json()).results || []);
+      if (responseRegistroCivil.ok) {
+        const d = await responseRegistroCivil.json();
+        setRegistrosCivis(d.results || d || []);
+      }
 
       const responseDeficiencias = await fetch(`${API_URL}/api/tipo_deficiencia/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseDeficiencias.ok) setDeficiencias((await responseDeficiencias.json()).results || []);
+      if (responseDeficiencias.ok) {
+        const d = await responseDeficiencias.json();
+        setDeficiencias(d.results || d || []);
+      }
 
       const responseNecessidades = await fetch(`${API_URL}/api/tipo_necessita_cuidados/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseNecessidades.ok) setNecessidadesCuidados((await responseNecessidades.json()).results || []);
+      if (responseNecessidades.ok) {
+        const d = await responseNecessidades.json();
+        setNecessidadesCuidados(d.results || d || []);
+      }
 
       const responseCaps = await fetch(`${API_URL}/api/tipo_tratamento_caps/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseCaps.ok) setTratamentosCaps((await responseCaps.json()).results || []);
+      if (responseCaps.ok) {
+        const d = await responseCaps.json();
+        setTratamentosCaps(d.results || d || []);
+      }
 
       const responseCursos = await fetch(`${API_URL}/api/tipo_curso/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseCursos.ok) setCursos((await responseCursos.json()).results || []);
+      if (responseCursos.ok) {
+        const d = await responseCursos.json();
+        setCursos(d.results || d || []);
+      }
 
       const responseSeries = await fetch(`${API_URL}/api/tipo_serie/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseSeries.ok) setSeries((await responseSeries.json()).results || []);
+      if (responseSeries.ok) {
+        const d = await responseSeries.json();
+        setSeries(d.results || d || []);
+      }
 
       const responseAtividades = await fetch(`${API_URL}/api/tipo_atividade/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseAtividades.ok) setAtividades((await responseAtividades.json()).results || []);
+      if (responseAtividades.ok) {
+        const d = await responseAtividades.json();
+        setAtividades(d.results || d || []);
+      }
 
       const responseCbos = await fetch(`${API_URL}/api/cbo/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseCbos.ok) setCbos((await responseCbos.json()).results || []);
+      if (responseCbos.ok) {
+        const d = await responseCbos.json();
+        setCbos(d.results || d || []);
+      }
 
       const responseTemposRua = await fetch(`${API_URL}/api/tempo_rua/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseTemposRua.ok) setTemposRua((await responseTemposRua.json()).results || []);
+      if (responseTemposRua.ok) {
+        const d = await responseTemposRua.json();
+        setTemposRua(d.results || d || []);
+      }
 
       const responseTemposCidade = await fetch(`${API_URL}/api/tempo_cidade/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseTemposCidade.ok) setTemposCidade((await responseTemposCidade.json()).results || []);
+      if (responseTemposCidade.ok) {
+        const d = await responseTemposCidade.json();
+        setTemposCidade(d.results || d || []);
+      }
 
       const responseContatos = await fetch(`${API_URL}/api/contato_parente/`, { headers: { 'Authorization': `Token ${token}` } });
-      if (responseContatos.ok) setContatosParentes((await responseContatos.json()).results || []);
+      if (responseContatos.ok) {
+        const d = await responseContatos.json();
+        setContatosParentes(d.results || d || []);
+      }
 
       const responseFamilias = await fetch(`${API_URL}/api/familias_domicilios/`, { headers: { 'Authorization': `Token ${token}` } });
       if (responseFamilias.ok) {
