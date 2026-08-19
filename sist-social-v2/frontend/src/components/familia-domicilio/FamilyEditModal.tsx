@@ -582,6 +582,12 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
               setPessoas0a17={setPessoas0a17}
               setPessoas18a64={setPessoas18a64}
               setPessoas65mais={setPessoas65mais}
+              membrosFamilia={membrosFamilia}
+              familias={familias}
+              editandoId={editandoId}
+              cep={cep}
+              logradouro={logradouro}
+              numero={numero}
             />
           )}
 

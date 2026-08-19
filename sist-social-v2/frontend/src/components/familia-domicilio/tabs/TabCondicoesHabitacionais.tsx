@@ -64,6 +64,13 @@ interface TabCondicoesHabitacionaisProps {
   setPessoas0a17: (val: string) => void;
   setPessoas18a64: (val: string) => void;
   setPessoas65mais: (val: string) => void;
+
+  membrosFamilia: any[];
+  familias: any[];
+  editandoId: number | null;
+  cep: string;
+  logradouro: string;
+  numero: string;
 }
 
 export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps> = ({
@@ -120,8 +127,65 @@ export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps>
   setTotalFamilias,
   setPessoas0a17,
   setPessoas18a64,
-  setPessoas65mais
+  setPessoas65mais,
+  membrosFamilia,
+  familias,
+  editandoId,
+  cep,
+  logradouro,
+  numero
 }) => {
+
+  // Efeito 1: Calcula o total de pessoas e as faixas etárias baseando-se na composição familiar
+  React.useEffect(() => {
+    // 1. Total de pessoas da composição familiar
+    setTotalPessoas(membrosFamilia.length.toString());
+
+    // 2. Contagem de pessoas por faixa etária
+    let count0to17 = 0;
+    let count18to64 = 0;
+    let count65plus = 0;
+
+    membrosFamilia.forEach(m => {
+      const dobString = m.certidao_nascimento_data || m.certidao_nascimento_data_exibicao;
+      if (dobString) {
+        const dob = new Date(dobString);
+        const ageMs = Date.now() - dob.getTime();
+        const ageDate = new Date(ageMs);
+        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+        if (age <= 17) {
+          count0to17++;
+        } else if (age >= 18 && age <= 64) {
+          count18to64++;
+        } else if (age >= 65) {
+          count65plus++;
+        }
+      }
+    });
+
+    setPessoas0a17(count0to17.toString());
+    setPessoas18a64(count18to64.toString());
+    setPessoas65mais(count65plus.toString());
+  }, [membrosFamilia, setTotalPessoas, setPessoas0a17, setPessoas18a64, setPessoas65mais]);
+
+  // Efeito 2: Calcula o total de famílias no mesmo endereço
+  React.useEffect(() => {
+    if (logradouro && numero && cep && familias.length > 0) {
+      const cleanCep = (c: string) => c.replace(/\D/g, '');
+      const addrFamilies = familias.filter(f => 
+        f.logradouro_nome?.trim().toLowerCase() === logradouro.trim().toLowerCase() &&
+        f.logradouro_numero?.trim().toString() === numero.trim().toString() &&
+        cleanCep(f.logradouro_cep || '') === cleanCep(cep)
+      );
+      
+      const isCurrentInList = editandoId ? addrFamilies.some(f => f.id === editandoId) : false;
+      const count = isCurrentInList ? addrFamilies.length : addrFamilies.length + 1;
+      setTotalFamilias(count.toString());
+    } else {
+      setTotalFamilias('1'); // Padrão é pelo menos a família atual
+    }
+  }, [logradouro, numero, cep, familias, editandoId, setTotalFamilias]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
@@ -285,24 +349,24 @@ export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps>
             <input type="number" min="0" className="form-control" value={pessoasDormitorio} onChange={e => setPessoasDormitorio(e.target.value)} />
           </div>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Total de Pessoas no Domicílio</label>
-            <input type="number" min="0" className="form-control" value={totalPessoas} onChange={e => setTotalPessoas(e.target.value)} />
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Total de Pessoas no Domicílio (Auto)</label>
+            <input type="number" min="0" className="form-control" value={totalPessoas} readOnly style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
           </div>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Total de Famílias no Domicílio</label>
-            <input type="number" min="0" className="form-control" value={totalFamilias} onChange={e => setTotalFamilias(e.target.value)} />
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Total de Famílias no Domicílio (Auto)</label>
+            <input type="number" min="0" className="form-control" value={totalFamilias} readOnly style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
           </div>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas de 0 a 17 anos</label>
-            <input type="number" min="0" className="form-control" value={pessoas0a17} onChange={e => setPessoas0a17(e.target.value)} />
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas de 0 a 17 anos (Auto)</label>
+            <input type="number" min="0" className="form-control" value={pessoas0a17} readOnly style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
           </div>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas de 18 a 64 anos</label>
-            <input type="number" min="0" className="form-control" value={pessoas18a64} onChange={e => setPessoas18a64(e.target.value)} />
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas de 18 a 64 anos (Auto)</label>
+            <input type="number" min="0" className="form-control" value={pessoas18a64} readOnly style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
           </div>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas de 65+ anos</label>
-            <input type="number" min="0" className="form-control" value={pessoas65mais} onChange={e => setPessoas65mais(e.target.value)} />
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas de 65+ anos (Auto)</label>
+            <input type="number" min="0" className="form-control" value={pessoas65mais} readOnly style={{ backgroundColor: '#f1f5f9', color: '#64748b' }} />
           </div>
         </div>
       </div>
