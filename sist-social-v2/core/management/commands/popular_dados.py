@@ -90,6 +90,26 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.WARNING("Menus já existem. Ignorado."))
 
+        # 1.3 Origens de Cadastro Padrão
+        from core.models.tabela_basica import TipoOrigemCadastro
+        if not TipoOrigemCadastro.objects.exists():
+            self.stdout.write("Criando Origens de Cadastro iniciais...")
+            TipoOrigemCadastro.objects.create(nome="Espontâneo", ativo=True)
+            TipoOrigemCadastro.objects.create(nome="Busca Ativa", ativo=True)
+            TipoOrigemCadastro.objects.create(nome="Encaminhamento Governamental", ativo=True)
+            TipoOrigemCadastro.objects.create(nome="Encaminhamento Não Governamental", ativo=True)
+            self.stdout.write(self.style.SUCCESS("Origens de Cadastro criadas!"))
+
+        # 1.4 Tipos de Unidade de Atendimento de Família
+        from core.models.tabela_basica import TipoUnidadeAtendimentoFamilia
+        if not TipoUnidadeAtendimentoFamilia.objects.exists():
+            self.stdout.write("Criando Tipos de Unidade de Atendimento iniciais...")
+            TipoUnidadeAtendimentoFamilia.objects.create(nome="CRAS", ativo=True)
+            TipoUnidadeAtendimentoFamilia.objects.create(nome="CREAS", ativo=True)
+            TipoUnidadeAtendimentoFamilia.objects.create(nome="Centro POP", ativo=True)
+            TipoUnidadeAtendimentoFamilia.objects.create(nome="Outra Unidade", ativo=True)
+            self.stdout.write(self.style.SUCCESS("Tipos de Unidade criados!"))
+
 
 
         # Pasta padrão para os CSVs
