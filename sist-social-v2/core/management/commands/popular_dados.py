@@ -17,16 +17,28 @@ class Command(BaseCommand):
         password = 'adm123'
         email = 'adm@sistsocial.com'
 
+        from django.contrib.auth.models import Group
+        from core.models import RecursoHumano, Unidade
+
+        group_admin, _ = Group.objects.get_or_create(name='Administradores')
+
         if not User.objects.filter(username=username).exists():
             self.stdout.write(f"Criando superusuário '{username}'...")
-            User.objects.create_superuser(
+            user = User.objects.create_superuser(
                 username=username,
                 email=email,
                 password=password
             )
             self.stdout.write(self.style.SUCCESS(f"Superusuário '{username}' criado com sucesso!"))
         else:
+            user = User.objects.get(username=username)
             self.stdout.write(self.style.WARNING(f"Superusuário '{username}' já existe. Ignorado."))
+
+        # Garante que o usuário está no grupo de Administradores
+        if not user.groups.filter(id=group_admin.id).exists():
+            user.groups.add(group_admin)
+            self.stdout.write(self.style.SUCCESS(f"Usuário '{username}' adicionado ao grupo '{group_admin.name}'."))
+
 
         # 1.1 Unidade Padrão
         from core.models import Unidade
@@ -44,6 +56,24 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Unidade Padrão criada com sucesso!"))
         else:
             self.stdout.write(self.style.WARNING("Unidade Padrão já existe. Ignorado."))
+
+        # 1.1.2 Perfil Profissional para adm
+        unidade_padrao = Unidade.objects.first()
+        if not hasattr(user, 'recurso_humano') and unidade_padrao:
+            self.stdout.write("Criando perfil profissional (Recurso Humano) para o adm...")
+            rh = RecursoHumano.objects.create(
+                usuario=user,
+                cpf="000.000.000-00",
+                cep="00000-000",
+                logradouro="Rua Principal",
+                numero="123",
+                municipio="Cidade Padrão",
+                uf="SP",
+                unidade_socioassistencial=True
+            )
+            rh.unidades.add(unidade_padrao)
+            self.stdout.write(self.style.SUCCESS("Perfil profissional do adm criado com sucesso!"))
+
 
         # 1.2 Menus Padrão
         from core.models import Menu
