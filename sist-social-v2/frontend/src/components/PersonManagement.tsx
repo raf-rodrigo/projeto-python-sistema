@@ -199,8 +199,7 @@ export default function PersonManagement() {
   const [tipoNecessitaCuidadosId, setTipoNecessitaCuidadosId] = useState('');
   const [usaMedicamentoControlado, setUsaMedicamentoControlado] = useState<'Sim' | 'Não'>('Não');
   const [medicamentoContinuo, setMedicamentoContinuo] = useState<'Sim' | 'Não'>('Não');
-  const [abusoDeAlcool, setAbusoDeAlcool] = useState<'Sim' | 'Não'>('Não');
-  const [abusoDeDroga, setAbusoDeDroga] = useState<'Sim' | 'Não'>('Não');
+
   const [tratamentoSaude, setTratamentoSaude] = useState<'Sim' | 'Não'>('Não');
   const [tipoTratamentoCapsId, setTipoTratamentoCapsId] = useState('');
 
@@ -554,9 +553,7 @@ export default function PersonManagement() {
       setAtendidoInstNaoGov(d.atendido_inst_nao_gov || 'Não');
       setAtendidoHospitalGeral(d.atendido_hospital_geral || 'Não');
       setNaoAtendido(d.nao_atendido || 'Não');
-      setUsaAlcool(d.usa_alcool || 'Não');
-      setUsaDroga(d.usa_droga || 'Não');
-      setTranstornoMental(d.transtorno_mental || 'Não');
+
       setRespondeuSustento(d.respondeu_sustento || 'Não');
       setSustentoConstrucaoCivil(d.sustento_construcao_civil || 'Não');
       setSustentoGuardadorCarro(d.sustento_guardador_carro || 'Não');
@@ -664,8 +661,9 @@ export default function PersonManagement() {
     setTipoNecessitaCuidadosId(p.tipo_necessita_cuidados || '');
     setUsaMedicamentoControlado(p.usa_medicamento_controlado || 'Não');
     setMedicamentoContinuo(p.medicamento_continuo || 'Não');
-    setAbusoDeAlcool(p.abuso_de_alcool || 'Não');
-    setAbusoDeDroga(p.abuso_de_droga || 'Não');
+    setUsaAlcool(p.usa_alcool || 'Não');
+    setUsaDroga(p.usa_droga || 'Não');
+    setTranstornoMental(p.transtorno_mental || 'Não');
     setTratamentoSaude(p.tratamento_saude || 'Não');
     setTipoTratamentoCapsId(p.tipo_tratamento_caps || '');
 
@@ -792,9 +790,7 @@ export default function PersonManagement() {
         atendido_inst_nao_gov: atendidoInstNaoGov,
         atendido_hospital_geral: atendidoHospitalGeral,
         nao_atendido: naoAtendido,
-        usa_alcool: usaAlcool,
-        usa_droga: usaDroga,
-        transtorno_mental: transtornoMental,
+
         respondeu_sustento: respondeuSustento,
         sustento_construcao_civil: sustentoConstrucaoCivil,
         sustento_guardador_carro: sustentoGuardadorCarro,
@@ -837,8 +833,9 @@ export default function PersonManagement() {
       tipo_deficiencia: tipoDeficienciaId ? parseInt(tipoDeficienciaId) : null,
       tipo_necessita_cuidados: tipoNecessitaCuidadosId ? parseInt(tipoNecessitaCuidadosId) : null,
       usa_medicamento_controlado: usaMedicamentoControlado,
-      abuso_de_alcool: abusoDeAlcool,
-      abuso_de_droga: abusoDeDroga,
+      usa_alcool: usaAlcool,
+      usa_droga: usaDroga,
+      transtorno_mental: transtornoMental,
       medicamento_continuo: medicamentoContinuo,
       tratamento_saude: tratamentoSaude,
       tipo_tratamento_caps: tipoTratamentoCapsId ? parseInt(tipoTratamentoCapsId) : null,
@@ -1180,10 +1177,7 @@ export default function PersonManagement() {
           setUsaMedicamentoControlado={setUsaMedicamentoControlado}
           medicamentoContinuo={medicamentoContinuo}
           setMedicamentoContinuo={setMedicamentoContinuo}
-          abusoDeAlcool={abusoDeAlcool}
-          setAbusoDeAlcool={setAbusoDeAlcool}
-          abusoDeDroga={abusoDeDroga}
-          setAbusoDeDroga={setAbusoDeDroga}
+
           tratamentoSaude={tratamentoSaude}
           setTratamentoSaude={setTratamentoSaude}
           tipoTratamentoCapsId={tipoTratamentoCapsId}

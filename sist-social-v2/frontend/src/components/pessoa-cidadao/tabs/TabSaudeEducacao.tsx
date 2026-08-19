@@ -18,10 +18,12 @@ interface TabSaudeEducacaoProps {
   setUsaMedicamentoControlado: (val: 'Sim' | 'Não') => void;
   medicamentoContinuo: 'Sim' | 'Não';
   setMedicamentoContinuo: (val: 'Sim' | 'Não') => void;
-  abusoDeAlcool: 'Sim' | 'Não';
-  setAbusoDeAlcool: (val: 'Sim' | 'Não') => void;
-  abusoDeDroga: 'Sim' | 'Não';
-  setAbusoDeDroga: (val: 'Sim' | 'Não') => void;
+  usaAlcool: 'Sim' | 'Não';
+  setUsaAlcool: (val: 'Sim' | 'Não') => void;
+  usaDroga: 'Sim' | 'Não';
+  setUsaDroga: (val: 'Sim' | 'Não') => void;
+  transtornoMental: 'Sim' | 'Não';
+  setTranstornoMental: (val: 'Sim' | 'Não') => void;
   tratamentoSaude: 'Sim' | 'Não';
   setTratamentoSaude: (val: 'Sim' | 'Não') => void;
   tipoTratamentoCapsId: string;
@@ -64,10 +66,12 @@ export const TabSaudeEducacao: React.FC<TabSaudeEducacaoProps> = ({
   setUsaMedicamentoControlado,
   medicamentoContinuo,
   setMedicamentoContinuo,
-  abusoDeAlcool,
-  setAbusoDeAlcool,
-  abusoDeDroga,
-  setAbusoDeDroga,
+  usaAlcool,
+  setUsaAlcool,
+  usaDroga,
+  setUsaDroga,
+  transtornoMental,
+  setTranstornoMental,
   tratamentoSaude,
   setTratamentoSaude,
   tipoTratamentoCapsId,
@@ -136,22 +140,22 @@ export const TabSaudeEducacao: React.FC<TabSaudeEducacaoProps> = ({
           </select>
         </div>
         <div>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Abuso Álcool?</label>
-          <select className="form-control" value={abusoDeAlcool} onChange={e => setAbusoDeAlcool(e.target.value as any)}>
+          <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Usa Álcool?</label>
+          <select className="form-control" value={usaAlcool} onChange={e => setUsaAlcool(e.target.value as any)}>
             <option value="Não">Não</option>
             <option value="Sim">Sim</option>
           </select>
         </div>
         <div>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Abuso Drogas?</label>
-          <select className="form-control" value={abusoDeDroga} onChange={e => setAbusoDeDroga(e.target.value as any)}>
+          <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Usa Drogas?</label>
+          <select className="form-control" value={usaDroga} onChange={e => setUsaDroga(e.target.value as any)}>
             <option value="Não">Não</option>
             <option value="Sim">Sim</option>
           </select>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Tratamento Saúde?</label>
           <select className="form-control" value={tratamentoSaude} onChange={e => setTratamentoSaude(e.target.value as any)}>
@@ -164,6 +168,13 @@ export const TabSaudeEducacao: React.FC<TabSaudeEducacaoProps> = ({
           <select className="form-control" value={tipoTratamentoCapsId} onChange={e => setTipoTratamentoCapsId(e.target.value)}>
             <option value="">Nenhum</option>
             {tratamentosCaps.map(tc => <option key={tc.id} value={tc.id}>{tc.nome}</option>)}
+          </select>
+        </div>
+        <div>
+          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Transtorno Mental?</label>
+          <select className="form-control" value={transtornoMental} onChange={e => setTranstornoMental(e.target.value as any)}>
+            <option value="Não">Não</option>
+            <option value="Sim">Sim</option>
           </select>
         </div>
       </div>

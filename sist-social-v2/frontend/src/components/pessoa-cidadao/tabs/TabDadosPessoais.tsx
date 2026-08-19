@@ -144,12 +144,7 @@ interface TabDadosPessoaisProps {
   setAtendidoHospitalGeral: (val: 'Sim' | 'Não') => void;
   naoAtendido: 'Sim' | 'Não';
   setNaoAtendido: (val: 'Sim' | 'Não') => void;
-  usaAlcool: 'Sim' | 'Não';
-  setUsaAlcool: (val: 'Sim' | 'Não') => void;
-  usaDroga: 'Sim' | 'Não';
-  setUsaDroga: (val: 'Sim' | 'Não') => void;
-  transtornoMental: 'Sim' | 'Não';
-  setTranstornoMental: (val: 'Sim' | 'Não') => void;
+
 
   // Sustento
   respondeuSustento: 'Sim' | 'Não';
@@ -303,12 +298,7 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
   setAtendidoHospitalGeral,
   naoAtendido,
   setNaoAtendido,
-  usaAlcool,
-  setUsaAlcool,
-  usaDroga,
-  setUsaDroga,
-  transtornoMental,
-  setTranstornoMental,
+
   respondeuSustento,
   setRespondeuSustento,
   sustentoConstrucaoCivil,
@@ -789,7 +779,7 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
                   </select>
                 </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Organização Não Gov?</label>
                   <select className="form-control" value={atendidoInstNaoGov} onChange={e => setAtendidoInstNaoGov(e.target.value as any)}>
@@ -807,29 +797,6 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
                 <div>
                   <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Não foi atendido?</label>
                   <select className="form-control" value={naoAtendido} onChange={e => setNaoAtendido(e.target.value as any)}>
-                    <option value="Não">Não</option>
-                    <option value="Sim">Sim</option>
-                  </select>
-                </div>
-                <div style={{ backgroundColor: '#fdf2f8', padding: '2px', borderRadius: '4px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#9d174d', display: 'block', marginBottom: '4px' }}>Usa álcool?</label>
-                  <select className="form-control" value={usaAlcool} onChange={e => setUsaAlcool(e.target.value as any)}>
-                    <option value="Não">Não</option>
-                    <option value="Sim">Sim</option>
-                  </select>
-                </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ backgroundColor: '#fdf2f8', padding: '2px', borderRadius: '4px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#9d174d', display: 'block', marginBottom: '4px' }}>Usa outras drogas?</label>
-                  <select className="form-control" value={usaDroga} onChange={e => setUsaDroga(e.target.value as any)}>
-                    <option value="Não">Não</option>
-                    <option value="Sim">Sim</option>
-                  </select>
-                </div>
-                <div style={{ backgroundColor: '#fdf2f8', padding: '2px', borderRadius: '4px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#9d174d', display: 'block', marginBottom: '4px' }}>Possui transtorno mental?</label>
-                  <select className="form-control" value={transtornoMental} onChange={e => setTranstornoMental(e.target.value as any)}>
                     <option value="Não">Não</option>
                     <option value="Sim">Sim</option>
                   </select>

@@ -92,8 +92,9 @@ class Pessoa(models.Model):
     tipo_deficiencia = models.ForeignKey(TipoDeficiencia, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo de Deficiência")
     tipo_necessita_cuidados = models.ForeignKey(TipoNecessitaCuidado, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Necessita Cuidados?")
     usa_medicamento_controlado = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Medicamento Controlado?")
-    abuso_de_alcool = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Uso Abusivo Álcool?")
-    abuso_de_droga = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Uso Abusivo Droga?")
+    usa_alcool = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Usa Álcool?")
+    usa_droga = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Usa Droga?")
+    transtorno_mental = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Possui Transtorno Mental?")
     medicamento_continuo = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Medicamento Contínuo?")
     tratamento_saude = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Em Tratamento Saúde?")
     tipo_tratamento_caps = models.ForeignKey(TipoTratamentoCaps, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tratamento CAPS")
@@ -282,9 +283,6 @@ class PessoaSituacaoRua(models.Model):
     atendido_inst_nao_gov = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Atendido por Inst. Não Gov?")
     atendido_hospital_geral = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Atendido por Hospital Geral?")
     nao_atendido = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Não atendido em nenhum local?")
-    usa_alcool = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Usa álcool?")
-    usa_droga = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Usa drogas?")
-    transtorno_mental = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Possui transtorno mental?")
 
     # Como Adquire o Sustento
     respondeu_sustento = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Respondeu sustento?")

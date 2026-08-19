@@ -277,10 +277,7 @@ interface PersonEditModalProps {
   setUsaMedicamentoControlado: (val: 'Sim' | 'Não') => void;
   medicamentoContinuo: 'Sim' | 'Não';
   setMedicamentoContinuo: (val: 'Sim' | 'Não') => void;
-  abusoDeAlcool: 'Sim' | 'Não';
-  setAbusoDeAlcool: (val: 'Sim' | 'Não') => void;
-  abusoDeDroga: 'Sim' | 'Não';
-  setAbusoDeDroga: (val: 'Sim' | 'Não') => void;
+
   tratamentoSaude: 'Sim' | 'Não';
   setTratamentoSaude: (val: 'Sim' | 'Não') => void;
   tipoTratamentoCapsId: string;
@@ -578,10 +575,7 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
   setUsaMedicamentoControlado,
   medicamentoContinuo,
   setMedicamentoContinuo,
-  abusoDeAlcool,
-  setAbusoDeAlcool,
-  abusoDeDroga,
-  setAbusoDeDroga,
+
   tratamentoSaude,
   setTratamentoSaude,
   tipoTratamentoCapsId,
@@ -806,12 +800,7 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 setAtendidoHospitalGeral={setAtendidoHospitalGeral}
                 naoAtendido={naoAtendido}
                 setNaoAtendido={setNaoAtendido}
-                usaAlcool={usaAlcool}
-                setUsaAlcool={setUsaAlcool}
-                usaDroga={usaDroga}
-                setUsaDroga={setUsaDroga}
-                transtornoMental={transtornoMental}
-                setTranstornoMental={setTranstornoMental}
+
                 respondeuSustento={respondeuSustento}
                 setRespondeuSustento={setRespondeuSustento}
                 sustentoConstrucaoCivil={sustentoConstrucaoCivil}
@@ -940,10 +929,12 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 setUsaMedicamentoControlado={setUsaMedicamentoControlado}
                 medicamentoContinuo={medicamentoContinuo}
                 setMedicamentoContinuo={setMedicamentoContinuo}
-                abusoDeAlcool={abusoDeAlcool}
-                setAbusoDeAlcool={setAbusoDeAlcool}
-                abusoDeDroga={abusoDeDroga}
-                setAbusoDeDroga={setAbusoDeDroga}
+                usaAlcool={usaAlcool}
+                setUsaAlcool={setUsaAlcool}
+                usaDroga={usaDroga}
+                setUsaDroga={setUsaDroga}
+                transtornoMental={transtornoMental}
+                setTranstornoMental={setTranstornoMental}
                 tratamentoSaude={tratamentoSaude}
                 setTratamentoSaude={setTratamentoSaude}
                 tipoTratamentoCapsId={tipoTratamentoCapsId}
