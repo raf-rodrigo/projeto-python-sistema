@@ -348,14 +348,14 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
         </div>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nome Completo *</label>
-          <input type="text" id="input-nome" className="form-control" value={nome} onChange={e => setNome(e.target.value)} />
+          <input type="text" id="input-nome" className="form-control" value={nome} onChange={e => setNome(e.target.value.toUpperCase())} style={{ textTransform: 'uppercase' }} />
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nome Social</label>
-          <input type="text" className="form-control" value={nomeSocial} onChange={e => setNomeSocial(e.target.value)} />
+          <input type="text" className="form-control" value={nomeSocial} onChange={e => setNomeSocial(e.target.value.toUpperCase())} style={{ textTransform: 'uppercase' }} />
         </div>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>NIS</label>
