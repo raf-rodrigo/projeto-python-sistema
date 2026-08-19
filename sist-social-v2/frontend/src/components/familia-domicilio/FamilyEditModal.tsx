@@ -239,7 +239,7 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
           )}
 
           {/* Aba 1: Início */}
-          {(!editandoId || activeEditTab === 'inicio') && (
+          {(editandoId && activeEditTab === 'inicio') && (
             <TabInicio 
               editandoId={editandoId}
               unidades={unidades}
