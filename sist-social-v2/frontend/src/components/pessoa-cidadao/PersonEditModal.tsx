@@ -650,7 +650,7 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', padding: '16px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', padding: '16px 24px', borderBottom: 'none', backgroundColor: '#ffffff' }}>
           {[
             { id: 'pessoais', label: 'Dados Pessoais' },
             { id: 'filiacao', label: 'Filiação & Origem' },
