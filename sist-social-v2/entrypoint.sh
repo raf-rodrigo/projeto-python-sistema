@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+echo "Instalando/Atualizando dependências do requirements.txt..."
+pip install -r requirements.txt
+
+
 # If RUN_MIGRATIONS is set, try to run migrations and collectstatic (safe-guarded)
 if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
   if [ -f manage.py ]; then
