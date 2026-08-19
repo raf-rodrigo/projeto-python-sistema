@@ -28,6 +28,24 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.WARNING(f"Superusuário '{username}' já existe. Ignorado."))
 
+        # 1.1 Unidade Padrão
+        from core.models import Unidade
+        if not Unidade.objects.exists():
+            self.stdout.write("Criando Unidade Padrão inicial...")
+            Unidade.objects.create(
+                razao_social="Unidade Social Padrão LTDA",
+                nome_conhecido="Unidade Social Padrão",
+                cep="00000-000",
+                logradouro="Rua Principal",
+                logradouro_numero="123",
+                sigla="USP",
+                ativo=True
+            )
+            self.stdout.write(self.style.SUCCESS("Unidade Padrão criada com sucesso!"))
+        else:
+            self.stdout.write(self.style.WARNING("Unidade Padrão já existe. Ignorado."))
+
+
         # Pasta padrão para os CSVs
         csv_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 'import_csv')
         
