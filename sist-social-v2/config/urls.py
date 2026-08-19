@@ -33,15 +33,13 @@ for name, obj in inspect.getmembers(views):
         # Converte NomeDaViewSet para nome_da_view_set
         url_name = re.sub(r'(?<!^)(?=[A-Z])', '_', name[:-7]).lower()
         
-        # Ajuste especial para manter consistência de pluralização/nomenclatura
+        # Ajuste especial para manter consistência de pluralização/nomenclatura com o frontend
         if url_name == 'estado':
             url_name = 'estados'
         elif url_name == 'municipio':
             url_name = 'municipios'
         elif url_name == 'cid':
             url_name = 'cids'
-        elif url_name == 'cbo':
-            url_name = 'cbos'
         elif url_name == 'area':
             url_name = 'areas'
         elif url_name == 'unidade':
@@ -50,6 +48,18 @@ for name, obj in inspect.getmembers(views):
             url_name = 'familias_domicilios'
         elif url_name == 'pessoa':
             url_name = 'pessoas'
+        elif url_name == 'atendimento':
+            url_name = 'atendimentos_sociais'
+        elif url_name == 'tipo_necessita_cuidado':
+            url_name = 'tipo_necessita_cuidados'
+        elif url_name == 'tipo_serie_curso':
+            url_name = 'tipo_serie'
+        elif url_name == 'populacoes_ruas_tempo_de_rua':
+            url_name = 'tempo_rua'
+        elif url_name == 'tipos_tempos_residencias_cidades_populacoes_ruas':
+            url_name = 'tempo_cidade'
+        elif url_name == 'tipos_contatos_parentes':
+            url_name = 'contato_parente'
             
         router.register(url_name, obj, basename=url_name)
 
