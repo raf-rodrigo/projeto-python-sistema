@@ -452,8 +452,7 @@ export default function PersonManagement() {
     setTipoNecessitaCuidadosId('');
     setUsaMedicamentoControlado('Não');
     setMedicamentoContinuo('Não');
-    setAbusoDeAlcool('Não');
-    setAbusoDeDroga('Não');
+
     setTratamentoSaude('Não');
     setTipoTratamentoCapsId('');
     setEscreveLe('Sim');
