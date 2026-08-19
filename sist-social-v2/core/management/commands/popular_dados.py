@@ -45,6 +45,22 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.WARNING("Unidade Padrão já existe. Ignorado."))
 
+        # 1.2 Menus Padrão
+        from core.models import Menu
+        if not Menu.objects.exists():
+            self.stdout.write("Criando Menus iniciais...")
+            Menu.objects.create(nome="Atendimentos", url="atendimentos", icone="FileText", ordem=1, ativo=True)
+            Menu.objects.create(nome="Famílias", url="familias", icone="Home", ordem=2, ativo=True)
+            Menu.objects.create(nome="Pessoas", url="pessoas", icone="Users", ordem=3, ativo=True)
+            Menu.objects.create(nome="Unidades", url="unidades", icone="Building", ordem=4, ativo=True)
+            Menu.objects.create(nome="Usuários", url="usuarios", icone="UserCheck", ordem=5, ativo=True)
+            Menu.objects.create(nome="Tabelas Básicas", url="tabelas", icone="Table", ordem=6, ativo=True)
+            Menu.objects.create(nome="Configurar Menus", url="gerenciamento-menus", icone="Settings", ordem=7, ativo=True)
+            self.stdout.write(self.style.SUCCESS("Menus iniciais criados com sucesso!"))
+        else:
+            self.stdout.write(self.style.WARNING("Menus já existem. Ignorado."))
+
+
 
         # Pasta padrão para os CSVs
         csv_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 'import_csv')
