@@ -92,13 +92,21 @@ class Command(BaseCommand):
 
         # 1.3 Origens de Cadastro Padrão
         from core.models.tabela_basica import TipoOrigemCadastro
-        if not TipoOrigemCadastro.objects.exists():
-            self.stdout.write("Criando Origens de Cadastro iniciais...")
-            TipoOrigemCadastro.objects.create(nome="Espontâneo", ativo=True)
-            TipoOrigemCadastro.objects.create(nome="Busca Ativa", ativo=True)
-            TipoOrigemCadastro.objects.create(nome="Encaminhamento Governamental", ativo=True)
-            TipoOrigemCadastro.objects.create(nome="Encaminhamento Não Governamental", ativo=True)
-            self.stdout.write(self.style.SUCCESS("Origens de Cadastro criadas!"))
+        origens = [
+            "CadUnico",
+            "Busca Ativa",
+            "Espontâneo",
+            "Inscrição MCMV",
+            "Visita Domiciliar",
+            "Atendimento CRAS",
+            "Atendimento CREAS",
+            "Outros Atendimentos",
+            "Conselho Tutelar"
+        ]
+        self.stdout.write("Sincronizando Origens de Cadastro...")
+        for nome_origem in origens:
+            TipoOrigemCadastro.objects.get_or_create(nome=nome_origem, defaults={"ativo": True})
+        self.stdout.write(self.style.SUCCESS("Origens de Cadastro sincronizadas!"))
 
         # 1.4 Tipos de Unidade de Atendimento de Família
         from core.models.tabela_basica import TipoUnidadeAtendimentoFamilia
