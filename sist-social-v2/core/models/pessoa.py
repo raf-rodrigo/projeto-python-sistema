@@ -23,9 +23,15 @@ class Pessoa(models.Model):
         ('Casamento', 'Casamento'),
         ('RANI', 'RANI'),
     ]
+    SITUACAO_ATUAL_CHOICES = [
+        ('Padrao', 'Padrão'),
+        ('Rua', 'Situação de Rua'),
+        ('Migrante', 'Migrante'),
+        ('Ambos', 'Situação de Rua e Migrante'),
+    ]
 
     familia_domicilio = models.ForeignKey(FamiliaDomicilio, on_delete=models.SET_NULL, null=True, blank=True, related_name='membros', verbose_name="Família/Domicílio")
-    situacao_de_rua = models.CharField(max_length=3, choices=SIM_NAO_CHOICES, default='Não', verbose_name="Situação de Rua?")
+    situacao_de_rua = models.CharField(max_length=15, choices=SITUACAO_ATUAL_CHOICES, default='Padrao', verbose_name="Situação Atual")
     nome = models.CharField(max_length=255, verbose_name="Nome Completo")
     nis = models.CharField(max_length=20, null=True, blank=True, verbose_name="NIS")
     nome_social = models.CharField(max_length=255, null=True, blank=True, verbose_name="Nome Social")

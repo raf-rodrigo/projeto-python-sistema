@@ -33,8 +33,8 @@ interface TabDadosPessoaisProps {
   tipoParentesco: string;
   setTipoParentesco: (val: string) => void;
   parentescos: TabelaBasicaItem[];
-  situacaoDeRua: 'Sim' | 'Não';
-  setSituacaoDeRua: (val: 'Sim' | 'Não') => void;
+  situacaoDeRua: 'Padrao' | 'Rua' | 'Migrante' | 'Ambos';
+  setSituacaoDeRua: (val: 'Padrao' | 'Rua' | 'Migrante' | 'Ambos') => void;
   
   // Contatos (Se Não rua)
   telefone: string;
@@ -327,10 +327,12 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
-          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Situação de Rua?</label>
+          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Situação Atual</label>
           <select className="form-control" value={situacaoDeRua} onChange={e => setSituacaoDeRua(e.target.value as any)}>
-            <option value="Não">Não</option>
-            <option value="Sim">Sim</option>
+            <option value="Padrao">Padrão</option>
+            <option value="Rua">Situação de Rua</option>
+            <option value="Migrante">Migrante</option>
+            <option value="Ambos">Situação de Rua e Migrante</option>
           </select>
         </div>
         <div>
@@ -407,7 +409,7 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
       </div>
 
 
-      {situacaoDeRua === 'Não' ? (
+      {(situacaoDeRua === 'Padrao' || situacaoDeRua === 'Migrante') ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
           <div>
             <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Telefone</label>

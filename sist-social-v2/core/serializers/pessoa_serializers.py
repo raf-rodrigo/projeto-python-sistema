@@ -31,7 +31,7 @@ class PessoaSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         situacao_rua_detalhes_data = validated_data.pop('situacao_rua_detalhes', None)
         pessoa = Pessoa.objects.create(**validated_data)
-        if pessoa.situacao_de_rua == 'Sim' and situacao_rua_detalhes_data:
+        if pessoa.situacao_de_rua in ['Rua', 'Ambos'] and situacao_rua_detalhes_data:
             PessoaSituacaoRua.objects.create(pessoa=pessoa, **situacao_rua_detalhes_data)
         return pessoa
 
@@ -39,7 +39,7 @@ class PessoaSerializer(serializers.ModelSerializer):
         situacao_rua_detalhes_data = validated_data.pop('situacao_rua_detalhes', None)
         instance = super().update(instance, validated_data)
         
-        if instance.situacao_de_rua == 'Sim':
+        if instance.situacao_de_rua in ['Rua', 'Ambos']:
             if situacao_rua_detalhes_data:
                 PessoaSituacaoRua.objects.update_or_create(
                     pessoa=instance,

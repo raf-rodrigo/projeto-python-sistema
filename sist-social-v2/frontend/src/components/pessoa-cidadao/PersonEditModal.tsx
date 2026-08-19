@@ -62,8 +62,8 @@ interface PersonEditModalProps {
   setTipoEstadoCivil: (val: string) => void;
   tipoParentesco: string;
   setTipoParentesco: (val: string) => void;
-  situacaoDeRua: 'Sim' | 'Não';
-  setSituacaoDeRua: (val: 'Sim' | 'Não') => void;
+  situacaoDeRua: 'Padrao' | 'Rua' | 'Migrante' | 'Ambos';
+  setSituacaoDeRua: (val: 'Padrao' | 'Rua' | 'Migrante' | 'Ambos') => void;
   telefone: string;
   setTelefone: (val: string) => void;
   celular: string;

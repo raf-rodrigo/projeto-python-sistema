@@ -82,7 +82,7 @@ export default function PersonManagement() {
   const [raca, setRaca] = useState('');
   const [tipoEstadoCivil, setTipoEstadoCivil] = useState('');
   const [orientacaoSexual, setOrientacaoSexual] = useState('');
-  const [situacaoDeRua, setSituacaoDeRua] = useState<'Sim' | 'Não'>('Não');
+  const [situacaoDeRua, setSituacaoDeRua] = useState<'Padrao' | 'Rua' | 'Migrante' | 'Ambos'>('Padrao');
   const [tempoViveNaRua, setTempoViveNaRua] = useState('');
   const [tempoMoraNaCidade, setTempoMoraNaCidade] = useState('');
   const [viveComFamiliaRua, setViveComFamiliaRua] = useState<'Sim' | 'Não'>('Não');
@@ -361,7 +361,7 @@ export default function PersonManagement() {
     setRaca('');
     setTipoEstadoCivil('');
     setOrientacaoSexual('');
-    setSituacaoDeRua('Não');
+    setSituacaoDeRua('Padrao');
     setTempoViveNaRua('');
     setTempoMoraNaCidade('');
     setViveComFamiliaRua('Não');
@@ -506,7 +506,7 @@ export default function PersonManagement() {
     setRaca(p.raca || '');
     setTipoEstadoCivil(p.tipo_estado_civil || '');
     setOrientacaoSexual(p.orientacao_sexual || '');
-    setSituacaoDeRua(p.situacao_de_rua || 'Não');
+    setSituacaoDeRua(p.situacao_de_rua || 'Padrao');
 
     if (p.situacao_rua_detalhes) {
       const d = p.situacao_rua_detalhes;
@@ -746,7 +746,7 @@ export default function PersonManagement() {
       tipo_estado_civil: tipoEstadoCivil ? parseInt(tipoEstadoCivil) : null,
       orientacao_sexual: orientacaoSexual ? parseInt(orientacaoSexual) : null,
       situacao_de_rua: situacaoDeRua,
-      situacao_rua_detalhes: situacaoDeRua === 'Sim' ? {
+      situacao_rua_detalhes: (situacaoDeRua === 'Rua' || situacaoDeRua === 'Ambos') ? {
         tempo_vive_na_rua: tempoViveNaRua || null,
         tempo_mora_na_cidade: tempoMoraNaCidade || null,
         vive_com_familia_rua: viveComFamiliaRua,
