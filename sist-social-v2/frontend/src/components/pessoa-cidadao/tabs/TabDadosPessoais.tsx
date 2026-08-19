@@ -337,6 +337,13 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
+          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Situação de Rua?</label>
+          <select className="form-control" value={situacaoDeRua} onChange={e => setSituacaoDeRua(e.target.value as any)}>
+            <option value="Não">Não</option>
+            <option value="Sim">Sim</option>
+          </select>
+        </div>
+        <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Família</label>
           <select className="form-control" value={familiaDomicilio} onChange={e => setFamiliaDomicilio(e.target.value)} disabled={lockFamiliaSelect}>
             <option value="">Selecione...</option>
@@ -351,13 +358,13 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nome Completo *</label>
           <input type="text" id="input-nome" className="form-control" value={nome} onChange={e => setNome(e.target.value)} />
         </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Nome Social</label>
           <input type="text" className="form-control" value={nomeSocial} onChange={e => setNomeSocial(e.target.value)} />
         </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>NIS</label>
           <input type="text" className="form-control" value={nis} onChange={e => setNis(e.target.value)} />
@@ -366,6 +373,9 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Data de Nascimento *</label>
           <input type="date" id="input-nascimento" className="form-control" value={certidaoNascimentoData} onChange={e => setCertidaoNascimentoData(e.target.value)} />
         </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Sexo *</label>
           <select className="form-control" value={sexo} onChange={e => setSexo(e.target.value as any)}>
@@ -373,9 +383,6 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
             <option value="Masc">Masculino</option>
           </select>
         </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Raça/Cor</label>
           <select className="form-control" value={raca} onChange={e => setRaca(e.target.value)}>
@@ -392,7 +399,7 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
         <div>
           <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Estado Civil</label>
           <select className="form-control" value={tipoEstadoCivil} onChange={e => setTipoEstadoCivil(e.target.value)}>
@@ -407,14 +414,8 @@ export const TabDadosPessoais: React.FC<TabDadosPessoaisProps> = ({
             {parentescos.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
           </select>
         </div>
-        <div>
-          <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Situação de Rua?</label>
-          <select className="form-control" value={situacaoDeRua} onChange={e => setSituacaoDeRua(e.target.value as any)}>
-            <option value="Não">Não</option>
-            <option value="Sim">Sim</option>
-          </select>
-        </div>
       </div>
+
 
       {situacaoDeRua === 'Não' ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
