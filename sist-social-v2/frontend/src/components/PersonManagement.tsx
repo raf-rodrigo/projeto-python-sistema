@@ -1014,12 +1014,14 @@ export default function PersonManagement() {
       </div>
 
       {/* Tabela de Munícipes */}
-      <PersonTable 
-        pessoas={pessoas}
-        carregando={carregando}
-        abrirEditarModal={abrirEditarModal}
-        deletarPessoa={deletarPessoa}
-      />
+      <div className="table-responsive">
+        <PersonTable 
+          pessoas={pessoas}
+          carregando={carregando}
+          abrirEditarModal={abrirEditarModal}
+          deletarPessoa={deletarPessoa}
+        />
+      </div>
 
       {/* Modal Principal de Cadastro/Edição de Munícipes */}
       {modalAberto && (

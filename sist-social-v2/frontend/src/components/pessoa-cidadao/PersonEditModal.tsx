@@ -5,6 +5,7 @@ import { TabDocumentacao } from './tabs/TabDocumentacao';
 import { TabRegistroCivil } from './tabs/TabRegistroCivil';
 import { TabSaudeEducacao } from './tabs/TabSaudeEducacao';
 import { TabTrabalho } from './tabs/TabTrabalho';
+import { TabSituacaoRua } from './tabs/TabSituacaoRua';
 
 interface PersonEditModalProps {
   editandoId: number | null;
@@ -637,57 +638,67 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
 }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
-      <div style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '1150px', borderRadius: '16px', display: 'flex', flexDirection: 'column', maxHeight: '96vh' }}>
+      <div style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '1100px', borderRadius: '16px', display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}>
         
-        {/* Header Modal */}
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0f172a' }}>
-              {editandoId ? 'Editar Pessoa (Munícipe)' : 'Nova Pessoa (Munícipe)'}
-            </h3>
+        {/* Header Modal com Título, Subtítulo e Ações */}
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px', backgroundColor: '#ffffff' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>
+                {editandoId ? 'Editar Pessoa (Munícipe)' : 'Nova Pessoa (Munícipe)'}
+              </h3>
+              {editandoId && nome && (
+                <div style={{ fontSize: '13px', color: '#475569', display: 'flex', gap: '16px' }}>
+                  <span><strong>Nome:</strong> <span style={{ color: '#2563eb', fontWeight: 600 }}>{nome}</span></span>
+                  {nis && <span><strong>NIS:</strong> <span style={{ color: '#2563eb', fontWeight: 600 }}>{nis}</span></span>}
+                </div>
+              )}
+            </div>
+            <button onClick={() => setModalAberto(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#94a3b8', cursor: 'pointer' }}>&times;</button>
           </div>
-          <button onClick={() => setModalAberto(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#94a3b8', cursor: 'pointer' }}>&times;</button>
-        </div>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', padding: '16px 24px', borderBottom: 'none', backgroundColor: '#ffffff' }}>
-          {[
-            { id: 'pessoais', label: 'Dados Pessoais' },
-            { id: 'filiacao', label: 'Filiação & Origem' },
-            { id: 'documentos', label: 'Documentos' },
-            { id: 'registro', label: 'Registro Civil' },
-            { id: 'saude_edu', label: 'Saúde & Educação' },
-            { id: 'trabalho', label: 'Trabalho & Rendas' },
-            { id: 'observacoes', label: 'Observações' }
-          ].map(t => {
-            const isSelected = activeModalTab === t.id;
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setActiveModalTab(t.id as any)}
-                style={{
-                  padding: '8px 14px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                  border: 'none',
-                  borderRadius: '6px',
-                  backgroundColor: isSelected ? '#10b981' : '#f3f4f6',
-                  color: isSelected ? '#ffffff' : '#475569',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s'
-                }}
-              >
-                {t.label}
-              </button>
-            );
-          })}
+          {/* Barra de Abas do Munícipe */}
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', paddingBottom: '4px' }}>
+            {[
+              { id: 'pessoais', label: 'Dados Pessoais' },
+              { id: 'filiacao', label: 'Filiação & Origem' },
+              { id: 'documentos', label: 'Documentos' },
+              { id: 'registro', label: 'Registro Civil' },
+              { id: 'saude_edu', label: 'Saúde & Educação' },
+              { id: 'trabalho', label: 'Trabalho & Rendas' },
+              ...(situacaoDeRua === 'Rua' || situacaoDeRua === 'Ambos'
+                ? [{ id: 'situacao_rua', label: 'Situação de Rua' }]
+                : []),
+              { id: 'observacoes', label: 'Observações' }
+            ].map(t => {
+              const isSelected = activeModalTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setActiveModalTab(t.id as any)}
+                  style={{
+                    padding: '8px 14px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    border: 'none',
+                    borderRadius: '6px',
+                    backgroundColor: isSelected ? '#10b981' : '#f3f4f6',
+                    color: isSelected ? '#ffffff' : '#475569',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={salvarPessoa} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
-          <div style={{ padding: '24px', flex: 1 }}>
+        <form onSubmit={salvarPessoa} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto', padding: '24px', gap: '20px' }}>
 
             {/* TAB 1: DADOS PESSOAIS */}
             {activeModalTab === 'pessoais' && (
@@ -726,6 +737,12 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 setCelular={setCelular}
                 email={email}
                 setEmail={setEmail}
+              />
+            )}
+
+            {/* TAB: SITUAÇÃO DE RUA (NOVO COMPONENTE) */}
+            {activeModalTab === 'situacao_rua' && (
+              <TabSituacaoRua
                 subTabRua={subTabRua}
                 setSubTabRua={setSubTabRua}
                 tempoViveNaRua={tempoViveNaRua}
@@ -815,7 +832,6 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 setAtendidoHospitalGeral={setAtendidoHospitalGeral}
                 naoAtendido={naoAtendido}
                 setNaoAtendido={setNaoAtendido}
-
                 respondeuSustento={respondeuSustento}
                 setRespondeuSustento={setRespondeuSustento}
                 sustentoConstrucaoCivil={sustentoConstrucaoCivil}
@@ -1031,8 +1047,6 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 />
               </div>
             )}
-
-          </div>
 
           <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '12px', backgroundColor: '#f8fafc' }}>
             <button 

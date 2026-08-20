@@ -39,19 +39,19 @@ export const FamilyTable: React.FC<FamilyTableProps> = ({
   }
 
   return (
-    <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-      <table className="dashboard-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)', overflowX: 'auto' }}>
+      <table className="dashboard-table" style={{ width: '100%', minWidth: '950px', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1' }}>
-            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Código</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Prontuário</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Nome RF</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>NIS</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>CPF</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Telefone</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>PBF</th>
-            <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Extr.Pobreza</th>
-            <th style={{ width: '120px', textAlign: 'center', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Ação</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '90px' }}>Código</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '90px' }}>Prontuário</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '220px' }}>Nome RF</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '110px' }}>NIS</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '120px' }}>CPF</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '120px' }}>Telefone</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '80px' }}>PBF</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', minWidth: '110px' }}>Extr.Pobreza</th>
+            <th style={{ padding: '14px 16px', width: '120px', textAlign: 'center', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Ação</th>
           </tr>
         </thead>
         <tbody>
@@ -62,24 +62,25 @@ export const FamilyTable: React.FC<FamilyTableProps> = ({
                 <td style={{ padding: '14px 16px', fontWeight: 600, color: isRfAguardando ? '#ef4444' : '#1e3a8a' }}>
                   {f.familia_codigo || `FAM-${f.id}`}
                 </td>
-                <td style={{ fontWeight: 500, color: isRfAguardando ? '#ef4444' : '#475569' }}>
+                <td style={{ padding: '14px 16px', fontWeight: 500, color: isRfAguardando ? '#ef4444' : '#475569' }}>
                   {f.prontuario || `SADS-${f.id}`}
                 </td>
                 <td style={{ 
+                  padding: '14px 16px',
                   fontWeight: 600, 
                   color: isRfAguardando ? '#ef4444' : '#334155',
-                  maxWidth: '220px',
+                  maxWidth: '260px',
                   whiteSpace: 'normal',
-                  wordBreak: 'break-word'
+                  wordBreak: 'keep-all'
                 }}>
                   {f.responsavel_familiar_nome}
                 </td>
-                <td style={{ color: isRfAguardando ? '#ef4444' : '#64748b' }}>{f.nis || 'N/A'}</td>
-                <td style={{ color: isRfAguardando ? '#ef4444' : '#64748b' }}>{f.cpf || 'N/A'}</td>
-                <td style={{ color: isRfAguardando ? '#ef4444' : '#64748b' }}>{f.telefone || 'N/A'}</td>
-                <td style={{ color: '#475569' }}>{f.pbf || 'Não'}</td>
-                <td style={{ color: '#475569' }}>{f.ext_pobreza || 'Não'}</td>
-                <td>
+                <td style={{ padding: '14px 16px', color: isRfAguardando ? '#ef4444' : '#64748b' }}>{f.nis || 'N/A'}</td>
+                <td style={{ padding: '14px 16px', color: isRfAguardando ? '#ef4444' : '#64748b' }}>{f.cpf || 'N/A'}</td>
+                <td style={{ padding: '14px 16px', color: isRfAguardando ? '#ef4444' : '#64748b' }}>{f.telefone || 'N/A'}</td>
+                <td style={{ padding: '14px 16px', color: '#475569' }}>{f.pbf || 'Não'}</td>
+                <td style={{ padding: '14px 16px', color: '#475569' }}>{f.ext_pobreza || 'Não'}</td>
+                <td style={{ padding: '14px 16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                     <button onClick={() => abrirEditarModal(f)} style={{ border: 'none', backgroundColor: 'transparent', color: '#0284c7', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Editar">
                       <Edit3 size={16} />

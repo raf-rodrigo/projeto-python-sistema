@@ -75,7 +75,74 @@ interface FamiliaDomicilio {
   telefone?: string;
   pbf?: string;
   ext_pobreza?: string;
+  membros_details?: any[];
   transferencias_details?: TransferenciaUnidadeItem[];
+
+  // --- NOVAS PROPRIEDADES DE COMPILAÇÃO ---
+  tipo_especie_domicilio?: number;
+  tipo_residencia?: number;
+  tipo_construcao_domicilio?: number;
+  tipo_piso_domicilio?: number;
+  tipo_iluminacao_domicilio?: number;
+  tipo_acessibilidade_domicilio?: number;
+  tipo_animal?: number;
+  agua_canalizada?: string;
+  tipo_abastecimento_agua?: number;
+  possue_banheiro?: string;
+  tipo_escoamento_sanitario?: number;
+  tipo_coleta_lixo?: number;
+  calcamento_na_frente_domicilio?: string;
+  area_dificil_acesso?: string;
+  numero_comodos?: string;
+  numero_domitorio?: string;
+  numero_pessoa_dormitorio?: string;
+  total_pessoa_domicilio?: string;
+  total_familia_domicilio?: string;
+  pessoas_de_zero_a_dezessete?: string;
+  pessoas_de_dezoito_a_sessenta_e_quatro?: string;
+  pessoas_com_mais_de_sessenta_e_cinco?: string;
+  codigo_povo_indigena?: string;
+  povo_indigena?: string;
+  codigo_reserva_indigena?: string;
+  reserva_indigena?: string;
+  codigo_comunidade_quilombola?: string;
+  comunidade_quilombola?: string;
+  despesa_energia_eletrica?: string;
+  despesa_agua_esgoto?: string;
+  despesa_gas_carvao_lenha?: string;
+  despesa_alimentacao_higiene_limpeza?: string;
+  despesa_transporte?: string;
+  despesa_aluguel?: string;
+  despesa_medicamento_uso_regular?: string;
+  despesa_combustivel?: string;
+  despesa_financiamento_imovel?: string;
+  despesa_financiamento_veiculo?: string;
+  despesa_celular?: string;
+  despesa_assinatura_tv?: string;
+  despesa_telefone_fixo?: string;
+  despesa_emprestimo?: string;
+  despesa_saude?: string;
+  despesa_educacao?: string;
+
+  // --- NOVAS PROPRIEDADES SOCIOASSISTENCIAIS ---
+  renda_per_capita_sem_programas_sociais?: string;
+  renda_per_capita_com_progamas_sociais?: string;
+  possue_meio_transporte?: string;
+  transporte_automovel?: boolean;
+  transporte_moto?: boolean;
+  transporte_bicicleta?: boolean;
+  transporte_outros?: boolean;
+  codigo_estabelecimento_saude?: string;
+  nome_estabelecimento_saude?: string;
+  grupos_tradicionais_especificos?: number;
+  nivel_vulnerabilidade?: string;
+  info_trabalho_infantil?: boolean;
+  info_extrema_pobreza?: boolean;
+  info_renda_cidada?: boolean;
+  info_insuficiencia_alimentar?: boolean;
+  info_bolsa_familia?: boolean;
+  info_bpc?: boolean;
+  info_acao_jovem?: boolean;
 }
 
 export default function FamilyManagement() {
@@ -102,6 +169,7 @@ export default function FamilyManagement() {
   const [tiposColetaLixo, setTiposColetaLixo] = useState<any[]>([]);
   const [tiposAcessibilidade, setTiposAcessibilidade] = useState<any[]>([]);
   const [tiposAnimais, setTiposAnimais] = useState<any[]>([]);
+  const [gruposTradicionaisList, setGruposTradicionaisList] = useState<TabelaBasicaItem[]>([]);
 
   // Form Fields
   const [cep, setCep] = useState('');
@@ -180,6 +248,29 @@ export default function FamilyManagement() {
   const [despesaEmprestimo, setDespesaEmprestimo] = useState('0.00');
   const [despesaSaude, setDespesaSaude] = useState('0.00');
   const [despesaEducacao, setDespesaEducacao] = useState('0.00');
+
+  // --- NOVOS ESTADOS SOCIOASSISTENCIAIS ---
+  const [rendaSemProgramas, setRendaSemProgramas] = useState('');
+  const [rendaComProgramas, setRendaComProgramas] = useState('');
+  const [possuiMeioTransporte, setPossuiMeioTransporte] = useState('Não');
+  const [transporteAutomovel, setTransporteAutomovel] = useState(false);
+  const [transporteMoto, setTransporteMoto] = useState(false);
+  const [transporteBicicleta, setTransporteBicicleta] = useState(false);
+  const [transporteOutros, setTransporteOutros] = useState(false);
+  const [codigoEstabelecimentoSaude, setCodigoEstabelecimentoSaude] = useState('');
+  const [nomeEstabelecimentoSaude, setNomeEstabelecimentoSaude] = useState('');
+  const [grupoTradicionalId, setGrupoTradicionalId] = useState('');
+  const [nivelVulnerabilidade, setNivelVulnerabilidade] = useState('');
+  const [infoTrabalhoInfantil, setInfoTrabalhoInfantil] = useState(false);
+  const [infoExtremaPobreza, setInfoExtremaPobreza] = useState(false);
+  const [infoRendaCidada, setInfoRendaCidada] = useState(false);
+  const [infoInsuficienciaAlimentar, setInfoInsuficienciaAlimentar] = useState(false);
+  const [infoBolsaFamilia, setInfoBolsaFamilia] = useState(false);
+  const [infoBpc, setInfoBpc] = useState(false);
+  const [infoAcaoJovem, setInfoAcaoJovem] = useState(false);
+  
+  // Observações
+  const [observacoes, setObservacoes] = useState('');
 
   // Valores padrão/somente leitura carregados da sessão
   const [unidadeCadastroLabel, setUnidadeCadastroLabel] = useState('CREAS ITAPEGICA');
@@ -319,6 +410,11 @@ export default function FamilyManagement() {
       const resAnimais = await fetch(`${API_URL}/api/tipos_animais/?no_pagination=true`, { headers: {
       'Authorization': `Token ${token}` } });
       if (resAnimais.ok) setTiposAnimais(await resAnimais.json());
+
+      // 11. Grupos Tradicionais
+      const resGrupos = await fetch(`${API_URL}/api/tipo_grupos_tradicionais_especificos/?no_pagination=true`, { headers: {
+      'Authorization': `Token ${token}` } });
+      if (resGrupos.ok) setGruposTradicionaisList(await resGrupos.json());
 
 
       const resOrigem = await fetch(`${API_URL}/api/tipo_origem_cadastro/`, {
@@ -464,6 +560,26 @@ export default function FamilyManagement() {
     setDespesaSaude('0.00');
     setDespesaEducacao('0.00');
 
+    setRendaSemProgramas('');
+    setRendaComProgramas('');
+    setPossuiMeioTransporte('Não');
+    setTransporteAutomovel(false);
+    setTransporteMoto(false);
+    setTransporteBicicleta(false);
+    setTransporteOutros(false);
+    setCodigoEstabelecimentoSaude('');
+    setNomeEstabelecimentoSaude('');
+    setGrupoTradicionalId('');
+    setNivelVulnerabilidade('');
+    setInfoTrabalhoInfantil(false);
+    setInfoExtremaPobreza(false);
+    setInfoRendaCidada(false);
+    setInfoInsuficienciaAlimentar(false);
+    setInfoBolsaFamilia(false);
+    setInfoBpc(false);
+    setInfoAcaoJovem(false);
+    setObservacoes('');
+
     setActiveEditTab('inicio');
     setErrorMsg(null);
     setModalAberto(true);
@@ -533,7 +649,7 @@ export default function FamilyManagement() {
     setDificilAcesso(f.area_dificil_acesso || 'Não');
 
     setNumeroComodos(f.numero_comodos || '');
-    setNumeroDormitorios(f.numero_dormitorio || '');
+    setNumeroDormitorios(f.numero_domitorio || '');
     setPessoasDormitorio(f.numero_pessoa_dormitorio || '');
     setTotalPessoas(f.total_pessoa_domicilio || '');
     setTotalFamilias(f.total_familia_domicilio || '');
@@ -562,6 +678,27 @@ export default function FamilyManagement() {
     setDespesaEmprestimo(f.despesa_emprestimo || '0.00');
     setDespesaSaude(f.despesa_saude || '0.00');
     setDespesaEducacao(f.despesa_educacao || '0.00');
+
+    // Socioassistenciais
+    setRendaSemProgramas(f.renda_per_capita_sem_programas_sociais || '');
+    setRendaComProgramas(f.renda_per_capita_com_progamas_sociais || '');
+    setPossuiMeioTransporte(f.possue_meio_transporte || 'Não');
+    setTransporteAutomovel(f.transporte_automovel || false);
+    setTransporteMoto(f.transporte_moto || false);
+    setTransporteBicicleta(f.transporte_bicicleta || false);
+    setTransporteOutros(f.transporte_outros || false);
+    setCodigoEstabelecimentoSaude(f.codigo_estabelecimento_saude || '');
+    setNomeEstabelecimentoSaude(f.nome_estabelecimento_saude || '');
+    setGrupoTradicionalId(f.grupos_tradicionais_especificos?.toString() || '');
+    setNivelVulnerabilidade(f.nivel_vulnerabilidade || '');
+    setInfoTrabalhoInfantil(f.info_trabalho_infantil || false);
+    setInfoExtremaPobreza(f.info_extrema_pobreza || false);
+    setInfoRendaCidada(f.info_renda_cidada || false);
+    setInfoInsuficienciaAlimentar(f.info_insuficiencia_alimentar || false);
+    setInfoBolsaFamilia(f.info_bolsa_familia || false);
+    setInfoBpc(f.info_bpc || false);
+    setInfoAcaoJovem(f.info_acao_jovem || false);
+    setObservacoes(f.observacoes || '');
     
     if (f.transferencias_details) {
       setLocalTransferencias(f.transferencias_details);
@@ -638,10 +775,6 @@ export default function FamilyManagement() {
       responsavel_cadastro: sessionUser.id || null,
       codigo_cadunico: codigoCadUnico || null,
       justificativa_transferencia: justificativaTransferencia || null,
-      unidade_cadastro: sessionUnidadeId ? parseInt(sessionUnidadeId) : null,
-      responsavel_cadastro: sessionUser.id || null,
-      codigo_cadunico: codigoCadUnico || null,
-      justificativa_transferencia: justificativaTransferencia || null,
 
       // --- NOVOS CAMPOS HABITACIONAIS ---
       tipo_especie_domicilio: especieDomicilioId ? parseInt(especieDomicilioId) : null,
@@ -690,6 +823,27 @@ export default function FamilyManagement() {
       despesa_emprestimo: despesaEmprestimo || '0.00',
       despesa_saude: despesaSaude || '0.00',
       despesa_educacao: despesaEducacao || '0.00',
+
+      // --- NOVOS CAMPOS SOCIOASSISTENCIAIS ---
+      renda_per_capita_sem_programas_sociais: rendaSemProgramas ? parseFloat(rendaSemProgramas) : null,
+      renda_per_capita_com_progamas_sociais: rendaComProgramas ? parseFloat(rendaComProgramas) : null,
+      possue_meio_transporte: possuiMeioTransporte || null,
+      transporte_automovel: transporteAutomovel,
+      transporte_moto: transporteMoto,
+      transporte_bicicleta: transporteBicicleta,
+      transporte_outros: transporteOutros,
+      codigo_estabelecimento_saude: codigoEstabelecimentoSaude || null,
+      nome_estabelecimento_saude: nomeEstabelecimentoSaude || null,
+      grupos_tradicionais_especificos: grupoTradicionalId ? parseInt(grupoTradicionalId) : null,
+      nivel_vulnerabilidade: nivelVulnerabilidade || null,
+      info_trabalho_infantil: infoTrabalhoInfantil,
+      info_extrema_pobreza: infoExtremaPobreza,
+      info_renda_cidada: infoRendaCidada,
+      info_insuficiencia_alimentar: infoInsuficienciaAlimentar,
+      info_bolsa_familia: infoBolsaFamilia,
+      info_bpc: infoBpc,
+      info_acao_jovem: infoAcaoJovem,
+      observacoes: observacoes || null
     };
 
     try {
@@ -787,12 +941,14 @@ export default function FamilyManagement() {
       </div>
 
       {/* Tabela Principal */}
-      <FamilyTable 
-        familias={familias}
-        carregando={carregando}
-        abrirEditarModal={abrirEditarModal}
-        deletarFamilia={deletarFamilia}
-      />
+      <div className="table-responsive">
+        <FamilyTable 
+          familias={familias}
+          carregando={carregando}
+          abrirEditarModal={abrirEditarModal}
+          deletarFamilia={deletarFamilia}
+        />
+      </div>
 
       {/* Modal Principal de Edição com as Abas */}
       {modalAberto && (
@@ -962,6 +1118,46 @@ export default function FamilyManagement() {
           setDespesaEmprestimo={setDespesaEmprestimo}
           setDespesaSaude={setDespesaSaude}
           setDespesaEducacao={setDespesaEducacao}
+          
+          rendaSemProgramas={rendaSemProgramas}
+          rendaComProgramas={rendaComProgramas}
+          possuiMeioTransporte={possuiMeioTransporte}
+          transporteAutomovel={transporteAutomovel}
+          transporteMoto={transporteMoto}
+          transporteBicicleta={transporteBicicleta}
+          transporteOutros={transporteOutros}
+          codigoEstabelecimentoSaude={codigoEstabelecimentoSaude}
+          nomeEstabelecimentoSaude={nomeEstabelecimentoSaude}
+          grupoTradicionalId={grupoTradicionalId}
+          gruposTradicionaisList={gruposTradicionaisList}
+          nivelVulnerabilidade={nivelVulnerabilidade}
+          infoTrabalhoInfantil={infoTrabalhoInfantil}
+          infoExtremaPobreza={infoExtremaPobreza}
+          infoRendaCidada={infoRendaCidada}
+          infoInsuficienciaAlimentar={infoInsuficienciaAlimentar}
+          infoBolsaFamilia={infoBolsaFamilia}
+          infoBpc={infoBpc}
+          infoAcaoJovem={infoAcaoJovem}
+          setRendaSemProgramas={setRendaSemProgramas}
+          setRendaComProgramas={setRendaComProgramas}
+          setPossuiMeioTransporte={setPossuiMeioTransporte}
+          setTransporteAutomovel={setTransporteAutomovel}
+          setTransporteMoto={setTransporteMoto}
+          setTransporteBicicleta={setTransporteBicicleta}
+          setTransporteOutros={setTransporteOutros}
+          setCodigoEstabelecimentoSaude={setCodigoEstabelecimentoSaude}
+          setNomeEstabelecimentoSaude={setNomeEstabelecimentoSaude}
+          setGrupoTradicionalId={setGrupoTradicionalId}
+          setNivelVulnerabilidade={setNivelVulnerabilidade}
+          setInfoTrabalhoInfantil={setInfoTrabalhoInfantil}
+          setInfoExtremaPobreza={setInfoExtremaPobreza}
+          setInfoRendaCidada={setInfoRendaCidada}
+          setInfoInsuficienciaAlimentar={setInfoInsuficienciaAlimentar}
+          setInfoBolsaFamilia={setInfoBolsaFamilia}
+          setInfoBpc={setInfoBpc}
+          setInfoAcaoJovem={setInfoAcaoJovem}
+          observacoes={observacoes}
+          setObservacoes={setObservacoes}
         />
       )}
 

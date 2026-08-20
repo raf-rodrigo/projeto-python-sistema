@@ -7,6 +7,10 @@ import { TabHistoricoTransferencia } from './tabs/TabHistoricoTransferencia';
 import { TabCondicoesHabitacionais } from './tabs/TabCondicoesHabitacionais';
 import { TabEtnia } from './tabs/TabEtnia';
 import { TabDespesas } from './tabs/TabDespesas';
+import { TabSocioassistenciais } from './tabs/TabSocioassistenciais';
+import { TabObservacoes } from './tabs/TabObservacoes';
+import { TabHistoricoAtendimento } from './tabs/TabHistoricoAtendimento';
+import { TabBeneficios } from './tabs/TabBeneficios';
 
 interface FamilyEditModalProps {
   editandoId: number | null;
@@ -191,6 +195,50 @@ interface FamilyEditModalProps {
 
   // States necessários para Histórico Transferência
   localTransferencias: any[];
+
+  // --- NOVOS CAMPOS SOCIOASSISTENCIAIS ---
+  rendaSemProgramas: string;
+  rendaComProgramas: string;
+  possuiMeioTransporte: string;
+  transporteAutomovel: boolean;
+  transporteMoto: boolean;
+  transporteBicicleta: boolean;
+  transporteOutros: boolean;
+  codigoEstabelecimentoSaude: string;
+  nomeEstabelecimentoSaude: string;
+  grupoTradicionalId: string;
+  gruposTradicionaisList: any[];
+  nivelVulnerabilidade: string;
+  infoTrabalhoInfantil: boolean;
+  infoExtremaPobreza: boolean;
+  infoRendaCidada: boolean;
+  infoInsuficienciaAlimentar: boolean;
+  infoBolsaFamilia: boolean;
+  infoBpc: boolean;
+  infoAcaoJovem: boolean;
+
+  setRendaSemProgramas: (val: string) => void;
+  setRendaComProgramas: (val: string) => void;
+  setPossuiMeioTransporte: (val: string) => void;
+  setTransporteAutomovel: (val: boolean) => void;
+  setTransporteMoto: (val: boolean) => void;
+  setTransporteBicicleta: (val: boolean) => void;
+  setTransporteOutros: (val: boolean) => void;
+  setCodigoEstabelecimentoSaude: (val: string) => void;
+  setNomeEstabelecimentoSaude: (val: string) => void;
+  setGrupoTradicionalId: (val: string) => void;
+  setNivelVulnerabilidade: (val: string) => void;
+  setInfoTrabalhoInfantil: (val: boolean) => void;
+  setInfoExtremaPobreza: (val: boolean) => void;
+  setInfoRendaCidada: (val: boolean) => void;
+  setInfoInsuficienciaAlimentar: (val: boolean) => void;
+  setInfoBolsaFamilia: (val: boolean) => void;
+  setInfoBpc: (val: boolean) => void;
+  setInfoAcaoJovem: (val: boolean) => void;
+
+  // Observações
+  observacoes: string;
+  setObservacoes: (val: string) => void;
 }
 
 export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
@@ -358,7 +406,48 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
   setDespesaTelefoneFixo,
   setDespesaEmprestimo,
   setDespesaSaude,
-  setDespesaEducacao
+  setDespesaEducacao,
+  
+  // socioassistenciais
+  rendaSemProgramas,
+  rendaComProgramas,
+  possuiMeioTransporte,
+  transporteAutomovel,
+  transporteMoto,
+  transporteBicicleta,
+  transporteOutros,
+  codigoEstabelecimentoSaude,
+  nomeEstabelecimentoSaude,
+  grupoTradicionalId,
+  gruposTradicionaisList,
+  nivelVulnerabilidade,
+  infoTrabalhoInfantil,
+  infoExtremaPobreza,
+  infoRendaCidada,
+  infoInsuficienciaAlimentar,
+  infoBolsaFamilia,
+  infoBpc,
+  infoAcaoJovem,
+  setRendaSemProgramas,
+  setRendaComProgramas,
+  setPossuiMeioTransporte,
+  setTransporteAutomovel,
+  setTransporteMoto,
+  setTransporteBicicleta,
+  setTransporteOutros,
+  setCodigoEstabelecimentoSaude,
+  setNomeEstabelecimentoSaude,
+  setGrupoTradicionalId,
+  setNivelVulnerabilidade,
+  setInfoTrabalhoInfantil,
+  setInfoExtremaPobreza,
+  setInfoRendaCidada,
+  setInfoInsuficienciaAlimentar,
+  setInfoBolsaFamilia,
+  setInfoBpc,
+  setInfoAcaoJovem,
+  observacoes,
+  setObservacoes
 }) => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
@@ -699,6 +788,49 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
             />
           )}
 
+          {/* Aba: Condições Socioassistenciais */}
+          {editandoId && activeEditTab === 'socioassistenciais' && (
+            <TabSocioassistenciais
+              rendaSemProgramas={rendaSemProgramas}
+              rendaComProgramas={rendaComProgramas}
+              possuiMeioTransporte={possuiMeioTransporte}
+              transporteAutomovel={transporteAutomovel}
+              transporteMoto={transporteMoto}
+              transporteBicicleta={transporteBicicleta}
+              transporteOutros={transporteOutros}
+              codigoEstabelecimentoSaude={codigoEstabelecimentoSaude}
+              nomeEstabelecimentoSaude={nomeEstabelecimentoSaude}
+              grupoTradicionalId={grupoTradicionalId}
+              gruposTradicionaisList={gruposTradicionaisList}
+              nivelVulnerabilidade={nivelVulnerabilidade}
+              infoTrabalhoInfantil={infoTrabalhoInfantil}
+              infoExtremaPobreza={infoExtremaPobreza}
+              infoRendaCidada={infoRendaCidada}
+              infoInsuficienciaAlimentar={infoInsuficienciaAlimentar}
+              infoBolsaFamilia={infoBolsaFamilia}
+              infoBpc={infoBpc}
+              infoAcaoJovem={infoAcaoJovem}
+              setRendaSemProgramas={setRendaSemProgramas}
+              setRendaComProgramas={setRendaComProgramas}
+              setPossuiMeioTransporte={setPossuiMeioTransporte}
+              setTransporteAutomovel={setTransporteAutomovel}
+              setTransporteMoto={setTransporteMoto}
+              setTransporteBicicleta={setTransporteBicicleta}
+              setTransporteOutros={setTransporteOutros}
+              setCodigoEstabelecimentoSaude={setCodigoEstabelecimentoSaude}
+              setNomeEstabelecimentoSaude={setNomeEstabelecimentoSaude}
+              setGrupoTradicionalId={setGrupoTradicionalId}
+              setNivelVulnerabilidade={setNivelVulnerabilidade}
+              setInfoTrabalhoInfantil={setInfoTrabalhoInfantil}
+              setInfoExtremaPobreza={setInfoExtremaPobreza}
+              setInfoRendaCidada={setInfoRendaCidada}
+              setInfoInsuficienciaAlimentar={setInfoInsuficienciaAlimentar}
+              setInfoBolsaFamilia={setInfoBolsaFamilia}
+              setInfoBpc={setInfoBpc}
+              setInfoAcaoJovem={setInfoAcaoJovem}
+            />
+          )}
+
           {/* Aba: Despesas */}
           {editandoId && activeEditTab === 'despesas' && (
             <TabDespesas 
@@ -734,6 +866,31 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
               setDespesaEmprestimo={setDespesaEmprestimo}
               setDespesaSaude={setDespesaSaude}
               setDespesaEducacao={setDespesaEducacao}
+            />
+          )}
+          {/* Aba: Observacoes */}
+          {editandoId && activeEditTab === 'observacoes' && (
+            <TabObservacoes
+              observacoes={observacoes}
+              setObservacoes={setObservacoes}
+            />
+          )}
+
+          {/* Aba: Histórico de Atendimentos */}
+          {editandoId && activeEditTab === 'historico_atendimento' && (
+            <TabHistoricoAtendimento
+              editandoId={editandoId}
+              API_URL={API_URL}
+              token={token}
+            />
+          )}
+
+          {/* Aba: Benefícios Recebidos */}
+          {editandoId && activeEditTab === 'beneficios' && (
+            <TabBeneficios
+              editandoId={editandoId}
+              API_URL={API_URL}
+              token={token}
             />
           )}
 

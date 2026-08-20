@@ -60,6 +60,8 @@ for name, obj in inspect.getmembers(views):
             url_name = 'tempo_cidade'
         elif url_name == 'tipos_contatos_parentes':
             url_name = 'contato_parente'
+        elif url_name == 'beneficio':
+            url_name = 'beneficios'
             
         router.register(url_name, obj, basename=url_name)
 

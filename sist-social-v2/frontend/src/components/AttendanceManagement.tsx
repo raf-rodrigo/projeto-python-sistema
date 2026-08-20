@@ -20,6 +20,8 @@ interface Pessoa {
   id: number;
   nome: string;
   cpf: string;
+  nome_social?: string;
+  nis?: string;
   familia_details?: {
     id: number;
     familia_codigo?: string;
@@ -94,7 +96,7 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
   const [tiposAtendimentos, setTiposAtendimentos] = useState<TabelaBasicaItem[]>([]);
   const [unidades, setUnidades] = useState<any[]>([]);
   
-  const [familias, setFamilias] = useState<TabelaBasicaItem[]>([]);
+  const [familias, setFamilias] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('');
@@ -447,7 +449,7 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
           Nenhum registro de atendimento encontrado.
         </div>
       ) : (
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+        <div className="table-responsive" style={{ backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)', overflow: 'hidden' }}>
           <table className="dashboard-table">
             <thead>
               <tr style={{ backgroundColor: '#f1f5f9' }}>

@@ -163,11 +163,27 @@ class FamiliaDomicilio(models.Model):
     # CONDIÇÕES SOCIOASSISTENCIAIS
     renda_per_capita_sem_programas_sociais = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, verbose_name="Renda Per Capita Sem Programas")
     renda_per_capita_com_progamas_sociais = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True, verbose_name="Renda Per Capita Com Programas")
-    codigo_conta_energia_eletrica = models.CharField(max_length=50, null=True, blank=True, verbose_name="Cód. Conta de Luz")
+    
+    # Transporte
+    possue_meio_transporte = models.CharField(max_length=3, choices=AREA_RISCO_CHOICES, null=True, blank=True, verbose_name="Possui meio de transporte?")
+    transporte_automovel = models.BooleanField(default=False, verbose_name="Transporte Automóvel")
+    transporte_moto = models.BooleanField(default=False, verbose_name="Transporte Moto")
+    transporte_bicicleta = models.BooleanField(default=False, verbose_name="Transporte Bicicleta")
+    transporte_outros = models.BooleanField(default=False, verbose_name="Transporte Outros")
+    
     codigo_estabelecimento_saude = models.CharField(max_length=50, null=True, blank=True, verbose_name="Cód. Posto Saúde")
     nome_estabelecimento_saude = models.CharField(max_length=150, null=True, blank=True, verbose_name="Posto de Saúde de Referência")
     grupos_tradicionais_especificos = models.ForeignKey(TipoGruposTradicionaisEspecificos, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Grupo Tradicional/Específico")
     nivel_vulnerabilidade = models.CharField(max_length=10, choices=VULNERABILIDADE_CHOICES, null=True, blank=True, verbose_name="Nível de Vulnerabilidade")
+
+    # Outras Informações (Checkboxes adicionais)
+    info_trabalho_infantil = models.BooleanField(default=False, verbose_name="Indicação de Trabalho Infantil")
+    info_extrema_pobreza = models.BooleanField(default=False, verbose_name="Situação Extrema Pobreza")
+    info_renda_cidada = models.BooleanField(default=False, verbose_name="Recebe Renda Cidadã")
+    info_insuficiencia_alimentar = models.BooleanField(default=False, verbose_name="Insuficiência Alimentar na Família")
+    info_bolsa_familia = models.BooleanField(default=False, verbose_name="Beneficiário Bolsa Família")
+    info_bpc = models.BooleanField(default=False, verbose_name="Membros Beneficiários BPC")
+    info_acao_jovem = models.BooleanField(default=False, verbose_name="Recebe Ação Jovem")
 
     observacoes = models.TextField(null=True, blank=True, verbose_name="Observações")
     ativo = models.BooleanField(default=True, verbose_name="Ativo")
