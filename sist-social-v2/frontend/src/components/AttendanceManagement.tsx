@@ -1,102 +1,26 @@
 import { useState, useEffect } from 'react';
 import SearchableSelect from './SearchableSelect';
+import AttendanceTable from './attendance/AttendanceTable';
+import AttendanceActionsDrawer from './attendance/AttendanceActionsDrawer';
+import InternalReferralModal from './attendance/InternalReferralModal';
 import { 
   Users, 
   PlusCircle, 
-  Edit3, 
-  Trash2, 
-  Search, 
   FileText,
-  UserCheck,
-  Building
 } from 'lucide-react';
 
-interface TabelaBasicaItem {
-  id: number;
-  nome: string;
-}
-
-interface Pessoa {
-  id: number;
-  nome: string;
-  cpf: string;
-  nome_social?: string;
-  nis?: string;
-  familia_details?: {
-    id: number;
-    familia_codigo?: string;
-  };
-  prontuario?: string;
-}
-
-interface Atendimento {
-  id: number;
-  codigo_atendimento?: string;
-  origem_atendimento?: number;
-  modalidade: 'Simplificado' | 'Tecnico' | 'Encaminhamento Interno' | 'Referencia' | 'ContraReferencia';
-  status: 'Aberto' | 'Finalizado' | 'Encaminhado' | 'Encaminhamento Tecnico' | 'Encaminhamento Interno';
-  data_atendimento: string;
-  descricao_sumaria_atendimento: string;
-  descricao_atendimento_tecnico?: string;
-  pessoa: number;
-  pessoa_details?: {
-    id: number;
-    nome: string;
-    cpf: string;
-  };
-  familia?: number;
-  familia_details?: {
-    id: number;
-    familia_codigo?: string;
-  };
-  prontuario?: string;
-  unidade_atendimento_social?: number;
-  unidade_details?: {
-    id: number;
-    nome_conhecido: string;
-  };
-  tecnico_responsavel_inicial?: number;
-  tecnico_responsavel_inicial_details?: {
-    id: number;
-    username: string;
-    first_name?: string;
-    last_name?: string;
-  };
-  tecnico_responsavel_tecnico?: number;
-  tecnico_responsavel_tecnico_details?: {
-    id: number;
-    username: string;
-    first_name?: string;
-    last_name?: string;
-  };
-  motivo_atendimento?: number;
-  motivo_atendimento_details?: {
-    id: number;
-    nome: string;
-  };
-  tipo_atendimento?: number;
-  tipo_atendimento_details?: {
-    id: number;
-    nome: string;
-  };
-  observacoes?: string;
-  informacoes?: string;
-}
-
-interface AttendanceManagementProps {
-  userPermissions?: string[];
-  triggerNovo?: boolean;
-  unidadeId?: string;
-  currentUser?: {
-    username: string;
-    first_name?: string;
-    last_name?: string;
-    groups?: string[];
-  };
-}
+import type {
+  Atendimento,
+  AttendanceManagementProps,
+  ModalidadeAtendimento,
+  Pessoa,
+  Profissional,
+  TabelaBasicaItem,
+  UnidadeResumo
+} from './attendance/AttendanceManagementTypes';
 
 export default function AttendanceManagement({ 
-  userPermissions = [], 
+
   triggerNovo = false, 
   unidadeId: activeUnidadeId = '',
   currentUser
@@ -114,7 +38,7 @@ export default function AttendanceManagement({
   // Apoio para filtros baseados em modalidade e pesquisa na V1
   const [motivosAtendimentos, setMotivosAtendimentos] = useState<TabelaBasicaItem[]>([]);
   const [tiposAtendimentos, setTiposAtendimentos] = useState<TabelaBasicaItem[]>([]);
-  const [unidades, setUnidades] = useState<any[]>([]);
+  const [unidades, setUnidades] = useState<UnidadeResumo[]>([]);
   
   const [familias, setFamilias] = useState<any[]>([]);
   const [carregando, setCarregando] = useState(true);
@@ -132,7 +56,7 @@ export default function AttendanceManagement({
   const [termoBuscaMunicipe, setTermoBuscaMunicipe] = useState('');
 
   // Form Fields - Atendimento
-  const [modalidade, setModalidade] = useState<'Simplificado' | 'Tecnico' | 'Encaminhamento Interno' | 'Referencia' | 'ContraReferencia'>('Simplificado');
+  const [modalidade, setModalidade] = useState<ModalidadeAtendimento>('Simplificado');
   const [status, setStatus] = useState<any>('Aberto');
   
   // Controle de Ações / Success Overlay
@@ -167,7 +91,7 @@ export default function AttendanceManagement({
   
   // Controle de validação específica por campo
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [profissionais, setProfissionais] = useState<any[]>([]);
+  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [modalEncaminhamentoAberto, setModalEncaminhamentoAberto] = useState(false);
   const [motivoEncaminhamento, setMotivoEncaminhamento] = useState('');
   const [dataEncaminhamento, setDataEncaminhamento] = useState(() => new Date().toISOString().split('T')[0]);
@@ -178,10 +102,6 @@ export default function AttendanceManagement({
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
   const token = localStorage.getItem('token');
   
-  const podeVerTecnico = userPermissions.includes('core.visualizar_atendimento_tecnico') || 
-                         userPermissions.includes('visualizar_atendimento_tecnico') || 
-                         true;
-
   const carregarDados = async () => {
     setCarregando(true);
     try {
@@ -602,20 +522,6 @@ export default function AttendanceManagement({
     (p.cpf && p.cpf.includes(termoBuscaMunicipe))
   );
 
-  const rotuloProfissional = (profissional: any) => {
-    const nome = [profissional.first_name, profissional.last_name].filter(Boolean).join(' ') || profissional.username;
-    const nomesUnidades = (profissional.perfil?.unidades || [])
-      .map((unidadeId: number) => unidades.find(u => u.id === unidadeId)?.nome_conhecido)
-      .filter(Boolean);
-    return `${nome} — ${nomesUnidades.join(', ') || 'Sem unidade vinculada'}`;
-  };
-
-  const profissionalEncaminhamento = profissionais.find(p => p.id.toString() === profissionalEncaminhamentoId);
-  const unidadesDoProfissional = (profissionalEncaminhamento?.perfil?.unidades || [])
-    .map((unidadeId: number) => unidades.find(u => u.id === unidadeId)?.nome_conhecido)
-    .filter(Boolean);
-  const unidadeProfissionalLabel = unidadesDoProfissional.join(', ') || 'Sem unidade de trabalho vinculada';
-  const pessoaAtendimento = pessoas.find(p => p.id.toString() === pessoaId);
 
   return (
     <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100%' }}>
@@ -659,68 +565,12 @@ export default function AttendanceManagement({
         </select>
       </div>
 
-      {/* Tabela de Atendimentos */}
-      {carregando ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Carregando atendimentos...</div>
-      ) : atendimentos.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#ffffff', borderRadius: '12px', color: '#64748b' }}>
-          Nenhum registro de atendimento encontrado.
-        </div>
-      ) : (
-        <div className="table-responsive" style={{ backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-          <table className="dashboard-table">
-            <thead>
-              <tr style={{ backgroundColor: '#f1f5f9' }}>
-                <th style={{ padding: '14px 16px' }}>Data</th>
-                <th style={{ minWidth: '220px' }}>Munícipe Atendido</th>
-                <th>Número do Prontuário</th>
-                <th>Tipo de Atendimento</th>
-                <th>Modalidade</th>
-                <th>Técnico</th>
-                <th>Status</th>
-                <th style={{ width: '100px', textAlign: 'center' }}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {atendimentos.map(a => {
-                if (a.modalidade === 'Tecnico' && !podeVerTecnico) return null;
-
-                const tecnico = a.tecnico_responsavel_tecnico_details
-                  || a.tecnico_responsavel_inicial_details;
-                const nomeTecnico = tecnico
-                  ? [tecnico.first_name, tecnico.last_name].filter(Boolean).join(' ') || tecnico.username
-                  : '-';
-
-                return (
-                  <tr key={a.id}>
-                    <td style={{ padding: '14px 16px' }}>
-                      {new Date(`${a.data_atendimento}T00:00:00`).toLocaleDateString('pt-BR')}
-                    </td>
-                    <td style={{ minWidth: '220px' }}>
-                      <div style={{ fontWeight: 600, color: '#0f172a' }}>{a.pessoa_details?.nome || 'Munícipe não identificado'}</div>
-                    </td>
-                    <td>{a.prontuario || '-'}</td>
-                    <td>{a.tipo_atendimento_details?.nome || 'Geral'}</td>
-                    <td>{a.origem_atendimento ? 'Encaminhamento Interno' : a.modalidade === 'Tecnico' ? 'Técnico' : a.modalidade === 'Referencia' ? 'Referência' : a.modalidade === 'ContraReferencia' ? 'Contrarreferência' : a.modalidade}</td>
-                    <td>{nomeTecnico}</td>
-                    <td><span style={{ fontWeight: 600 }}>{a.status}</span></td>
-                    <td>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                        <button onClick={() => abrirEditarModal(a)} style={{ border: 'none', backgroundColor: '#f1f5f9', color: '#475569', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}>
-                          <Edit3 size={16} />
-                        </button>
-                        <button onClick={() => deletarAtendimento(a.id)} style={{ border: 'none', backgroundColor: '#fee2e2', color: '#ef4444', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}>
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <AttendanceTable
+        atendimentos={atendimentos}
+        carregando={carregando}
+        onEdit={abrirEditarModal}
+        onDelete={deletarAtendimento}
+      />
 
       {/* MODAL PRINCIPAL REGISTRO DE ATENDIMENTO */}
       {modalAberto && (
@@ -1059,155 +909,37 @@ export default function AttendanceManagement({
             </form>
           </div>
 
-            {/* Bloco da Direita: Gaveta Lateral de Ações (Slide-out) */}
             {showAcoesOverlay && (
-              <div style={{ 
-                backgroundColor: '#f8fafc', 
-                borderLeft: '1px solid #e2e8f0', 
-                padding: '24px', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: '16px', 
-                animation: 'slideRight 0.3s ease-out' 
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-                  <h3 style={{ margin: 0, color: '#334155', fontSize: '18px', fontWeight: 700 }}>Ações</h3>
-                  <button onClick={() => setShowAcoesOverlay(false)} style={{ background: 'none', border: 'none', fontSize: '1.25rem', color: '#94a3b8', cursor: 'pointer' }}>&times;</button>
-                </div>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
-                  <button 
-                    type="button"
-                    onClick={encerrarAtendimento}
-                    style={{ width: '100%', padding: '12px', backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    ✖ Encerrar Atendimento
-                  </button>
-
-                  <button 
-                    onClick={() => {
-                      window.open(`${API_URL}/api/atendimentos_sociais/${lastCreatedId}/pdf/`, '_blank');
-                    }} 
-                    style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    🖨 Ver Impressão
-                  </button>
-
-                  <button 
-                    type="button"
-                    onClick={abrirEncaminhamentoInterno}
-                    style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    ⇄ Encaminhamento Interno
-                  </button>
-
-                  <button 
-                    onClick={() => {
-                      alert('Funcionalidade de agendamento em desenvolvimento.');
-                    }} 
-                    style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    📅 Agendamento
-                  </button>
-
-                  <button 
-                    onClick={() => {
-                      alert('Funcionalidade de visualização de agenda em desenvolvimento.');
-                    }} 
-                    style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    📅 Visualizar Agenda
-                  </button>
-
-                  <button 
-                    onClick={() => {
-                      alert('Funcionalidade de upload de documentos em desenvolvimento.');
-                    }} 
-                    style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  >
-                    ☁ Upload Documentos
-                  </button>
-                </div>
-              </div>
+              <AttendanceActionsDrawer
+                atendimentoId={lastCreatedId || editandoId}
+                apiUrl={API_URL}
+                onClose={() => setShowAcoesOverlay(false)}
+                onFinish={encerrarAtendimento}
+                onInternalReferral={abrirEncaminhamentoInterno}
+              />
             )}
           </div>
         </div>
       )}
 
-      {modalEncaminhamentoAberto && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.65)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2100, padding: '20px', boxSizing: 'border-box' }}>
-          <div style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '820px', maxHeight: 'calc(100vh - 40px)', borderRadius: '14px', boxShadow: '0 20px 50px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ padding: '18px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#334155' }}>Encaminhamento Interno</h3>
-              <button type="button" onClick={() => setModalEncaminhamentoAberto(false)} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#64748b' }}>&times;</button>
-            </div>
-
-            <form onSubmit={salvarEncaminhamentoInterno} style={{ overflowY: 'auto', padding: '22px 26px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {erroEncaminhamento && (
-                <div style={{ padding: '10px 12px', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '8px', fontSize: '13px' }}>{erroEncaminhamento}</div>
-              )}
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Família</label>
-                  <input className="form-control" value={familiaLabel || 'Sem vínculo'} readOnly style={{ backgroundColor: '#f1f5f9' }} />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Prontuário</label>
-                  <input className="form-control" value={prontuarioLabel || 'Nenhum'} readOnly style={{ backgroundColor: '#f1f5f9' }} />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Pessoa</label>
-                <input className="form-control" value={pessoaAtendimento?.nome || 'Munícipe não identificado'} readOnly style={{ backgroundColor: '#f1f5f9' }} />
-              </div>
-
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Motivo do Encaminhamento *</label>
-                <textarea className="form-control" rows={4} value={motivoEncaminhamento} onChange={e => setMotivoEncaminhamento(e.target.value)} required />
-                <div style={{ fontSize: '11px', marginTop: '4px', color: motivoEncaminhamento.trim().length >= 21 ? '#059669' : '#64748b' }}>
-                  {motivoEncaminhamento.trim().length >= 21 ? 'Quantidade mínima atendida.' : `Insira no mínimo ${21 - motivoEncaminhamento.trim().length} caracteres.`}
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '16px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Data *</label>
-                  <input type="date" className="form-control" value={dataEncaminhamento} onChange={e => setDataEncaminhamento(e.target.value)} required />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Profissional de destino *</label>
-                  <select className="form-control" value={profissionalEncaminhamentoId} onChange={e => setProfissionalEncaminhamentoId(e.target.value)} required>
-                    <option value="">Selecione o técnico e sua unidade</option>
-                    {profissionais.map(profissional => (
-                      <option key={profissional.id} value={profissional.id}>{rotuloProfissional(profissional)}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {profissionalEncaminhamento && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', padding: '12px', borderRadius: '8px', backgroundColor: '#eff6ff' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569' }}>Técnico selecionado</label>
-                    <div style={{ fontWeight: 600, color: '#1e3a8a' }}>{[profissionalEncaminhamento.first_name, profissionalEncaminhamento.last_name].filter(Boolean).join(' ') || profissionalEncaminhamento.username}</div>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569' }}>Unidade de trabalho</label>
-                    <div style={{ fontWeight: 600, color: '#1e3a8a' }}>{unidadeProfissionalLabel}</div>
-                  </div>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingTop: '14px', borderTop: '1px solid #e2e8f0' }}>
-                <button type="button" onClick={() => setModalEncaminhamentoAberto(false)} style={{ padding: '9px 16px', border: '1px solid #cbd5e1', borderRadius: '7px', backgroundColor: '#ffffff', cursor: 'pointer' }}>Voltar</button>
-                <button type="submit" disabled={salvandoEncaminhamento} className="btn-primary-action">{salvandoEncaminhamento ? 'Encaminhando...' : 'Encaminhar'}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <InternalReferralModal
+        open={modalEncaminhamentoAberto}
+        familyLabel={familiaLabel}
+        recordLabel={prontuarioLabel}
+        person={pessoas.find(pessoa => pessoa.id.toString() === pessoaId)}
+        reason={motivoEncaminhamento}
+        date={dataEncaminhamento}
+        professionalId={profissionalEncaminhamentoId}
+        professionals={profissionais}
+        units={unidades}
+        error={erroEncaminhamento}
+        saving={salvandoEncaminhamento}
+        onReasonChange={setMotivoEncaminhamento}
+        onDateChange={setDataEncaminhamento}
+        onProfessionalChange={setProfissionalEncaminhamentoId}
+        onClose={() => setModalEncaminhamentoAberto(false)}
+        onSubmit={salvarEncaminhamentoInterno}
+      />
 
       {/* AVISO DE SUCESSO DO ATENDIMENTO REGISTRADO */}
       {showSuccessMessage && (

@@ -88,6 +88,18 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
   * Registros técnicos que possuem `origem_atendimento` são identificados e filtrados como Encaminhamento Interno.
   * Foi removida da consulta geral a restrição que ocultava registros técnicos sem a permissão detalhada; a página agora recebe todas as modalidades ativas.
 
+### 9. Refatoração do Frontend de Atendimentos
+* O componente `AttendanceManagement.tsx` passou a atuar como coordenador do estado, regras e chamadas à API.
+* Foram extraídos módulos TSX em `frontend/src/components/attendance/`:
+  * `AttendanceManagementTypes.tsx`: contratos de dados compartilhados pelo gerenciamento de atendimentos.
+  * `AttendanceTable.tsx`: estados de carregamento/vazio e renderização da listagem.
+  * `AttendanceActionsDrawer.tsx`: gaveta lateral e seus comandos.
+  * `InternalReferralModal.tsx`: apresentação e seleção de técnico/unidade no encaminhamento.
+* A primeira etapa reduziu o arquivo principal de 1.358 para aproximadamente 1.093 linhas sem alterar o fluxo funcional.
+* Todos os módulos extraídos seguem o padrão `.tsx` adotado no projeto.
+* O arquivo `AttendanceManagementTypes.tsx` recebeu esse nome por centralizar exclusivamente os contratos de dados do gerenciamento de atendimentos.
+* Próxima etapa sugerida: extrair o formulário principal e os modais de cadastro rápido de munícipe.
+
 ---
 
 ## 🗄️ Próximos Passos
