@@ -789,7 +789,7 @@ export default function PersonManagement() {
   };
 
   const deletarPessoa = async (id: number) => {
-    if (!window.confirm('Excluir logicamente esta pessoa?')) return;
+    if (!window.confirm('Excluir logicamente este munícipe?')) return;
     try {
       const res = await fetch(`${API_URL}/api/pessoas/${id}/`, {
         method: 'DELETE',
@@ -977,7 +977,7 @@ export default function PersonManagement() {
         }
       } else {
         const errorData = await res.json();
-        setErrorModalMsg(errorData.detail || 'Erro ao salvar pessoa.');
+        setErrorModalMsg(errorData.detail || 'Erro ao salvar munícipe.');
       }
     } catch (err) {
       setErrorModalMsg('Erro de conexão.');
@@ -991,13 +991,13 @@ export default function PersonManagement() {
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <User className="text-conecta" size={28} />
-            Cadastro de Pessoa (Munícipe)
+            Cadastro de Munícipe
           </h2>
           <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.875rem' }}>Cadastre e gerencie o perfil de cada munícipe atendido.</p>
         </div>
         <button onClick={abrirNovoModal} className="btn-primary-action">
           <PlusCircle size={18} />
-          Cadastrar Pessoa
+          Cadastrar Munícipe
         </button>
       </div>
 

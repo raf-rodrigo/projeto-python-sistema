@@ -85,7 +85,21 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
   * Após encaminhar, somente o modal secundário é fechado; o modal principal do atendimento permanece aberto exibindo o status `Encaminhado`.
   * Atendimentos simplificados, abertos e já gravados exibem no cabeçalho um controle alternável `Abrir Ações` / `Fechar Ações` para mostrar ou recolher a gaveta lateral.
   * A listagem geral reúne atendimentos simplificados, técnicos, encaminhamentos internos, referências e contrarreferências, com opções específicas no filtro de modalidade.
-  * Registros técnicos que possuem `origem_atendimento` são identificados e filtrados como Encaminhamento Interno.
+  * Registros técnicos que possuem `origem_atendimento` continuam vinculados ao fluxo de encaminhamento, mas sua modalidade permanece **Técnico**.
+  * Na tabela, o atendimento originado por encaminhamento é apresentado na modalidade **Técnico**; enquanto aguarda abertura possui somente a ação **Abrir atendimento**.
+  * O atendimento técnico criado por encaminhamento nasce com o status `Esperando para ser aberto`; a migration `0038` também adequou os registros derivados existentes que ainda estavam abertos.
+  * A ação do encaminhamento utiliza um ícone de livro fechado e abre o formulário técnico. Ao confirmar **Abrir Atendimento**, o registro muda para o status `Aberto`.
+  * Depois que o encaminhamento é aberto e passa ao status `Aberto`, sua linha deixa de usar o livro fechado e passa a exibir as ações padrão **Editar** e **Excluir**.
+  * Enquanto o atendimento técnico aguarda abertura, a lateral de ações não é exibida. Depois da abertura, a lateral passa a ser mostrada e pode ser aberta ou fechada pelo usuário.
+  * O modal de abertura contém Dados Pessoais, Dados do Atendimento, Informações do Atendimento Inicial somente para leitura e Informações do Atendimento Técnico editáveis, incluindo os responsáveis e suas funções.
+  * Nos cadastros iniciais Simplificado e Técnico, o comando inicial foi nomeado **Abrir Atendimento**; após a criação, os salvamentos seguintes continuam como **Salvar Registro**.
+  * A identificação do rótulo inicial usa a ausência de `atendimentoSelecionado` como fonte de verdade, evitando que IDs residuais façam o botão exibir Salvar Registro em um novo cadastro.
+  * O atendimento Técnico criado diretamente usa o mesmo layout técnico do encaminhamento. O bloco Informações do Atendimento Inicial permanece visível e informa que não há atendimento inicial.
+  * O componente `ReferralInitialInformation.tsx` concentra a apresentação dos dados herdados do atendimento de origem.
+  * A gaveta de ações fica disponível nos atendimentos **Simplificados** não finalizados e em todos os atendimentos **Técnicos** depois que são abertos.
+  * Para atendimentos técnicos abertos, com ou sem atendimento inicial, a gaveta usa a variante técnica do legado: Encerrar Atendimento, Ver Impressão, Abrir Prontuário, Reencaminhamento Interno, Encaminhamento Referência, Contra Referência, Upload Documentos e Associação Grupos. A abertura do prontuário navega para o cadastro do munícipe; ações ainda sem endpoint permanecem sinalizadas como em desenvolvimento.
+  * As notificações de sucesso são ocultadas automaticamente após 2 segundos e não exigem fechamento manual pelo usuário.
+  * No frontend, a nomenclatura visível foi padronizada para **Munícipe/Munícipes** em substituição a Pessoa/Pessoas/Cidadão; nomes técnicos internos, rotas e contratos com o backend foram preservados.
   * Foi removida da consulta geral a restrição que ocultava registros técnicos sem a permissão detalhada; a página agora recebe todas as modalidades ativas.
 
 ### 9. Refatoração do Frontend de Atendimentos
@@ -99,6 +113,23 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
 * Todos os módulos extraídos seguem o padrão `.tsx` adotado no projeto.
 * O arquivo `AttendanceManagementTypes.tsx` recebeu esse nome por centralizar exclusivamente os contratos de dados do gerenciamento de atendimentos.
 * Próxima etapa sugerida: extrair o formulário principal e os modais de cadastro rápido de munícipe.
+
+### 10. Impressão de Atendimentos
+* Foi criado o endpoint autenticado `GET /api/atendimentos_sociais/{id}/impressao/` no `AtendimentoViewSet`, com renderização do template `core/templates/atendimentos/impressao_atendimento.html`.
+* O botão Ver Impressão passou a buscar o HTML com Token e abrir a pré-visualização em nova aba.
+* O relatório recebeu layout A4 moderno, cabeçalho institucional inspirado no legado, logotipo incorporado em Base64, dados do munícipe, atendimento, informações inicial/técnica, responsáveis, funções e data de emissão.
+* O template foi validado com um registro real: sem tags Django literais, com logotipo e dados renderizados.
+
+### 11. Checkpoint do Fluxo de Atendimentos — 21/08/2026
+* A listagem diferencia atendimentos Simplificados e Técnicos pela modalidade real do registro.
+* Encaminhamentos internos criam um atendimento de modalidade Técnico, vinculado por `origem_atendimento`, inicialmente com status `Esperando para ser aberto`.
+* Enquanto aguarda abertura, o atendimento Técnico apresenta livro fechado e somente a ação Abrir Atendimento; depois passa para `Aberto` e apresenta Editar e Excluir.
+* Atendimentos Simplificados e Técnicos são iniciados pelo comando Abrir Atendimento; alterações posteriores usam Salvar Registro.
+* O Técnico direto e o Técnico originado por encaminhamento compartilham o mesmo layout. Sem origem, a seção inicial informa que não existe atendimento inicial; com origem, apresenta os dados herdados somente para leitura.
+* Após a abertura, atendimentos Técnicos utilizam a gaveta técnica de ações; Simplificados continuam usando sua gaveta própria.
+* Mensagens de sucesso desaparecem automaticamente após 2 segundos.
+* A terminologia visível no frontend está padronizada como Munícipe/Munícipes, preservando contratos técnicos com o backend.
+* O permissionamento detalhado permanece adiado para uma etapa posterior.
 
 ---
 

@@ -1,5 +1,7 @@
+import base64
 import re
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.db.models import Q
 from django.db import transaction
 from rest_framework import filters, status, viewsets
@@ -8,6 +10,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from core.models.atendimento import AtendimentoSocial
 from core.serializers.atendimento_serializers import AtendimentoSocialSerializer
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.utils import timezone
 
 class AtendimentoViewSet(viewsets.ModelViewSet):
     serializer_class = AtendimentoSocialSerializer
@@ -98,7 +103,7 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
             novo_atendimento = AtendimentoSocial.objects.create(
                 origem_atendimento=origem,
                 modalidade='Tecnico',
-                status='Aberto',
+                status='Esperando para ser aberto',
                 pessoa=origem.pessoa,
                 familia=origem.familia,
                 prontuario=origem.prontuario,
@@ -121,6 +126,36 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
             AtendimentoSocialSerializer(novo_atendimento).data,
             status=status.HTTP_201_CREATED,
         )
+
+    @action(detail=True, methods=['get'], url_path='impressao')
+    def impressao(self, request, pk=None):
+        atendimento = self.get_object()
+        logo_path = settings.BASE_DIR / 'core' / 'static' / 'core' / 'img' / 'logo_relatorio.jpg'
+        logo_data_uri = ''
+        if logo_path.exists():
+            logo_base64 = base64.b64encode(logo_path.read_bytes()).decode('ascii')
+            logo_data_uri = f'data:image/jpeg;base64,{logo_base64}'
+
+        html = render_to_string(
+            'atendimentos/impressao_atendimento.html',
+            {
+                'atendimento': atendimento,
+                'data_emissao': timezone.localtime(),
+                'logo_data_uri': logo_data_uri,
+            },
+            request = request,
+        )
+
+        response = HttpResponse(
+            html,
+            content_type='text/html; charset=utf-8',
+        )
+
+        response['Content-Disposition'] = (
+            f'inline; filename="atendimento_{atendimento.id}.html"'
+        )
+
+        return response
 
     def perform_destroy(self, instance):
         instance.ativo = False

@@ -53,7 +53,7 @@ export default function InternalReferralModal(props: InternalReferralModalProps)
             <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Prontuário</label><input className="form-control" value={props.recordLabel || 'Nenhum'} readOnly style={{ backgroundColor: '#f1f5f9' }} /></div>
           </div>
 
-          <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Pessoa</label><input className="form-control" value={props.person?.nome || 'Munícipe não identificado'} readOnly style={{ backgroundColor: '#f1f5f9' }} /></div>
+          <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Munícipe</label><input className="form-control" value={props.person?.nome || 'Munícipe não identificado'} readOnly style={{ backgroundColor: '#f1f5f9' }} /></div>
 
           <div>
             <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Motivo do Encaminhamento *</label>

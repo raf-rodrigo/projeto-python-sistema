@@ -1,4 +1,4 @@
-import { Edit3, Trash2 } from 'lucide-react';
+import { Book, Edit3, Trash2 } from 'lucide-react';
 import type { Atendimento } from './AttendanceManagementTypes';
 
 interface AttendanceTableProps {
@@ -9,7 +9,6 @@ interface AttendanceTableProps {
 }
 
 function modalidadeLabel(atendimento: Atendimento) {
-  if (atendimento.origem_atendimento) return 'Encaminhamento Interno';
   if (atendimento.modalidade === 'Tecnico') return 'Técnico';
   if (atendimento.modalidade === 'Referencia') return 'Referência';
   if (atendimento.modalidade === 'ContraReferencia') return 'Contrarreferência';
@@ -50,6 +49,8 @@ export default function AttendanceTable({ atendimentos, carregando, onEdit, onDe
             const nomeTecnico = tecnico
               ? [tecnico.first_name, tecnico.last_name].filter(Boolean).join(' ') || tecnico.username
               : '-';
+            const isEncaminhamento = Boolean(atendimento.origem_atendimento);
+            const isEncaminhamentoPendente = isEncaminhamento && atendimento.status === 'Esperando para ser aberto';
 
             return (
               <tr key={atendimento.id}>
@@ -64,8 +65,18 @@ export default function AttendanceTable({ atendimentos, carregando, onEdit, onDe
                 <td><span style={{ fontWeight: 600 }}>{atendimento.status}</span></td>
                 <td>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                    <button onClick={() => onEdit(atendimento)} style={{ border: 'none', backgroundColor: '#f1f5f9', color: '#475569', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}><Edit3 size={16} /></button>
-                    <button onClick={() => onDelete(atendimento.id)} style={{ border: 'none', backgroundColor: '#fee2e2', color: '#ef4444', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                    <button
+                      type="button"
+                      title={isEncaminhamentoPendente ? 'Abrir atendimento' : 'Editar atendimento'}
+                      aria-label={isEncaminhamentoPendente ? 'Abrir atendimento' : 'Editar atendimento'}
+                      onClick={() => onEdit(atendimento)}
+                      style={{ border: 'none', backgroundColor: '#f1f5f9', color: '#475569', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}
+                    >
+                      {isEncaminhamentoPendente ? <Book size={16} /> : <Edit3 size={16} />}
+                    </button>
+                    {!isEncaminhamentoPendente && (
+                      <button type="button" title="Excluir atendimento" aria-label="Excluir atendimento" onClick={() => onDelete(atendimento.id)} style={{ border: 'none', backgroundColor: '#fee2e2', color: '#ef4444', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                    )}
                   </div>
                 </td>
               </tr>

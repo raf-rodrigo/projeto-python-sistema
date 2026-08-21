@@ -3,6 +3,7 @@ import SearchableSelect from './SearchableSelect';
 import AttendanceTable from './attendance/AttendanceTable';
 import AttendanceActionsDrawer from './attendance/AttendanceActionsDrawer';
 import InternalReferralModal from './attendance/InternalReferralModal';
+import ReferralInitialInformation from './attendance/ReferralInitialInformation';
 import { 
   Users, 
   PlusCircle, 
@@ -50,6 +51,7 @@ export default function AttendanceManagement({
   const [modalDecisaoAberto, setModalDecisaoAberto] = useState(false);
   const [modalNovaPessoaAberto, setModalNovaPessoaAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [atendimentoSelecionado, setAtendimentoSelecionado] = useState<Atendimento | null>(null);
   const [errorPessoaMsg, setErrorPessoaMsg] = useState<string | null>(null);
 
   // Filtro de Munícipe no Select (Searchable)
@@ -61,8 +63,20 @@ export default function AttendanceManagement({
   
   // Controle de Ações / Success Overlay
   const [showAcoesOverlay, setShowAcoesOverlay] = useState(false);
+  const atendimentoPermiteAcoes = status !== 'Finalizado' && status !== 'Esperando para ser aberto' && (modalidade === 'Simplificado' || modalidade === 'Tecnico');
+  const exibirAcoesOverlay = showAcoesOverlay && atendimentoPermiteAcoes;
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [lastCreatedId, setLastCreatedId] = useState<number | null>(null);
+  useEffect(() => {
+    if (!showSuccessMessage) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setShowSuccessMessage(false);
+    }, 2000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showSuccessMessage]);
+
   const [dataAtendimento, setDataAtendimento] = useState(() => new Date().toISOString().split('T')[0]);
   const [pessoaId, setPessoaId] = useState('');
   
@@ -218,6 +232,7 @@ export default function AttendanceManagement({
   }, [pessoaId, pessoas]);
 
   const abrirNovoModal = () => {
+    setAtendimentoSelecionado(null);
     setEditandoId(null);
     setModalidade('Simplificado');
     setStatus('Aberto');
@@ -238,9 +253,10 @@ export default function AttendanceManagement({
   };
 
   const abrirEditarModal = (a: Atendimento) => {
+    setAtendimentoSelecionado(a);
     setEditandoId(a.id);
     setLastCreatedId(a.id);
-    setShowAcoesOverlay(a.status === 'Aberto');
+    setShowAcoesOverlay(a.status !== 'Finalizado' && a.status !== 'Esperando para ser aberto' && (a.modalidade === 'Simplificado' || a.modalidade === 'Tecnico'));
     setModalidade(a.modalidade);
     setStatus(a.status);
     setDataAtendimento(a.data_atendimento);
@@ -315,9 +331,13 @@ export default function AttendanceManagement({
 
     setValidationErrors({});
 
+    const statusParaSalvar = atendimentoSelecionado?.origem_atendimento && status === 'Esperando para ser aberto'
+      ? 'Aberto'
+      : status;
+
     const payload = {
       modalidade,
-      status,
+      status: statusParaSalvar,
       data_atendimento: dataAtendimento,
       pessoa: parseInt(pessoaId),
       unidade_atendimento_social: unidadeId ? parseInt(unidadeId) : null,
@@ -344,8 +364,10 @@ export default function AttendanceManagement({
         const novoAtendimento = await res.json();
         setLastCreatedId(novoAtendimento.id);
         setEditandoId(novoAtendimento.id);
+        setAtendimentoSelecionado(novoAtendimento);
+        setStatus(novoAtendimento.status);
         setShowSuccessMessage(true);
-        setShowAcoesOverlay(true);
+        setShowAcoesOverlay(novoAtendimento.status !== 'Finalizado' && novoAtendimento.status !== 'Esperando para ser aberto' && (novoAtendimento.modalidade === 'Simplificado' || novoAtendimento.modalidade === 'Tecnico'));
         carregarDados();
       } else {
         const errJson = await res.json();
@@ -406,7 +428,7 @@ export default function AttendanceManagement({
 
       setStatus('Encaminhado');
       setModalEncaminhamentoAberto(false);
-      setShowAcoesOverlay(false);
+      setShowAcoesOverlay(true);
       setShowSuccessMessage(true);
       carregarDados();
     } catch (err) {
@@ -442,6 +464,66 @@ export default function AttendanceManagement({
       carregarDados();
     } catch (err) {
       alert('Erro de conexão ao encerrar o atendimento.');
+    }
+  };
+
+  const abrirImpressao = async () => {
+    const atendimentoId = editandoId || lastCreatedId;
+
+    if (!atendimentoId) {
+      alert('Não foi possível identificar o atendimento.');
+      return;
+    }
+
+    // Deve ser aberta durante o clique para não ser bloqueada pelo navegador.
+    const janelaImpressao = window.open('', '_blank');
+
+    if (!janelaImpressao) {
+      alert('O navegador bloqueou a abertura da impressão.');
+      return;
+    }
+
+    janelaImpressao.document.write(`
+      <!DOCTYPE html>
+      <html lang="pt-BR">
+        <head>
+          <title>Carregando impressão...</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; padding: 30px;">
+          Carregando documento...
+        </body>
+      </html>
+    `);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/atendimentos_sociais/${atendimentoId}/impressao/`,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro HTTP ${response.status}`);
+      }
+
+      const html = await response.text();
+      const arquivoHtml = new Blob([html], {
+        type: 'text/html;charset=utf-8',
+      });
+
+      const enderecoTemporario = URL.createObjectURL(arquivoHtml);
+      janelaImpressao.location.href = enderecoTemporario;
+
+      window.setTimeout(() => {
+        URL.revokeObjectURL(enderecoTemporario);
+      }, 60_000);
+    } catch (error) {
+      janelaImpressao.close();
+      console.log(error);
+      alert('Não foi possível carregar a impressão do atendimento.');
     }
   };
 
@@ -494,7 +576,7 @@ export default function AttendanceManagement({
         setNovaPessoaNascimento('');
       } else {
         const errJson = await res.json();
-        setErrorPessoaMsg(errJson.detail || 'Erro ao cadastrar cidadão rápido. Verifique os dados (ex: CPF único).');
+        setErrorPessoaMsg(errJson.detail || 'Erro ao cadastrar munícipe. Verifique os dados (ex: CPF único).');
       }
     } catch (err) {
       setErrorPessoaMsg('Erro de conexão com o servidor.');
@@ -578,24 +660,24 @@ export default function AttendanceManagement({
           <div style={{ 
             backgroundColor: '#ffffff', 
             width: '100%', 
-            maxWidth: showAcoesOverlay ? '1180px' : '850px', 
+            maxWidth: exibirAcoesOverlay ? '1180px' : '850px',
             borderRadius: '16px', 
             display: 'grid', 
-            gridTemplateColumns: showAcoesOverlay ? '1fr 300px' : '1fr',
+            gridTemplateColumns: exibirAcoesOverlay ? '1fr 300px' : '1fr',
             height: 'calc(100vh - 40px)',
             transition: 'max-width 0.3s ease-in-out',
             overflow: 'hidden'
           }}>
             
             {/* Bloco da Esquerda: Formulário de Registro */}
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', borderRight: showAcoesOverlay ? '1px solid #e2e8f0' : 'none' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden', borderRight: exibirAcoesOverlay ? '1px solid #e2e8f0' : 'none' }}>
               {/* Header */}
               <div style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0f172a' }}>
-                  {editandoId ? `Editar Atendimento ${lastCreatedId ? `Nº ${lastCreatedId}` : ''}` : `Registrar Novo Atendimento - Registro ${lastCreatedId ? `Nº ${lastCreatedId}` : ''}`}
+                  {atendimentoSelecionado?.origem_atendimento && status === 'Esperando para ser aberto' ? `Abrir Atendimento Técnico Nº ${lastCreatedId || editandoId}` : editandoId ? `Editar Atendimento ${lastCreatedId ? `Nº ${lastCreatedId}` : ''}` : `Registrar Novo Atendimento - Registro ${lastCreatedId ? `Nº ${lastCreatedId}` : ''}`}
                 </h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {modalidade === 'Simplificado' && status === 'Aberto' && Boolean(editandoId || lastCreatedId) && (
+                  {atendimentoPermiteAcoes && Boolean(editandoId || lastCreatedId) && (
                     <button
                       type="button"
                       onClick={() => setShowAcoesOverlay(aberto => !aberto)}
@@ -620,13 +702,14 @@ export default function AttendanceManagement({
                 {/* Pessoa Atendida Searchable */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px', marginBottom: '14px' }}>
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoa Atendida (Pesquisar ou Selecionar) *</label>
+                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Munícipe Atendido (Pesquisar ou Selecionar) *</label>
                     <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
                       <input 
                         type="text" 
                         placeholder="🔍 Digite para buscar munícipe por Nome, Nome Social, NIS ou CPF..." 
                         className="form-control"
-                        value={termoBuscaMunicipe}
+                        value={atendimentoSelecionado?.origem_atendimento ? (atendimentoSelecionado.pessoa_details?.nome || termoBuscaMunicipe) : termoBuscaMunicipe}
+                        readOnly={Boolean(atendimentoSelecionado?.origem_atendimento)}
                         onChange={e => setTermoBuscaMunicipe(e.target.value)}
                         style={{ fontSize: '13px', padding: '8px', border: validationErrors.pessoa ? '1.5px solid #ef4444' : '1px solid #cbd5e1' }}
                       />
@@ -645,7 +728,7 @@ export default function AttendanceManagement({
                             }}
                             style={{ padding: '6px 12px', backgroundColor: '#d97706', border: 'none', borderRadius: '6px', color: '#fff', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
                           >
-                            Cadastrar nova pessoa
+                            Cadastrar novo munícipe
                           </button>
                         </div>
                       )}
@@ -654,6 +737,7 @@ export default function AttendanceManagement({
                         value={pessoaId} 
                         onChange={val => setPessoaId(val.toString())} 
                         placeholder="Selecione o munícipe na lista..." 
+                        disabled={Boolean(atendimentoSelecionado?.origem_atendimento)}
                         required 
                         isError={!!validationErrors.pessoa}
                       />
@@ -769,7 +853,7 @@ export default function AttendanceManagement({
                       </div>
                       <div>
                         <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Num. Atendimento</label>
-                        <input type="text" className="form-control" placeholder="Gerado automaticamente" disabled style={{ backgroundColor: '#e2e8f0', color: '#475569' }} />
+                        <input type="text" className="form-control" value={editandoId || lastCreatedId || ''} placeholder="Gerado automaticamente" disabled style={{ backgroundColor: '#e2e8f0', color: '#475569' }} />
                       </div>
                     </div>
 
@@ -847,6 +931,10 @@ export default function AttendanceManagement({
                 </div>
               )}
 
+              {modalidade === 'Tecnico' && (
+                <ReferralInitialInformation atendimento={atendimentoSelecionado} />
+              )}
+
               {/* CARD SANFONA: INFORMAÇÕES DO ATENDIMENTO TÉCNICO (Somente se modalidade === Tecnico) */}
               {modalidade === 'Tecnico' && (
                 <div style={{ border: validationErrors.descricaoTecnico ? '1.5px solid #ef4444' : '1px solid #cbd5e1', borderRadius: '12px', padding: '18px', backgroundColor: '#fdfbf7' }}>
@@ -876,7 +964,7 @@ export default function AttendanceManagement({
                       <input 
                         type="text" 
                         className="form-control" 
-                        value={currentUser ? ([currentUser.first_name, currentUser.last_name].filter(Boolean).join(' ') || currentUser.username || 'Operador') : 'Operador'}
+                        value={atendimentoSelecionado?.origem_atendimento ? ([atendimentoSelecionado.tecnico_responsavel_tecnico_details?.first_name, atendimentoSelecionado.tecnico_responsavel_tecnico_details?.last_name].filter(Boolean).join(' ') || atendimentoSelecionado.tecnico_responsavel_tecnico_details?.username || '-') : currentUser ? ([currentUser.first_name, currentUser.last_name].filter(Boolean).join(' ') || currentUser.username || 'Operador') : 'Operador'}
                         disabled 
                         style={{ backgroundColor: '#e2e8f0', color: '#475569' }} 
                       />
@@ -886,7 +974,7 @@ export default function AttendanceManagement({
                       <input 
                         type="text" 
                         className="form-control" 
-                        value={currentUser?.groups && currentUser.groups.length > 0 ? (currentUser.groups[0] || 'Operador') : 'Operador'}
+                        value={atendimentoSelecionado?.origem_atendimento ? (atendimentoSelecionado.funcao_tecnico_responsavel_tecnico || '-') : currentUser?.groups && currentUser.groups.length > 0 ? (currentUser.groups[0] || 'Operador') : 'Operador'}
                         disabled 
                         style={{ backgroundColor: '#e2e8f0', color: '#475569' }} 
                       />
@@ -900,19 +988,25 @@ export default function AttendanceManagement({
                 <button type="button" onClick={() => setModalAberto(false)} style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: 'none', borderRadius: '8px', color: '#475569', fontWeight: 600, cursor: 'pointer' }}>
                   Cancelar
                 </button>
-                {status === 'Aberto' && (
+                {(status === 'Aberto' || (Boolean(atendimentoSelecionado?.origem_atendimento) && status === 'Esperando para ser aberto')) && (
                   <button type="submit" className="btn-primary-action">
-                    Salvar Registro
+                    {!atendimentoSelecionado || status === 'Esperando para ser aberto' ? 'Abrir Atendimento' : 'Salvar Registro'}
                   </button>
                 )}
               </div>
             </form>
           </div>
 
-            {showAcoesOverlay && (
+            {exibirAcoesOverlay && (
               <AttendanceActionsDrawer
                 atendimentoId={lastCreatedId || editandoId}
-                apiUrl={API_URL}
+                onPrint={abrirImpressao}
+                technical={modalidade === 'Tecnico'}
+                onOpenRecord={() => {
+                  if (pessoaId) localStorage.setItem('editandoPessoaPendenteId', pessoaId);
+                  setModalAberto(false);
+                  window.location.hash = 'pessoas';
+                }}
                 onClose={() => setShowAcoesOverlay(false)}
                 onFinish={encerrarAtendimento}
                 onInternalReferral={abrirEncaminhamentoInterno}
@@ -949,7 +1043,6 @@ export default function AttendanceManagement({
               <div style={{ fontWeight: 700, fontSize: '14px' }}>Sucesso!</div>
               <div style={{ fontSize: '12px', marginTop: '2px', opacity: 0.9 }}>Atendimento registrado com sucesso no sistema.</div>
             </div>
-            <button onClick={() => setShowSuccessMessage(false)} style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '18px', cursor: 'pointer', marginLeft: '12px', fontWeight: 700 }}>&times;</button>
           </div>
         </div>
       )}
@@ -1037,7 +1130,7 @@ export default function AttendanceManagement({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h3 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, color: '#1e293b' }}>
-                Pessoa não Encontrada.<br />Deseja cadastrá-la?
+                Munícipe não encontrado.<br />Deseja cadastrá-lo?
               </h3>
               <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>
                 Aconselha-se rever critérios de Pesquisa<br />Antes de Prosseguir

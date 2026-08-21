@@ -84,7 +84,7 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
                 }} 
                 style={{ padding: '12px', backgroundColor: '#f97316', color: '#ffffff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
               >
-                🔍 Incluir Pessoa já cadastrada
+                🔍 Incluir Munícipe já cadastrado
               </button>
               <button 
                 type="button" 
@@ -99,7 +99,7 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
                 }} 
                 style={{ padding: '12px', backgroundColor: '#f97316', color: '#ffffff', border: 'none', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}
               >
-                👤 Cadastrar Nova Pessoa
+                👤 Cadastrar Novo Munícipe
               </button>
               <button 
                 type="button" 
@@ -119,7 +119,7 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
           <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '90%', maxWidth: '850px', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#334155' }}>
-                👤 Incluir Pessoa
+                👤 Incluir Munícipe
               </h3>
               <button onClick={() => setModalIncluirExistenteOnly(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
             </div>
@@ -163,7 +163,7 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
                   {pessoasFiltradas.length === 0 ? (
                     <tr>
                       <td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
-                        {buscaPessoasQuery.length < 2 ? 'Digite pelo menos 2 caracteres para pesquisar...' : 'Nenhuma pessoa encontrada.'}
+                        {buscaPessoasQuery.length < 2 ? 'Digite pelo menos 2 caracteres para pesquisar...' : 'Nenhum munícipe encontrado.'}
                       </td>
                     </tr>
                   ) : (
@@ -211,7 +211,7 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
                                       })
                                     });
                                     if (res.ok) {
-                                      alert('Pessoa vinculada com sucesso.');
+                                      alert('Munícipe vinculado com sucesso.');
                                       setModalIncluirExistenteOnly(false);
                                       const upRes = await fetch(`${API_URL}/api/familias_domicilios/${editandoId}/`, {
                                         headers: { 'Authorization': `Token ${token}` }
@@ -241,13 +241,13 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
         </div>
       )}
 
-      {/* 3. Modal Transferir Pessoa */}
+      {/* 3. Modal Transferir Munícipe */}
       {modalTransferirPessoa && pessoaSelecionadaPendente && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10001 }}>
           <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '90%', maxWidth: '650px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#334155' }}>
-                Transferir Pessoa
+                Transferir Munícipe
               </h3>
               <button onClick={() => setModalTransferirPessoaOnly(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#94a3b8' }}>&times;</button>
             </div>
@@ -347,7 +347,7 @@ export const FamilyDialogs: React.FC<FamilyDialogsProps> = ({
                       });
 
                       if (res.ok) {
-                        alert('Pessoa transferida de família com sucesso.');
+                        alert('Munícipe transferido de família com sucesso.');
                         setModalTransferirPessoaOnly(false);
                         
                         const upRes = await fetch(`${API_URL}/api/familias_domicilios/${editandoId}/`, {

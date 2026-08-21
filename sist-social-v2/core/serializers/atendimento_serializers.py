@@ -26,6 +26,14 @@ class AtendimentoSocialSerializer(serializers.ModelSerializer):
             return {
                 "id": obj.origem_atendimento.id,
                 "codigo_atendimento": obj.origem_atendimento.codigo_atendimento,
-                "data_atendimento": obj.origem_atendimento.data_atendimento
+                "data_atendimento": obj.origem_atendimento.data_atendimento,
+                "descricao_sumaria_atendimento": obj.origem_atendimento.descricao_sumaria_atendimento,
+                "observacoes": obj.origem_atendimento.observacoes,
+                "prontuario": obj.origem_atendimento.prontuario,
+                "unidade": UnidadeSerializer(obj.origem_atendimento.unidade_atendimento_social).data if obj.origem_atendimento.unidade_atendimento_social else None,
+                "motivo_atendimento": MotivoAtendimentoSerializer(obj.origem_atendimento.motivo_atendimento).data if obj.origem_atendimento.motivo_atendimento else None,
+                "tipo_atendimento": TiposAtendimentosSerializer(obj.origem_atendimento.tipo_atendimento).data if obj.origem_atendimento.tipo_atendimento else None,
+                "tecnico_responsavel": UserSerializer(obj.origem_atendimento.tecnico_responsavel_inicial).data if obj.origem_atendimento.tecnico_responsavel_inicial else None,
+                "funcao_tecnico_responsavel": obj.origem_atendimento.funcao_tecnico_responsavel_inicial
             }
         return None

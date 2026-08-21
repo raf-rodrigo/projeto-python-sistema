@@ -153,14 +153,14 @@ export const TabCondicoesHabitacionais: React.FC<TabCondicoesHabitacionaisProps>
             <input type="number" className="form-control" value={numeroDormitorios} onChange={e => setNumeroDormitorios(e.target.value)} placeholder="0" />
           </div>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Pessoas por Dormitório:</label>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Munícipes por Dormitório:</label>
             <input type="number" className="form-control" value={pessoasDormitorio} onChange={e => setPessoasDormitorio(e.target.value)} placeholder="0" />
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px' }}>
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Total Pessoas:</label>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Total de Munícipes:</label>
             <input type="number" className="form-control" value={totalPessoas} onChange={e => setTotalPessoas(e.target.value)} placeholder="0" />
           </div>
           <div>

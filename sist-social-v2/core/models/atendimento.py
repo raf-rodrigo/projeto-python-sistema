@@ -18,6 +18,7 @@ class AtendimentoSocial(models.Model):
         ('Aberto', 'Aberto'),
         ('Finalizado', 'Finalizado'),
         ('Encaminhado', 'Encaminhado'),
+        ('Esperando para ser aberto', 'Esperando para ser aberto'),
         ('Encaminhamento Tecnico', 'Encaminhamento Técnico'),
         ('Encaminhamento Interno', 'Encaminhamento Interno'),
     ]

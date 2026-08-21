@@ -645,7 +645,7 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>
-                {editandoId ? 'Editar Pessoa (Munícipe)' : 'Nova Pessoa (Munícipe)'}
+                {editandoId ? 'Editar Munícipe' : 'Novo Munícipe'}
               </h3>
               {editandoId && nome && (
                 <div style={{ fontSize: '13px', color: '#475569', display: 'flex', gap: '16px' }}>

@@ -14,7 +14,7 @@ export interface Pessoa {
 }
 
 export type ModalidadeAtendimento = 'Simplificado' | 'Tecnico' | 'Encaminhamento Interno' | 'Referencia' | 'ContraReferencia';
-export type StatusAtendimento = 'Aberto' | 'Finalizado' | 'Encaminhado' | 'Encaminhamento Tecnico' | 'Encaminhamento Interno';
+export type StatusAtendimento = 'Aberto' | 'Finalizado' | 'Encaminhado' | 'Esperando para ser aberto' | 'Encaminhamento Tecnico' | 'Encaminhamento Interno';
 
 export interface UsuarioResumo {
   id: number;
@@ -27,6 +27,19 @@ export interface Atendimento {
   id: number;
   codigo_atendimento?: string;
   origem_atendimento?: number;
+  origem_atendimento_details?: {
+    id: number;
+    codigo_atendimento?: string;
+    data_atendimento: string;
+    descricao_sumaria_atendimento?: string;
+    observacoes?: string;
+    prontuario?: string;
+    unidade?: { id: number; nome_conhecido: string };
+    motivo_atendimento?: TabelaBasicaItem;
+    tipo_atendimento?: TabelaBasicaItem;
+    tecnico_responsavel?: UsuarioResumo;
+    funcao_tecnico_responsavel?: string;
+  };
   modalidade: ModalidadeAtendimento;
   status: StatusAtendimento;
   data_atendimento: string;
@@ -43,6 +56,8 @@ export interface Atendimento {
   tecnico_responsavel_inicial_details?: UsuarioResumo;
   tecnico_responsavel_tecnico?: number;
   tecnico_responsavel_tecnico_details?: UsuarioResumo;
+  funcao_tecnico_responsavel_inicial?: string;
+  funcao_tecnico_responsavel_tecnico?: string;
   motivo_atendimento?: number;
   motivo_atendimento_details?: TabelaBasicaItem;
   tipo_atendimento?: number;
