@@ -17,13 +17,13 @@ class AtendimentoSocial(models.Model):
     STATUS_CHOICES = [
         ('Aberto', 'Aberto'),
         ('Finalizado', 'Finalizado'),
+        ('Encaminhado', 'Encaminhado'),
         ('Encaminhamento Tecnico', 'Encaminhamento Técnico'),
         ('Encaminhamento Interno', 'Encaminhamento Interno'),
     ]
 
     # Identificadores de controle e código legível
     codigo_atendimento = models.CharField(max_length=50, null=True, blank=True, verbose_name="Código do Atendimento")
-    numero_atendimento = models.CharField(max_length=50, null=True, blank=True, verbose_name="Número do Atendimento Técnico")
     
     # Auto-relacionamento para encadeamento
     origem_atendimento = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='atendimentos_derivados', verbose_name="Origem do Atendimento")

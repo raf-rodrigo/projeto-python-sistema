@@ -1,6 +1,6 @@
 # Resumo da Conversa de Desenvolvimento - SistSocial V2
 
-**Última Atualização:** 14 de Agosto de 2026
+**Última Atualização:** 21 de Agosto de 2026
 
 Este documento contém o histórico das alterações e decisões técnicas tomadas para que o projeto possa ser facilmente continuado em outro ambiente/computador.
 
@@ -62,11 +62,38 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
   * Exibição de campos adicionais (Procedimentos e Providências) dinamicamente caso selecionado o tipo de atendimento **Técnico**.
   * Integração do painel no [Dashboard.tsx](file:///home/rdoimo/Documentos/Projetos/sist_python/sist-social-v2/frontend/src/components/Dashboard.tsx) e associação direta aos botões de ações rápidas.
 
+### 8. Ajustes na Listagem e no Modal de Atendimentos
+* **Listagem:**
+  * A tabela passou a exibir as colunas Data, Munícipe Atendido, Número do Prontuário, Tipo de Atendimento, Modalidade, Técnico, Status e Ações.
+  * Foram removidos da listagem o código interno `ATE_<id>`, CPF, relato inicial e unidade.
+  * A coluna Munícipe Atendido recebeu largura mínima de 220 px.
+  * O responsável técnico é exibido com fallback para o responsável inicial.
+* **Modal:**
+  * A altura e a rolagem interna foram corrigidas para que todo o formulário e seu rodapé permaneçam acessíveis.
+  * Campos de usuário e função foram estabilizados como strings para evitar o aviso do React sobre inputs controlados se tornando não controlados.
+  * Após o primeiro salvamento, o atendimento passa ao estado de edição, exibe o campo ID do Atendimento e bloqueia a alteração da modalidade.
+  * Os salvamentos seguintes no mesmo modal utilizam atualização (`PUT`), evitando a criação de registros duplicados.
+  * Enquanto o atendimento está Aberto, forma de acesso, tipo de atendimento e observações permanecem editáveis.
+  * A ação Encerrar Atendimento atualiza o status para Finalizado via `PATCH`, fecha o modal após sucesso e torna esses campos somente leitura em consultas posteriores.
+* **Banco de dados:**
+  * A migration `0036` removeu a coluna redundante `numero_atendimento` de `atendimentos_sociais`; o vínculo entre atendimentos permanece em `origem_atendimento_id`, chave estrangeira autorreferenciada para `atendimentos_sociais.id`.
+  * Foi criado o endpoint transacional `POST /api/atendimentos_sociais/{id}/encaminhar-interno/`, que cria um atendimento técnico ligado à origem e altera o atendimento simplificado para `Encaminhado`.
+  * A migration `0037` adicionou o status `Encaminhado`.
+* **Encaminhamento interno:**
+  * O modal replica o fluxo legado com família, prontuário e pessoa somente para leitura, motivo mínimo de 21 caracteres, data e profissional de destino.
+  * O seletor exibe `Nome do técnico — Unidade(s) de trabalho`; após a seleção, nome e unidade também aparecem em campos destacados.
+  * Após encaminhar, somente o modal secundário é fechado; o modal principal do atendimento permanece aberto exibindo o status `Encaminhado`.
+  * Atendimentos simplificados, abertos e já gravados exibem no cabeçalho um controle alternável `Abrir Ações` / `Fechar Ações` para mostrar ou recolher a gaveta lateral.
+  * A listagem geral reúne atendimentos simplificados, técnicos, encaminhamentos internos, referências e contrarreferências, com opções específicas no filtro de modalidade.
+  * Registros técnicos que possuem `origem_atendimento` são identificados e filtrados como Encaminhamento Interno.
+  * Foi removida da consulta geral a restrição que ocultava registros técnicos sem a permissão detalhada; a página agora recebe todas as modalidades ativas.
+
 ---
 
 ## 🗄️ Próximos Passos
 * Continuar o desenvolvimento da listagem e formulário de cadastro de usuários no React consumindo `/api/usuarios/`.
 * Verificar futuras normalizações e regras de negócio para atendimentos técnicos.
+* Definir posteriormente o permissionamento da listagem e visualização de atendimentos técnicos, encaminhamentos, referências e contrarreferências.
 
 ---
 

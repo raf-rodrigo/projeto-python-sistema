@@ -7,6 +7,7 @@ interface SearchableSelectProps {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  isError?: boolean;
 }
 
 export default function SearchableSelect({
@@ -15,7 +16,8 @@ export default function SearchableSelect({
   onChange,
   placeholder = 'Pesquisar...',
   required = false,
-  disabled = false
+  disabled = false,
+  isError = false
 }: SearchableSelectProps) {
   const [busca, setBusca] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +67,8 @@ export default function SearchableSelect({
           cursor: disabled ? 'not-allowed' : 'pointer',
           paddingRight: '30px',
           backgroundColor: disabled ? '#e2e8f0' : '#ffffff',
-          color: disabled ? '#475569' : '#000000'
+          color: disabled ? '#475569' : '#000000',
+          border: isError ? '1.5px solid #ef4444' : '1px solid #cbd5e1'
         }}
       />
       
