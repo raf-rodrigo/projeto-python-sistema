@@ -56,17 +56,25 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
             
         # Pega a modalidade enviada para salvar o técnico correspondente
         modalidade = self.request.data.get('modalidade', 'Simplificado')
+        pessoa = serializer.validated_data['pessoa']
+        familia = pessoa.familia_domicilio
         
         if modalidade == 'Tecnico':
             serializer.save(
                 tecnico_responsavel_tecnico=self.request.user,
-                funcao_tecnico_responsavel_tecnico=funcao
+                funcao_tecnico_responsavel_tecnico=funcao,
+                familia=familia
             )
         else:
             serializer.save(
                 tecnico_responsavel_inicial=self.request.user,
-                funcao_tecnico_responsavel_inicial=funcao
+                funcao_tecnico_responsavel_inicial=funcao,
+                familia=familia
             )
+
+    def perform_update(self, serializer):
+        pessoa = serializer.validated_data.get('pessoa', serializer.instance.pessoa)
+        serializer.save(familia=pessoa.familia_domicilio)
 
     @action(detail=True, methods=['post'], url_path='encaminhar-interno')
     def encaminhar_interno(self, request, pk=None):
@@ -105,7 +113,7 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
                 modalidade='Tecnico',
                 status='Esperando para ser aberto',
                 pessoa=origem.pessoa,
-                familia=origem.familia,
+                familia=origem.familia or origem.pessoa.familia_domicilio,
                 prontuario=origem.prontuario,
                 unidade_atendimento_social=unidade_destino or origem.unidade_atendimento_social,
                 data_atendimento=data_encaminhamento,

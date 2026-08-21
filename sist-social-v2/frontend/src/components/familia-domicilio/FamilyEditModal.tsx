@@ -1,4 +1,5 @@
 import React from 'react';
+import DocumentUploadModal from '../documents/DocumentUploadModal';
 import SearchableSelect from '../SearchableSelect';
 import { TabInicio } from './tabs/TabInicio';
 import { TabComposicaoFamiliar } from './tabs/TabComposicaoFamiliar';
@@ -449,7 +450,9 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
   observacoes,
   setObservacoes
 }) => {
+  const [modalDocumentosAberto, setModalDocumentosAberto] = React.useState(false);
   return (
+    <>
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
       <div style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '1100px', borderRadius: '16px', display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}>
         
@@ -470,8 +473,8 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {editandoId && (
                 <>
-                  <button type="button" style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    👁️ Visualizar Documentos
+                  <button type="button" onClick={() => setModalDocumentosAberto(true)} style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    📎 Upload e Visualização de Documentos
                   </button>
                   <button type="button" style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#2563eb', border: 'none', borderRadius: '6px', color: '#ffffff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     🖨️ Imprimir Ficha
@@ -927,5 +930,7 @@ export const FamilyEditModal: React.FC<FamilyEditModalProps> = ({
 
       </div>
     </div>
+      <DocumentUploadModal open={modalDocumentosAberto} entityType="familia" entityId={editandoId} entityLabel={`Família ${codigoFamiliaExibicao}`} onClose={() => setModalDocumentosAberto(false)} />
+    </>
   );
 };

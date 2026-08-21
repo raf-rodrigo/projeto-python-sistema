@@ -50,6 +50,8 @@ for name, obj in inspect.getmembers(views):
             url_name = 'pessoas'
         elif url_name == 'atendimento':
             url_name = 'atendimentos_sociais'
+        elif url_name == 'documento_anexo':
+            url_name = 'documentos'
         elif url_name == 'tipo_necessita_cuidado':
             url_name = 'tipo_necessita_cuidados'
         elif url_name == 'tipo_serie_curso':

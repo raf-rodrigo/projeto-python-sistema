@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import SearchableSelect from './SearchableSelect';
 import AttendanceTable from './attendance/AttendanceTable';
 import AttendanceActionsDrawer from './attendance/AttendanceActionsDrawer';
+import DocumentUploadModal from './documents/DocumentUploadModal';
 import InternalReferralModal from './attendance/InternalReferralModal';
 import ReferralInitialInformation from './attendance/ReferralInitialInformation';
 import { 
@@ -49,6 +50,7 @@ export default function AttendanceManagement({
   // Modais
   const [modalAberto, setModalAberto] = useState(false);
   const [modalDecisaoAberto, setModalDecisaoAberto] = useState(false);
+  const [modalDocumentosAberto, setModalDocumentosAberto] = useState(false);
   const [modalNovaPessoaAberto, setModalNovaPessoaAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [atendimentoSelecionado, setAtendimentoSelecionado] = useState<Atendimento | null>(null);
@@ -1001,6 +1003,7 @@ export default function AttendanceManagement({
               <AttendanceActionsDrawer
                 atendimentoId={lastCreatedId || editandoId}
                 onPrint={abrirImpressao}
+                onDocuments={() => setModalDocumentosAberto(true)}
                 technical={modalidade === 'Tecnico'}
                 onOpenRecord={() => {
                   if (pessoaId) localStorage.setItem('editandoPessoaPendenteId', pessoaId);
@@ -1015,6 +1018,14 @@ export default function AttendanceManagement({
           </div>
         </div>
       )}
+
+      <DocumentUploadModal
+        open={modalDocumentosAberto}
+        entityType="atendimento"
+        entityId={lastCreatedId || editandoId}
+        entityLabel={`Atendimento nº ${lastCreatedId || editandoId || ''}`}
+        onClose={() => setModalDocumentosAberto(false)}
+      />
 
       <InternalReferralModal
         open={modalEncaminhamentoAberto}

@@ -10,5 +10,6 @@ from .transferencia import TransferenciaUnidade
 from .transferencia_pessoa import TransferenciaPessoa
 from .configuracao import Configuracao
 from .beneficio import Beneficio
+from .documento_anexo import DocumentoAnexo
 
 

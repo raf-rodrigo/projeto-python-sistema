@@ -57,7 +57,7 @@
       <div class="section-title">Identificação do Munícipe</div>
       <div class="section-content grid">
         <div class="field full-width"><div class="field-label">Munícipe</div><div class="field-value">{{ atendimento.pessoa.nome|default:"Não informado" }}</div></div>
-        <div class="field"><div class="field-label">Família</div><div class="field-value">{{ atendimento.familia|default:"Não informada" }}</div></div>
+        <div class="field"><div class="field-label">Família</div><div class="field-value">{{ atendimento.familia|default:atendimento.pessoa.familia_domicilio|default:"Não informada" }}</div></div>
         <div class="field"><div class="field-label">Prontuário</div><div class="field-value">{{ atendimento.prontuario|default:"Não informado" }}</div></div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import React from 'react';
+import DocumentUploadModal from '../documents/DocumentUploadModal';
 import { TabDadosPessoais } from './tabs/TabDadosPessoais';
 import { TabFiliacaoOrigem } from './tabs/TabFiliacaoOrigem';
 import { TabDocumentacao } from './tabs/TabDocumentacao';
@@ -636,7 +637,9 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
   observacao,
   setObservacao
 }) => {
+  const [modalDocumentosAberto, setModalDocumentosAberto] = React.useState(false);
   return (
+    <>
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
       <div style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '1100px', borderRadius: '16px', display: 'flex', flexDirection: 'column', maxHeight: '95vh', overflow: 'hidden' }}>
         
@@ -654,7 +657,10 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
                 </div>
               )}
             </div>
-            <button onClick={() => setModalAberto(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#94a3b8', cursor: 'pointer' }}>&times;</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {editandoId && <button type="button" onClick={() => setModalDocumentosAberto(true)} style={{ padding: '7px 11px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f8fafc', cursor: 'pointer' }}>📎 Upload e Visualização de Documentos</button>}
+              <button onClick={() => setModalAberto(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', color: '#94a3b8', cursor: 'pointer' }}>&times;</button>
+            </div>
           </div>
 
           {/* Barra de Abas do Munícipe */}
@@ -1070,5 +1076,7 @@ export const PersonEditModal: React.FC<PersonEditModalProps> = ({
         </form>
       </div>
     </div>
+      <DocumentUploadModal open={modalDocumentosAberto} entityType="pessoa" entityId={editandoId} entityLabel={nome || 'Munícipe'} onClose={() => setModalDocumentosAberto(false)} />
+    </>
   );
 };

@@ -7,4 +7,5 @@ from .familia_serializers import FamiliaDomicilioSerializer
 from .pessoa_serializers import PessoaSerializer
 from .atendimento_serializers import AtendimentoSocialSerializer
 from .transferencia_serializers import TransferenciaUnidadeSerializer
+from .documento_anexo_serializers import DocumentoAnexoSerializer
 

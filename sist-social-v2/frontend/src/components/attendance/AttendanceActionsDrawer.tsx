@@ -6,6 +6,7 @@ interface AttendanceActionsDrawerProps {
   onOpenRecord?: () => void;
   technical?: boolean;
   onPrint: () => void;
+  onDocuments: () => void;
 }
 
 const secondaryButtonStyle = {
@@ -39,7 +40,8 @@ const technicalButtonStyle = {
   textAlign: 'left'
 } as const;
 
-export default function AttendanceActionsDrawer({ atendimentoId, onClose, onFinish, onInternalReferral, onOpenRecord, technical = false, onPrint }: AttendanceActionsDrawerProps) {
+export default function AttendanceActionsDrawer({ atendimentoId, onClose, onFinish, onInternalReferral, onOpenRecord, technical = false, onPrint, onDocuments }: AttendanceActionsDrawerProps) {
+  void atendimentoId;
 
   const emDesenvolvimento = (acao: string) => alert(`${acao} em desenvolvimento.`);
 
@@ -58,7 +60,7 @@ export default function AttendanceActionsDrawer({ atendimentoId, onClose, onFini
           <button type="button" onClick={() => emDesenvolvimento('Reencaminhamento interno')} style={technicalButtonStyle}>↔ Reencaminhamento Interno</button>
           <button type="button" onClick={() => emDesenvolvimento('Encaminhamento referência')} style={technicalButtonStyle}>↪ Encaminhamento Referência</button>
           <button type="button" onClick={() => emDesenvolvimento('Contra referência')} style={technicalButtonStyle}>↩ Contra Referência</button>
-          <button type="button" onClick={() => emDesenvolvimento('Upload de documentos')} style={technicalButtonStyle}>☁ Upload Documentos</button>
+          <button type="button" onClick={onDocuments} style={technicalButtonStyle}>📎 Upload e Visualização de Documentos</button>
           <button type="button" onClick={() => emDesenvolvimento('Associação a grupos')} style={technicalButtonStyle}>♣ Associação Grupos</button>
         </div>
       ) : (
@@ -68,7 +70,7 @@ export default function AttendanceActionsDrawer({ atendimentoId, onClose, onFini
           <button type="button" onClick={onInternalReferral} style={secondaryButtonStyle}>⇄ Encaminhamento Interno</button>
           <button type="button" onClick={() => emDesenvolvimento('Agendamento')} style={secondaryButtonStyle}>📅 Agendamento</button>
           <button type="button" onClick={() => emDesenvolvimento('Visualização da agenda')} style={secondaryButtonStyle}>📅 Visualizar Agenda</button>
-          <button type="button" onClick={() => emDesenvolvimento('Upload de documentos')} style={secondaryButtonStyle}>☁ Upload Documentos</button>
+          <button type="button" onClick={onDocuments} style={secondaryButtonStyle}>📎 Upload e Visualização de Documentos</button>
         </div>
       )}
     </aside>

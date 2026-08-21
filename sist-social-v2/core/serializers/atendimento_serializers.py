@@ -21,6 +21,21 @@ class AtendimentoSocialSerializer(serializers.ModelSerializer):
         model = AtendimentoSocial
         fields = '__all__'
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        status_atendimento = attrs.get('status', self.instance.status if self.instance else 'Aberto')
+        tipo_atendimento = attrs.get(
+            'tipo_atendimento',
+            self.instance.tipo_atendimento if self.instance else None,
+        )
+
+        if status_atendimento == 'Aberto' and not tipo_atendimento:
+            raise serializers.ValidationError({
+                'tipo_atendimento': 'O tipo de atendimento é obrigatório para abrir o atendimento.'
+            })
+
+        return attrs
+
     def get_origem_atendimento_details(self, obj):
         if obj.origem_atendimento:
             return {

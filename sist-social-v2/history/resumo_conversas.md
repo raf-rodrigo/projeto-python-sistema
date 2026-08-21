@@ -118,6 +118,7 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
 * Foi criado o endpoint autenticado `GET /api/atendimentos_sociais/{id}/impressao/` no `AtendimentoViewSet`, com renderização do template `core/templates/atendimentos/impressao_atendimento.html`.
 * O botão Ver Impressão passou a buscar o HTML com Token e abrir a pré-visualização em nova aba.
 * O relatório recebeu layout A4 moderno, cabeçalho institucional inspirado no legado, logotipo incorporado em Base64, dados do munícipe, atendimento, informações inicial/técnica, responsáveis, funções e data de emissão.
+* A família da impressão usa `atendimento.familia` com fallback para `atendimento.pessoa.familia_domicilio`. Novas criações, atualizações e encaminhamentos passam a gravar automaticamente a família atual do munícipe no atendimento.
 * O template foi validado com um registro real: sem tags Django literais, com logotipo e dados renderizados.
 
 ### 11. Checkpoint do Fluxo de Atendimentos — 21/08/2026
@@ -125,6 +126,7 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
 * Encaminhamentos internos criam um atendimento de modalidade Técnico, vinculado por `origem_atendimento`, inicialmente com status `Esperando para ser aberto`.
 * Enquanto aguarda abertura, o atendimento Técnico apresenta livro fechado e somente a ação Abrir Atendimento; depois passa para `Aberto` e apresenta Editar e Excluir.
 * Atendimentos Simplificados e Técnicos são iniciados pelo comando Abrir Atendimento; alterações posteriores usam Salvar Registro.
+* O campo Tipo de Atendimento é obrigatório na abertura: o frontend valida o formulário e o serializer rejeita qualquer criação ou transição para `Aberto` sem `tipo_atendimento`; o status `Esperando para ser aberto` continua permitido enquanto pendente.
 * O Técnico direto e o Técnico originado por encaminhamento compartilham o mesmo layout. Sem origem, a seção inicial informa que não existe atendimento inicial; com origem, apresenta os dados herdados somente para leitura.
 * Após a abertura, atendimentos Técnicos utilizam a gaveta técnica de ações; Simplificados continuam usando sua gaveta própria.
 * Mensagens de sucesso desaparecem automaticamente após 2 segundos.
@@ -142,3 +144,23 @@ Este documento contém o histórico das alterações e decisões técnicas tomad
 
 > [!NOTE]
 > Os logs originais da conversa (`transcript.jsonl` e `transcript_full.jsonl`) também foram copiados para esta pasta `history/` para que a próxima sessão da IA possa carregar o contexto exato caso necessário.
+
+### 12. Módulo Único de Documentos Anexos — 21/08/2026
+* Foi criado o modelo `DocumentoAnexo`, armazenado na tabela `documentos_anexos`, para atender de forma compartilhada Atendimentos, Munícipes e Famílias.
+* Cada anexo possui exatamente um vínculo entre `atendimento`, `pessoa` ou `familia`, regra garantida por constraint no banco de dados.
+* A tabela registra arquivo, nome original, MIME, tamanho, hash SHA-256, categoria, descrição, data do documento, usuário responsável, datas de criação/alteração e exclusão lógica por `ativo`.
+* A migration `0039_documentoanexo` foi criada e aplicada com sucesso.
+* Foi disponibilizada a API autenticada `/api/documentos/`, com filtros `tipo_entidade` e `entidade_id`, envio multipart, listagem, remoção lógica e download autenticado.
+* Os formatos permitidos são PDF, imagens, documentos de texto e planilhas, limitados a 10 MB.
+* O componente compartilhado `DocumentUploadModal.tsx` concentra envio, listagem, download e remoção, evitando três implementações diferentes.
+* A gaveta de ações dos atendimentos passou a abrir o módulo real de documentos, tanto na modalidade Simplificado quanto Técnico.
+* O modal de edição do Munícipe recebeu a ação Anexos e o modal de Família conectou sua ação Visualizar Documentos ao mesmo componente.
+* Os arquivos ficam em `media/documentos/AAAA/MM/`; como o projeto está montado em `/app`, o conteúdo persiste no diretório `media` do projeto.
+* O permissionamento fino por unidade/perfil permanece para a etapa de permissionamento já adiada; nesta fase, o endpoint exige usuário autenticado.
+
+### 13. Padronização das Ações de Documentos — 21/08/2026
+* Os botões que abrem o módulo compartilhado de documentos foram padronizados no frontend.
+* A legenda adotada em todos os contextos é **📎 Upload e Visualização de Documentos**, utilizando o ícone de clipe.
+* A padronização foi aplicada à gaveta de ações dos atendimentos Simplificado e Técnico, ao modal de edição do Munícipe e ao modal de edição da Família.
+* Todos os botões abrem o mesmo componente compartilhado `DocumentUploadModal.tsx`, mantendo centralizadas as funcionalidades de envio, listagem, download e remoção de anexos.
+* A integridade das alterações foi verificada com `git diff --check`, sem erros.

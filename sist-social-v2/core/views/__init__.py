@@ -8,3 +8,4 @@ from .pessoa_views import PessoaViewSet
 from .atendimento_views import AtendimentoViewSet
 from .configuracao_views import ConfiguracaoViewSet
 from .beneficio_views import BeneficioViewSet
+from .documento_anexo_views import DocumentoAnexoViewSet
