@@ -33,7 +33,7 @@ interface Atendimento {
   id: number;
   codigo_atendimento?: string;
   numero_atendimento?: string;
-  modalidade: 'Simplificado' | 'Tecnico';
+  modalidade: 'Simplificado' | 'Tecnico' | 'Encaminhamento Interno' | 'Referencia' | 'ContraReferencia';
   status: 'Aberto' | 'Finalizado' | 'Encaminhamento Tecnico' | 'Encaminhamento Interno';
   data_atendimento: string;
   descricao_sumaria_atendimento: string;
@@ -85,11 +85,31 @@ interface Atendimento {
 
 interface AttendanceManagementProps {
   userPermissions?: string[];
+  triggerNovo?: boolean;
+  unidadeId?: string;
+  currentUser?: {
+    username: string;
+    first_name?: string;
+    last_name?: string;
+    groups?: string[];
+  };
 }
 
-export default function AttendanceManagement({ userPermissions = [] }: AttendanceManagementProps) {
+export default function AttendanceManagement({ 
+  userPermissions = [], 
+  triggerNovo = false, 
+  unidadeId: activeUnidadeId = '',
+  currentUser
+}: AttendanceManagementProps) {
   const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
+  
+  // Auto-abrir modal se triggerNovo estiver ativo
+  useEffect(() => {
+    if (triggerNovo) {
+      abrirNovoModal();
+    }
+  }, [triggerNovo]);
   
   // Apoio para filtros baseados em modalidade e pesquisa na V1
   const [motivosAtendimentos, setMotivosAtendimentos] = useState<TabelaBasicaItem[]>([]);
@@ -113,8 +133,13 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
   const [termoBuscaMunicipe, setTermoBuscaMunicipe] = useState('');
 
   // Form Fields - Atendimento
-  const [modalidade, setModalidade] = useState<'Simplificado' | 'Tecnico'>('Simplificado');
+  const [modalidade, setModalidade] = useState<'Simplificado' | 'Tecnico' | 'Encaminhamento Interno' | 'Referencia' | 'ContraReferencia'>('Simplificado');
   const [status, setStatus] = useState<any>('Aberto');
+  
+  // Controle de Ações / Success Overlay
+  const [showAcoesOverlay, setShowAcoesOverlay] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [lastCreatedId, setLastCreatedId] = useState<number | null>(null);
   const [dataAtendimento, setDataAtendimento] = useState(() => new Date().toISOString().split('T')[0]);
   const [pessoaId, setPessoaId] = useState('');
   
@@ -224,8 +249,19 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
   }, [busca, filtroTipo]);
 
   useEffect(() => {
-    carregarClassificacoes(modalidade);
-  }, [modalidade]);
+    // Para classificação do tipo de atendimento, filtramos pela modalidade adequada
+    let modalidadeFiltro = 'Simplificado';
+    if (modalidade === 'Tecnico' || modalidade === 'Encaminhamento Interno' || modalidade === 'Referencia' || modalidade === 'ContraReferencia') {
+      modalidadeFiltro = 'Tecnico';
+    }
+    carregarClassificacoes(modalidadeFiltro);
+
+    // Se selecionado Simplificado, força data de hoje e a unidade logada do operador
+    if (modalidade === 'Simplificado') {
+      setDataAtendimento(new Date().toISOString().split('T')[0]);
+      setUnidadeId(activeUnidadeId);
+    }
+  }, [modalidade, activeUnidadeId]);
 
   // Atualizar dados de família e prontuário ao selecionar o munícipe
   useEffect(() => {
@@ -250,7 +286,7 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
     setStatus('Aberto');
     setDataAtendimento(new Date().toISOString().split('T')[0]);
     setPessoaId('');
-    setUnidadeId('');
+    setUnidadeId(activeUnidadeId);
     setMotivoAtendimentoId('');
     setTipoAtendimentoId('');
     setDescricaoSumaria('');
@@ -258,6 +294,9 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
     setDescricaoTecnico('');
     setTermoBuscaMunicipe('');
     setErrorMsg(null);
+    setShowAcoesOverlay(false);
+    setShowSuccessMessage(false);
+    setLastCreatedId(null);
     setModalAberto(true);
   };
 
@@ -315,7 +354,10 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
       });
 
       if (res.ok) {
-        setModalAberto(false);
+        const novoAtendimento = await res.json();
+        setLastCreatedId(novoAtendimento.id);
+        setShowSuccessMessage(true);
+        setShowAcoesOverlay(true);
         carregarDados();
       } else {
         const errJson = await res.json();
@@ -611,72 +653,143 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade de Atendimento</label>
-                    <SearchableSelect 
-                      options={unidades.map(u => ({ id: u.id, label: u.nome_conhecido }))} 
-                      value={unidadeId} 
-                      onChange={val => setUnidadeId(val.toString())} 
-                      placeholder="Selecione a unidade..." 
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Data Atendimento</label>
-                    <input type="date" className="form-control" value={dataAtendimento} onChange={e => setDataAtendimento(e.target.value)} />
-                  </div>
-                </div>
+                {modalidade === 'Simplificado' ? (
+                  <>
+                    {/* Linha 1 (Simplificado): Unidade e Data */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade</label>
+                        <SearchableSelect 
+                          options={unidades.map(u => ({ id: u.id, label: u.nome_conhecido }))} 
+                          value={unidadeId} 
+                          onChange={val => setUnidadeId(val.toString())} 
+                          placeholder="Selecione a unidade..." 
+                          disabled={true}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Data Atendimento</label>
+                        <input type="date" className="form-control" value={dataAtendimento} onChange={e => setDataAtendimento(e.target.value)} disabled style={{ backgroundColor: '#e2e8f0', color: '#475569' }} />
+                      </div>
+                    </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Forma de Acesso/Motivo do Atendimento *</label>
-                    <SearchableSelect 
-                      options={motivosAtendimentos.map(m => ({ id: m.id, label: m.nome }))} 
-                      value={motivoAtendimentoId} 
-                      onChange={val => setMotivoAtendimentoId(val.toString())} 
-                      placeholder="Selecione um motivo..." 
-                      required 
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Tipo Atendimento *</label>
-                    <SearchableSelect 
-                      options={tiposAtendimentos.map(t => ({ id: t.id, label: t.nome }))} 
-                      value={tipoAtendimentoId} 
-                      onChange={val => setTipoAtendimentoId(val.toString())} 
-                      placeholder="Selecione o tipo..." 
-                      required 
-                    />
-                  </div>
-                </div>
+                    {/* Linha 2 (Simplificado): Forma de Acesso e Tipo de Atendimento */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Forma de Acesso/Motivo do Atendimento *</label>
+                        <SearchableSelect 
+                          options={motivosAtendimentos.map(m => ({ id: m.id, label: m.nome }))} 
+                          value={motivoAtendimentoId} 
+                          onChange={val => setMotivoAtendimentoId(val.toString())} 
+                          placeholder="Selecione um motivo..." 
+                          required 
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Tipo Atendimento *</label>
+                        <SearchableSelect 
+                          options={tiposAtendimentos.map(t => ({ id: t.id, label: t.nome }))} 
+                          value={tipoAtendimentoId} 
+                          onChange={val => setTipoAtendimentoId(val.toString())} 
+                          placeholder="Selecione o tipo..." 
+                          required 
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Linha 1 (Técnico): Unidade e Num Atendimento */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Unidade</label>
+                        <SearchableSelect 
+                          options={unidades.map(u => ({ id: u.id, label: u.nome_conhecido }))} 
+                          value={unidadeId} 
+                          onChange={val => setUnidadeId(val.toString())} 
+                          placeholder="Selecione a unidade..." 
+                          disabled={true}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Num. Atendimento</label>
+                        <input type="text" className="form-control" placeholder="Gerado automaticamente" disabled style={{ backgroundColor: '#e2e8f0', color: '#475569' }} />
+                      </div>
+                    </div>
+
+                    {/* Linha 2 (Técnico): Data e Tipo de Atendimento */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Data Atendimento</label>
+                        <input type="date" className="form-control" value={dataAtendimento} onChange={e => setDataAtendimento(e.target.value)} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Tipo Atendimento *</label>
+                        <SearchableSelect 
+                          options={tiposAtendimentos.map(t => ({ id: t.id, label: t.nome }))} 
+                          value={tipoAtendimentoId} 
+                          onChange={val => setTipoAtendimentoId(val.toString())} 
+                          placeholder="Selecione o tipo..." 
+                          required 
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* CARD SANFONA: INFORMAÇÕES DO ATENDIMENTO INICIAL (Sempre visível para relato principal) */}
-              <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '18px' }}>
-                <h4 style={{ margin: '0 0 14px 0', fontSize: '0.95rem', fontWeight: 700, color: '#1e3a8a' }}>
-                  Informações do Atendimento Inicial
-                </h4>
-                
-                <div>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Observações Atendimento Inicial *</label>
-                  <textarea 
-                    className="form-control" 
-                    rows={4} 
-                    value={descricaoSumaria} 
-                    onChange={e => setDescricaoSumaria(e.target.value)}
-                    placeholder="Descreva a demanda inicial relatada pelo munícipe..."
-                  />
+              {/* CARD SANFONA: INFORMAÇÕES DO ATENDIMENTO INICIAL (Sempre visível para relato principal se Simplificado) */}
+              {modalidade === 'Simplificado' && (
+                <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '18px' }}>
+                  <h4 style={{ margin: '0 0 14px 0', fontSize: '0.95rem', fontWeight: 700, color: '#1e3a8a' }}>
+                    Informações do Atendimento Inicial
+                  </h4>
+                  
+                  <div style={{ marginBottom: '14px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Observações Atendimento Inicial *</label>
+                    <textarea 
+                      className="form-control" 
+                      rows={4} 
+                      value={descricaoSumaria} 
+                      onChange={e => setDescricaoSumaria(e.target.value)}
+                      placeholder="Descreva a demanda inicial relatada pelo munícipe..."
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Técnico Responsável</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={currentUser ? `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || currentUser.username : 'Operador'} 
+                        disabled 
+                        style={{ backgroundColor: '#e2e8f0', color: '#475569' }} 
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Função do Técnico</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={currentUser?.groups && currentUser.groups.length > 0 ? currentUser.groups[0] : 'Operador'} 
+                        disabled 
+                        style={{ backgroundColor: '#e2e8f0', color: '#475569' }} 
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* CARD SANFONA: INFORMAÇÕES DO ATENDIMENTO TÉCNICO (Somente se modalidade === Tecnico) */}
               {modalidade === 'Tecnico' && (
-                <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '18px', backgroundColor: '#fffdf5' }}>
+                <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '18px', backgroundColor: '#fdfbf7' }}>
                   <h4 style={{ margin: '0 0 14px 0', fontSize: '0.95rem', fontWeight: 700, color: '#b45309' }}>
                     Informações do Atendimento Técnico
                   </h4>
-                  <div>
-                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Descrição do Acompanhamento / Atendimento Técnico</label>
+
+                  <div style={{ marginBottom: '14px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Descrição do Atendimento Técnico</label>
                     <textarea 
                       className="form-control" 
                       rows={4} 
@@ -684,6 +797,29 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
                       onChange={e => setDescricaoTecnico(e.target.value)}
                       placeholder="Descreva as orientações, procedimentos e parecer técnico realizado no acompanhamento..."
                     />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Responsável Atendimento Técnico</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={currentUser ? `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || currentUser.username : 'Operador'} 
+                        disabled 
+                        style={{ backgroundColor: '#e2e8f0', color: '#475569' }} 
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Função</label>
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={currentUser?.groups && currentUser.groups.length > 0 ? currentUser.groups[0] : 'Operador'} 
+                        disabled 
+                        style={{ backgroundColor: '#e2e8f0', color: '#475569' }} 
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -698,6 +834,90 @@ export default function AttendanceManagement({ userPermissions = [] }: Attendanc
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* AVISO DE SUCESSO DO ATENDIMENTO REGISTRADO */}
+      {showSuccessMessage && (
+        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 2000, minWidth: '320px', animation: 'slideIn 0.3s ease-out' }}>
+          <div style={{ backgroundColor: '#10b981', color: '#ffffff', padding: '16px 20px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '14px' }}>Sucesso!</div>
+              <div style={{ fontSize: '12px', marginTop: '2px', opacity: 0.9 }}>Atendimento registrado com sucesso no sistema.</div>
+            </div>
+            <button onClick={() => setShowSuccessMessage(false)} style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '18px', cursor: 'pointer', marginLeft: '12px', fontWeight: 700 }}>&times;</button>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP DE AÇÕES SOBREESCRITO */}
+      {showAcoesOverlay && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1900 }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', width: '320px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'center', position: 'relative' }}>
+            <h3 style={{ margin: 0, color: '#334155', fontSize: '20px', fontWeight: 600 }}>Ações</h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
+              <button 
+                onClick={() => {
+                  setShowAcoesOverlay(false);
+                  setModalAberto(false);
+                }} 
+                style={{ width: '100%', padding: '12px', backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                ✖ Encerrar Atendimento
+              </button>
+
+              <button 
+                onClick={() => {
+                  window.open(`${API_URL}/api/atendimentos_sociais/${lastCreatedId}/pdf/`, '_blank');
+                }} 
+                style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                🖨 Ver Impressão
+              </button>
+
+              <button 
+                onClick={() => {
+                  // Aciona encaminhamento interno
+                  setModalidade('Encaminhamento Interno');
+                  setStatus('Aberto');
+                  setDescricaoSumaria('');
+                  setDescricaoTecnico('');
+                  setShowAcoesOverlay(false);
+                }} 
+                style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                ⇄ Encaminhamento Interno
+              </button>
+
+              <button 
+                onClick={() => {
+                  alert('Funcionalidade de agendamento em desenvolvimento.');
+                }} 
+                style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                📅 Agendamento
+              </button>
+
+              <button 
+                onClick={() => {
+                  alert('Funcionalidade de visualização de agenda em desenvolvimento.');
+                }} 
+                style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                📅 Visualizar Agenda
+              </button>
+
+              <button 
+                onClick={() => {
+                  alert('Funcionalidade de upload de documentos em desenvolvimento.');
+                }} 
+                style={{ width: '100%', padding: '12px', backgroundColor: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                ☁ Upload Documentos
+              </button>
+            </div>
           </div>
         </div>
       )}

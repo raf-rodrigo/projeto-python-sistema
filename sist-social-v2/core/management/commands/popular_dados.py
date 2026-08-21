@@ -184,7 +184,81 @@ class Command(BaseCommand):
             Pais.objects.get_or_create(nome=p_nome, defaults={"ativo": True})
         self.stdout.write(self.style.SUCCESS("Países sincronizados!"))
 
+        # 1.7 Motivo Atendimento (Formas de Acesso)
+        from core.models.tabela_basica import MotivoAtendimento
+        self.stdout.write("Sincronizando Motivos de Atendimento...")
+        motivos = [
+            (1, 'Por demanda espontânea', True),
+            (2, 'Agendamento', True),
+            (3, 'Denúncia', True),
+            (4, 'Em decorrência de Busca Ativa realizada pela equipe da unidade', True),
+            (5, 'Em decorrência de Visita Domiciliar realizada pela equipe da unidade', True),
+            (6, 'Em decorrência de encaminhamento realizado por outros serviços/unidades da Proteção Social Básica', True),
+            (7, 'Em decorrência de encaminhamento realizado por outros serviços/unidades da Proteção Social Especial', True),
+            (8, 'Em decorrência de encaminhamento realizado pela área de Saúde', True),
+            (9, 'Em decorrência de encaminhamento realizado pela área de Educação', True),
+            (10, 'Em decorrência de encaminhamento realizado outras políticas setoriais', True),
+            (11, 'Em decorrência de encaminhamento realizado pelo Conselho Tutelar', True),
+            (12, 'Em decorrência de encaminhamento realizado pelo Poder Judiciário', True),
+            (13, 'Em decorrência de encaminhamento realizado pelo Sistema de Garantia de Direitos (Defensoria Pública, ministério Público, Delegacias)', True),
+            (14, 'Situações de Vulnerabilidade', True),
+            (15, 'Outros encaminhamentos ', True),
+            (16, 'Contatos telefônicos para orientação/ agendamento', True),
+            (17, 'Demanda reprimida benefício eventual', False),
+        ]
+        for mid, desc, is_active in motivos:
+            MotivoAtendimento.objects.update_or_create(
+                id=mid,
+                defaults={"nome": desc, "ativo": is_active}
+            )
+        self.stdout.write(self.style.SUCCESS("Motivos de Atendimento sincronizados!"))
 
+        # 1.8 Tipos de Atendimento
+        from core.models.tabela_basica import TiposAtendimentos
+        self.stdout.write("Sincronizando Tipos de Atendimento...")
+        tipos = [
+            (1, 'Atendimento Particularizado (CRAS)', 'Tecnico', True),
+            (2, 'Atendimento em atividade coletiva de caráter continuado', 'Tecnico', True),
+            (3, 'Participação em atividade coletiva de caráter não continuado', 'Tecnico', True),
+            (4, 'Cadastramento / Atualização cadastral', 'Tecnico', True),
+            (5, 'Acompanhamento do MSE - CREAS', 'Tecnico', True),
+            (6, 'Solicitação / Concessão de Benefício Eventual', 'Tecnico', True),
+            (7, 'Atendimento Particularizado Domiciliar (CREAS)', 'Tecnico', True),
+            (8, 'Outros (CREAS)', 'Tecnico', True),
+            (9, 'Atualização Cadastral', 'Simplificado', True),
+            (10, 'Informações', 'Simplificado', True),
+            (11, 'Acompanhamento Técnico (CRAS)', 'Simplificado', True),
+            (12, 'Outros', 'Simplificado', True),
+            (13, 'Atualização Cad Unico (CRAS)', 'Simplificado', True),
+            (14, 'Atendimento Particularizado Domiciliar (CRAS)', 'Tecnico', True),
+            (15, 'Ação que Alimenta', 'Tecnico', False),
+            (16, 'Atendimento MSE ', 'Tecnico', False),
+            (17, 'Denúncia ', 'Simplificado', True),
+            (18, 'Agendamento', 'Simplificado', True),
+            (19, 'Acolhida particularizada (CRAS)', 'Tecnico', True),
+            (20, 'Orientações', 'Simplificado', True),
+            (21, 'Inclusão Cad Unico (CRAS)', 'Simplificado', True),
+            (22, 'Abordagem Social', 'Tecnico', False),
+            (23, 'Solicitação de Carteirinha', 'Simplificado', True),
+            (24, 'Acolhida Particularizada Domiciliar (CRAS)', 'Tecnico', True),
+            (25, 'Inclusão Cad Unico - Domiciliar (CRAS)', 'Tecnico', True),
+            (26, 'Acolhida Particularizada Domiciliar (CREAS)', 'Tecnico', True),
+            (27, 'Acolhida particularizada (CREAS)', 'Tecnico', True),
+            (28, 'Atendimento Particularizado (CREAS)', 'Tecnico', True),
+            (30, 'Abordagem Social (CREAS)', 'Tecnico', True),
+            (31, 'Entrega de Beneficios', 'Tecnico', True),
+            (32, 'Encaminhamento para o CRAS', 'Tecnico', True),
+            (33, 'Encaminhamento para o CREAS', 'Tecnico', True),
+            (34, 'Atendimento Migrantes - CREAS', 'Tecnico', True),
+            (35, 'Encaminhamento para acesso ao BPC (CRAS)', 'Tecnico', True),
+            (36, 'Atendimento Particularizado (Centro POP)', 'Tecnico', True),
+        ]
+        for tid, desc, modal, is_active in tipos:
+            TiposAtendimentos.objects.update_or_create(
+                id=tid,
+                defaults={"nome": desc, "modalidade": modal, "ativo": is_active}
+            )
+        self.stdout.write(self.style.SUCCESS("Tipos de Atendimento sincronizados!"))
 
         # Pasta padrão para os CSVs
         csv_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 'import_csv')

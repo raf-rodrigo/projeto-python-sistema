@@ -6,6 +6,7 @@ interface SearchableSelectProps {
   onChange: (value: string | number) => void;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export default function SearchableSelect({
@@ -13,7 +14,8 @@ export default function SearchableSelect({
   value,
   onChange,
   placeholder = 'Pesquisar...',
-  required = false
+  required = false,
+  disabled = false
 }: SearchableSelectProps) {
   const [busca, setBusca] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -44,21 +46,26 @@ export default function SearchableSelect({
       <input
         type="text"
         className="form-control"
-        value={isOpen ? busca : (selectedOption ? selectedOption.label : '')}
+        value={isOpen && !disabled ? busca : (selectedOption ? selectedOption.label : '')}
         onChange={e => {
+          if (disabled) return;
           setBusca(e.target.value);
           setIsOpen(true);
         }}
         onFocus={() => {
+          if (disabled) return;
           setBusca('');
           setIsOpen(true);
         }}
         placeholder={selectedOption ? selectedOption.label : placeholder}
         required={required && !value}
+        disabled={disabled}
         style={{
           width: '100%',
-          cursor: 'pointer',
-          paddingRight: '30px'
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          paddingRight: '30px',
+          backgroundColor: disabled ? '#e2e8f0' : '#ffffff',
+          color: disabled ? '#475569' : '#000000'
         }}
       />
       

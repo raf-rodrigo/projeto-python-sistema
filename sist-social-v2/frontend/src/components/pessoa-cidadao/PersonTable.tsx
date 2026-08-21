@@ -54,7 +54,7 @@ export const PersonTable: React.FC<PersonTableProps> = ({
       <table className="dashboard-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1' }}>
-            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Cidadão</th>
+            <th style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569', width: '280px', minWidth: '240px' }}>Cidadão</th>
             <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Código Família</th>
             <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Identificação (NIS)</th>
             <th style={{ textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#475569' }}>Data Nasc.</th>
@@ -67,10 +67,10 @@ export const PersonTable: React.FC<PersonTableProps> = ({
         <tbody>
           {pessoas.map(p => (
             <tr key={p.id} style={{ borderBottom: '1px solid #e2e8f0', fontSize: '13px' }}>
-              <td style={{ padding: '14px 16px' }}>
+              <td style={{ padding: '14px 16px', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontWeight: 600, color: '#0f172a' }}>{p.nome}</span>
-                  {p.nome_social && <span style={{ fontSize: '11px', color: '#f97316', fontWeight: 600 }}>Nome Social: {p.nome_social}</span>}
+                  <span style={{ fontWeight: 600, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={p.nome}>{p.nome}</span>
+                  {p.nome_social && <span style={{ fontSize: '11px', color: '#f97316', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={p.nome_social}>Nome Social: {p.nome_social}</span>}
                 </div>
               </td>
               <td style={{ fontWeight: 600, color: '#1e3a8a' }}>

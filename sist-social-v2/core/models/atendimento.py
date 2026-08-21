@@ -9,6 +9,9 @@ class AtendimentoSocial(models.Model):
     MODALIDADE_CHOICES = [
         ('Simplificado', 'Simplificado'),
         ('Tecnico', 'Técnico'),
+        ('Encaminhamento Interno', 'Encaminhamento Interno'),
+        ('Referencia', 'Referência'),
+        ('ContraReferencia', 'Contra-Referência'),
     ]
     
     STATUS_CHOICES = [
@@ -26,7 +29,7 @@ class AtendimentoSocial(models.Model):
     origem_atendimento = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='atendimentos_derivados', verbose_name="Origem do Atendimento")
     
     # Modalidade e Status
-    modalidade = models.CharField(max_length=15, choices=MODALIDADE_CHOICES, default='Simplificado', verbose_name="Modalidade de Atendimento")
+    modalidade = models.CharField(max_length=30, choices=MODALIDADE_CHOICES, default='Simplificado', verbose_name="Modalidade de Atendimento")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Aberto', verbose_name="Status do Atendimento")
 
     # Relacionamentos de Entidades Principais
